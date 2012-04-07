@@ -228,6 +228,7 @@ $(function() {
                             }
                         } else if (obj.type === 'subscribing_created') {
                             var channelName = obj.channel_name;
+                            // TODO: update viewState.channels
                             // TODO: merge
                             if (!viewState.userNames[channelName]) {
                                 viewState.userNames[channelName] = [];
