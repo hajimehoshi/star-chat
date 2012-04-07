@@ -183,6 +183,7 @@ $(function() {
         updateViewUsers();
     };
     function startStream() {
+        // TODO: Bug fix: ログアウト、ログイン時に違う stream がキャンセルされる
         if (viewState.stream) {
             viewState.stream.abort();
         }
@@ -253,6 +254,7 @@ $(function() {
                     // TODO: implement showing error message
                     return;
                 }
+                setTimeout(stopStream, 0);
                 setTimeout(startStream, 10000);
             },
         });
