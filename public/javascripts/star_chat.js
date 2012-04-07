@@ -217,14 +217,18 @@ $(function() {
                             console.log(e);
                             continue;
                         }
-                        var channelName = obj.channel_name;
-                        var message = obj.message;
-                        if (channelName && message) {
-                            if (!viewState.newMessages[channelName]) {
-                                viewState.newMessages[channelName] = [];
+                        if (obj.type === 'message_created') {
+                            var channelName = obj.channel_name;
+                            var message = obj.message;
+                            if (channelName && message) {
+                                if (!viewState.newMessages[channelName]) {
+                                    viewState.newMessages[channelName] = [];
+                                }
+                                viewState.newMessages[channelName].push(message);
+                                updateView();
                             }
-                            viewState.newMessages[channelName].push(message);
-                            updateView();
+                        } else if (obj.type === 'subscribing_created') {
+                            console.log(obj);
                         }
                     }
                 },

@@ -38,6 +38,14 @@ helpers do
       StarChat::User.new(user_name).save
   end
 
+  def broadcast(values)
+    json = values.to_json
+    settings.streams.each do |user_name, connection|
+      next unless yield(user_name, connection)
+      connection << json << "\n"
+    end
+  end
+
 end
 
 get '/', provides: :html do
@@ -65,6 +73,7 @@ get '/users/:user_name/stream', provides: :json do
       channel_name = channel.name
       msgs.concat(channel.messages(-100).map do |msg|
                     {
+                      type: 'message_created',
                       channel_name: channel_name,
                       message: msg,
                     }
@@ -113,19 +122,11 @@ post '/channels/:channel_name/messages', provides: :json do
     halt 400, {error: e.to_s}.to_json
   end
   # broadcast
-  message_json = {
-    channel_name: @channel.name,
-    message: message,
-  }.to_json
-  settings.streams.select do |user_name, connection|
-    user = StarChat::User.find(user_name)
-    return false unless user
-    user.channels.any? do |channel|
-      channel.name == @channel.name
-    end
-  end.each do |user_name, connection|
-    # TODO: 例外処理?
-    connection << message_json << "\n"
+  broadcast(type: 'message_created',
+            channel_name: @channel.name,
+            message: message) do
+    return false unless user = StarChat::User.find(user_name)
+    user.channels.any?{|channel| channel.name == @channel.name}
   end
   201
 end
@@ -150,5 +151,11 @@ post '/subscribings', provides: :json do
   end
   halt 409 if StarChat::Subscribing.exist?(channel, current_user)
   StarChat::Subscribing.new(channel, current_user).save
+  broadcast(type: 'subscribing_created',
+            channel_name: channel.name,
+            user_name: current_user.name) do |user_name, connection|
+    return false unless user = StarChat::User.find(user_name)
+    channel.users.include?(user)
+  end
   201
 end
