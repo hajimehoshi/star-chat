@@ -27,7 +27,7 @@ $(function() {
         streamContinuingErrorNum: 0,
         channels: [],
         channelName: '',
-        messages: {},
+        newMessages: {},
         users: [],
     };
     var update = (function () {
@@ -89,6 +89,25 @@ $(function() {
             } else {
                 $('#messages h2').text("\u00a0");
             }
+            /*$('#messages > section').filter(function (i) {
+                var channelName = $(this).attr('data-channel-name');
+                return // TODO: implement
+            }).remove();*/
+            if ($('#messages > section').filter(function (i) {
+                return $(this).attr('data-channel-name') === view.channelName;
+            }).length === 0) {
+                var section = $('<section></section>');
+                section.attr('data-channel-name', view.channelName);
+                $('#messages h2').after(section);
+            }
+            $('#messages > section').each(function (i) {
+                var e = $(this);
+                if (e.attr('data-channel-name') === view.channelName) {
+                    e.show();
+                } else {
+                    e.hide();
+                }
+            });
             (function () {
                 function messageToElement(message) {
                     var messageSection = $('<section></section>');
@@ -117,33 +136,33 @@ $(function() {
                     messageSection.attr('data-message-id', message.id);
                     return messageSection;
                 }
-                var msgs = view.messages[view.channelName];
+                if (!view.channelName) {
+                    return;
+                }
+                var msgs = view.newMessages[view.channelName];
                 if (!msgs) {
                     msgs = [];
                 }
-                // TODO: Hash (E-Tag) で比較?
-                // TODO: 最適化
-                if (!isSameArray(msgs, cachedMessages,
-                                 function (a, b) {
-                                     return a.id === b.id;
-                                 })) {
-                    // TODO: チャンネルごとに違う section 作る
-                    var section = $('#messages section');
-                    var isBottom =
-                        section.get(0).scrollHeight - section.scrollTop() ===
-                        section.outerHeight();
-                    section.empty();
-                    $.each(msgs, function (i, message) {
-                        section.append(messageToElement(message));
-                    });
-                    if (isBottom) {
-                        section.animate({scrollTop: section.get(0).scrollHeight});
+                var section = $('#messages > section').filter(function (i) {
+                    return $(this).attr('data-channel-name') === view.channelName;
+                });
+                var isBottom =
+                    section.get(0).scrollHeight - section.scrollTop() ===
+                    section.outerHeight();
+                // TODO: sort by id
+                $.each(msgs, function (i, message) {
+                    // TODO: optimize
+                    if (0 < $('.message').filter(function (i) {
+                        return $(this).attr('data-message-id') === message.id;
+                    }).length) {
+                        return;
                     }
-                    cachedMessages = [];
-                    for (var i = 0; i < msgs.length; i++) {
-                        cachedMessages[i] = msgs[i];
-                    }
+                    section.append(messageToElement(message));
+                });
+                if (isBottom) {
+                    section.animate({scrollTop: section.get(0).scrollHeight});
                 }
+                view.newMessages[view.channelName] = [];
                 lastChannelName = view.channelName;
             })();
             (function () {
@@ -201,10 +220,10 @@ $(function() {
                         var channelName = obj.channel_name;
                         var message = obj.message;
                         if (channelName && message) {
-                            if (!view.messages[channelName]) {
-                                view.messages[channelName] = [];
+                            if (!view.newMessages[channelName]) {
+                                view.newMessages[channelName] = [];
                             }
-                            view.messages[channelName].push(message);
+                            view.newMessages[channelName].push(message);
                             update();
                         }
                     }
@@ -251,7 +270,7 @@ $(function() {
         session.password = '';
         view.channels = [];
         view.channelName = '';
-        view.messages = {};
+        view.newMessages = {};
         view.users = [];
         update();
         stopStream();
@@ -397,37 +416,4 @@ $(function() {
             return false;
         });
     })();
-    /*function polling() {
-        var e = $('#messages section');
-        console.log(e.get(0).scrollHeight - e.scrollTop() === e.outerHeight());
-        setTimeout(polling, 1000);
-    }
-    polling();*/
-    /*function polling() {
-        (function () {
-            if (!session.loggedIn) {
-                return;
-            }
-            if (!view.channelName) {
-                return;
-            }
-            var channelName = view.channelName;
-            var url =
-                '/channels/' + encodeURIComponent(channelName) +
-                '/messages/recent';
-            $.ajax({
-                url: url,
-                type: 'GET',
-                cache: false,
-                beforeSend: addAuthHeader,
-                dataType: 'json',
-                success: function (data, textStatus, jqXHR) {
-                    view.messages[channelName] = data;
-                    update();
-                },
-            });
-        })();
-        setTimeout(polling, 5000);
-    }
-    polling();*/
 });
