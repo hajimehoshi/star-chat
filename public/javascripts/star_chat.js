@@ -37,6 +37,13 @@ $(function() {
         }
         return true;
     }
+    function uniq(arr) {
+        var values = {};
+        for (var i = 0; i < arr.length; i++) {
+            values[arr[i]] = true;
+        }
+        return Object.keys(values);
+    }
     var updateViewChannels = (function () {
         var cachedChannels = [];
         return function () {
@@ -234,6 +241,7 @@ $(function() {
                                     viewState.newMessages[channelName] = [];
                                 }
                                 viewState.newMessages[channelName].push(message);
+                                // TODO: bug fix
                                 if (channelName === viewState.channelName) {
                                     updateView();
                                 }
@@ -241,11 +249,13 @@ $(function() {
                         } else if (obj.type === 'subscribing_created') {
                             var channelName = obj.channel_name;
                             // TODO: update viewState.channels
-                            // TODO: merge
                             if (!viewState.userNames[channelName]) {
                                 viewState.userNames[channelName] = [];
                             }
-                            viewState.userNames[channelName].push(obj.user_name);
+                            var userNames = viewState.userNames[channelName];
+                            userNames.push(obj.user_name);
+                            viewState.userNames[channelName] = uniq(userNames);
+                            // TODO: bug fix
                             if (channelName === viewState.channelName) {
                                 updateView();
                             }
@@ -356,7 +366,7 @@ $(function() {
                 });
                 // TODO: merge
                 viewState.userNames[channelName] =
-                    viewState.userNames[channelName].concat(userNames);
+                    uniq(viewState.userNames[channelName].concat(userNames));
                 if (channelName === viewState.channelName) {
                     updateView();
                 }
@@ -419,7 +429,6 @@ $(function() {
         var form = $('#postMessageForm');
         form.find('input[type="submit"]').click(function (e) {
             var viewState = getViewState();
-            console.log(viewState);
             if (!session.loggedIn) {
                 // TODO: show alert or do something
                 return false;
