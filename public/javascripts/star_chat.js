@@ -232,7 +232,7 @@ $(function() {
                             console.log(e);
                             continue;
                         }
-                        if (obj.type === 'message_created') {
+                        if (obj.type === 'message') {
                             var channelName = obj.channel_name;
                             var message = obj.message;
                             if (channelName && message) {
@@ -244,7 +244,7 @@ $(function() {
                                     updateView();
                                 }
                             }
-                        } else if (obj.type === 'subscribing_created') {
+                        } else if (obj.type === 'subscribing') {
                             var channelName = obj.channel_name;
                             // TODO: update viewState.channels
                             if (!viewState.userNames[channelName]) {
