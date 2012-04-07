@@ -1,4 +1,19 @@
 $(function() {
+    var session = {
+        loggedIn: false,
+        userName: '',
+        password: '',
+    };
+    // TODO: channel page state (dirty)
+    var viewState = {
+        stream: null,
+        streamContinuingErrorNum: 0,
+        channels: [],
+        channelName: '',
+        newMessages: {},
+        messageIdsAlreadyShown: {},
+        users: [],
+    };
     function isSameArray(a, b, func) {
         if (!func) {
             func = function (x, y) {
@@ -15,21 +30,6 @@ $(function() {
         }
         return true;
     }
-    var session = {
-        loggedIn: false,
-        userName: '',
-        password: '',
-    };
-    // TODO: channel page state (dirty)
-    var viewState = {
-        stream: null,
-        streamContinuingErrorNum: 0,
-        channels: [],
-        channelName: '',
-        newMessages: {},
-        messageIdsAlreadyShown: {},
-        users: [],
-    };
     var updateViewChannels = (function () {
         var cachedChannels = [];
         return function () {
@@ -147,6 +147,7 @@ $(function() {
         viewState.newMessages[viewState.channelName] = [];
     }
     function updateViewUsers() {
+        // TODO: リアルタイム更新
         var users = viewState.users.sort(function (a, b) {
             if (a.name > b.name) {
                 return 1;
