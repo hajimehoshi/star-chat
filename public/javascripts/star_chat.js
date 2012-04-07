@@ -383,6 +383,9 @@ $(function() {
         form.find('input[type="submit"]').click(function (e) {
             var userName = form.find('input[name="userName"]').val();
             var password = form.find('input[name="password"]').val();
+            if (!userName) {
+                return false;
+            }
             tryLogIn(userName, password);
             e.stopPropagation();
             return false;
