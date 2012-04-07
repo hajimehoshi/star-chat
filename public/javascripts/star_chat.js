@@ -303,6 +303,7 @@ $(function() {
         session.userName = '';
         session.password = '';
         session.id = 0;
+        $('#messages > section').remove();
         updateView();
         stopStream();
     }
