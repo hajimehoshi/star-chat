@@ -200,7 +200,6 @@ $(function() {
         updateViewUsers();
     };
     function startStream() {
-        // TODO: Bug fix: ログアウト、ログイン時に違う stream がキャンセルされる
         var viewState = getViewState();
         if (viewState.stream) {
             viewState.stream.abort();
