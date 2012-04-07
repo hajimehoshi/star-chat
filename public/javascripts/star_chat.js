@@ -241,8 +241,7 @@ $(function() {
                                     viewState.newMessages[channelName] = [];
                                 }
                                 viewState.newMessages[channelName].push(message);
-                                // TODO: bug fix
-                                if (channelName === viewState.channelName) {
+                                if (channelName === getViewState().channelName) {
                                     updateView();
                                 }
                             }
@@ -256,7 +255,7 @@ $(function() {
                             userNames.push(obj.user_name);
                             viewState.userNames[channelName] = uniq(userNames);
                             // TODO: bug fix
-                            if (channelName === viewState.channelName) {
+                            if (channelName === getViewState().channelName) {
                                 updateView();
                             }
                         }
@@ -364,10 +363,9 @@ $(function() {
                 var userNames = $.map(data, function (user) {
                     return user.name;
                 });
-                // TODO: merge
                 viewState.userNames[channelName] =
                     uniq(viewState.userNames[channelName].concat(userNames));
-                if (channelName === viewState.channelName) {
+                if (channelName === getViewState().channelName) {
                     updateView();
                 }
             }
