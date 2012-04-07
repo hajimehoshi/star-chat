@@ -30,161 +30,161 @@ $(function() {
         newMessages: {},
         users: [],
     };
-    var update = (function () {
+    var updateViewChannels = (function () {
         var cachedChannels = [];
-        var lastChannelName = null;
-        var cachedMessages = [];
-        return function update() {
-            if (session.loggedIn) {
-                $('#logInForm').hide();
-                $('#logOutLink span').text(session.userName);
-                $('#logOutLink').show();
-                $('#main input').removeAttr('disabled');
-                if (view.channelName) {
-                    $('#postMessageForm input').removeAttr('disabled');
-                } else {
-                    $('#postMessageForm input').attr('disabled', 'disabled');
+        return function () {
+            // channels
+            var channels = view.channels.sort(function (a, b) {
+                if (a.name > b.name) {
+                    return 1;
                 }
-            } else {
-                $('#logInForm').show();
-                $('#logOutLink').hide();
-                $('#main input').attr('disabled', 'disabled');
-            }
-            (function () {
-                // channels
-                var channels = view.channels.sort(function (a, b) {
-                    if (a.name > b.name) {
-                        return 1;
-                    }
-                    if (a.name < b.name) {
-                        return -1;
-                    }
-                    return 0;
-                });
-                if (!isSameArray(channels, cachedChannels)) {
-                    var ul = $('#channels ul');
-                    ul.empty();
-                    $.each(channels, function (i, channel) {
-                        var a = $('<a href="#"></a>');
-                        a.text(channel.name);
-                        a.click(function () {
-                            view.channelName = channel.name;
-                            updateUserList();
-                            update();
-                            return false;
-                        });
-                        var li = $('<li></li>');
-                        li.append(a);
-                        ul.append(li);
-                    });
-                    cachedChannels = [];
-                    for (var i = 0; i < channels.length; i++) {
-                        cachedChannels[i] = channels[i];
-                    }
+                if (a.name < b.name) {
+                    return -1;
                 }
-            })();
-            // messages
-            if (view.channelName) {
-                $('#messages h2').text(view.channelName);
-            } else {
-                $('#messages h2').text("\u00a0");
-            }
-            /*$('#messages > section').filter(function (i) {
-                var channelName = $(this).attr('data-channel-name');
-                return // TODO: implement
-            }).remove();*/
-            if ($('#messages > section').filter(function (i) {
-                return $(this).attr('data-channel-name') === view.channelName;
-            }).length === 0) {
-                var section = $('<section></section>');
-                section.attr('data-channel-name', view.channelName);
-                $('#messages h2').after(section);
-            }
-            $('#messages > section').each(function (i) {
-                var e = $(this);
-                if (e.attr('data-channel-name') === view.channelName) {
-                    e.show();
-                } else {
-                    e.hide();
-                }
+                return 0;
             });
-            (function () {
-                function messageToElement(message) {
-                    var messageSection = $('<section></section>');
-                    messageSection.addClass('message');
-                    var userNameP = $('<p></p>').text(message.user_name);
-                    userNameP.addClass('userName');
-                    messageSection.append(userNameP);
-                    var bodyP = $('<p></p>').text(message.body);
-                    bodyP.addClass('body');
-                    messageSection.append(bodyP);
-                    // TODO: Use the element <time>?
-                    var time = new Date();
-                    time.setTime(message.created_at * 1000);
-                    var h = time.getHours() + '';
-                    var m = time.getMinutes() + '';
-                    if (h.length < 2) {
-                        h = '0' + h;
-                    }
-                    if (m.length < 2) {
-                        m = '0' + m;
-                    }
-                    var timeStr = h + ':' + m;
-                    var createdAtP = $('<p></p>').text(timeStr);
-                    createdAtP.addClass('createdAt');
-                    messageSection.append(createdAtP);
-                    messageSection.attr('data-message-id', message.id);
-                    return messageSection;
-                }
-                if (!view.channelName) {
-                    return;
-                }
-                var msgs = view.newMessages[view.channelName];
-                if (!msgs) {
-                    msgs = [];
-                }
-                var section = $('#messages > section').filter(function (i) {
-                    return $(this).attr('data-channel-name') === view.channelName;
+            if (isSameArray(channels, cachedChannels)) {
+                return;
+            }
+            var ul = $('#channels ul');
+            ul.empty();
+            $.each(channels, function (i, channel) {
+                var a = $('<a href="#"></a>');
+                a.text(channel.name);
+                a.click(function () {
+                    view.channelName = channel.name;
+                    updateUserList();
+                    update();
+                    return false;
                 });
-                var isBottom =
-                    section.get(0).scrollHeight - section.scrollTop() ===
-                    section.outerHeight();
-                // TODO: sort by id
-                $.each(msgs, function (i, message) {
-                    // TODO: optimize
-                    if (0 < $('.message').filter(function (i) {
-                        return $(this).attr('data-message-id') === message.id;
-                    }).length) {
-                        return;
-                    }
-                    section.append(messageToElement(message));
-                });
-                if (isBottom) {
-                    section.animate({scrollTop: section.get(0).scrollHeight});
-                }
-                view.newMessages[view.channelName] = [];
-                lastChannelName = view.channelName;
-            })();
-            (function () {
-                var users = view.users.sort(function (a, b) {
-                    if (a.name > b.name) {
-                        return 1;
-                    }
-                    if (a.name < b.name) {
-                        return -1;
-                    }
-                    return 0;
-                });
-                var ul = $('#users ul');
-                ul.empty();
-                $.each(users, function (i, user) {
-                    var li = $('<li></li>');
-                    li.text(user.name);
-                    ul.append(li);
-                });
-            })();
-        };
+                var li = $('<li></li>');
+                li.append(a);
+                ul.append(li);
+            });
+            cachedChannels = [];
+            for (var i = 0; i < channels.length; i++) {
+                cachedChannels[i] = channels[i];
+            }
+        }
     })();
+    function updateViewMessages() {
+        if (view.channelName) {
+            $('#messages h2').text(view.channelName);
+        } else {
+            $('#messages h2').text("\u00a0");
+        }
+        /*$('#messages > section').filter(function (i) {
+          var channelName = $(this).attr('data-channel-name');
+          return // TODO: implement
+          }).remove();*/
+        if ($('#messages > section').filter(function (i) {
+            return $(this).attr('data-channel-name') === view.channelName;
+        }).length === 0) {
+            var section = $('<section></section>');
+            section.attr('data-channel-name', view.channelName);
+            $('#messages h2').after(section);
+        }
+        $('#messages > section').each(function (i) {
+            var e = $(this);
+            if (e.attr('data-channel-name') === view.channelName) {
+                e.show();
+            } else {
+                e.hide();
+            }
+        });
+        function messageToElement(message) {
+            var messageSection = $('<section></section>');
+            messageSection.addClass('message');
+            var userNameP = $('<p></p>').text(message.user_name);
+            userNameP.addClass('userName');
+            messageSection.append(userNameP);
+            var bodyP = $('<p></p>').text(message.body);
+            bodyP.addClass('body');
+            messageSection.append(bodyP);
+            // TODO: Use the element <time>?
+            var time = new Date();
+            time.setTime(message.created_at * 1000);
+            var h = time.getHours() + '';
+            var m = time.getMinutes() + '';
+            if (h.length < 2) {
+                h = '0' + h;
+            }
+            if (m.length < 2) {
+                m = '0' + m;
+            }
+            var timeStr = h + ':' + m;
+            var createdAtP = $('<p></p>').text(timeStr);
+            createdAtP.addClass('createdAt');
+            messageSection.append(createdAtP);
+            messageSection.attr('data-message-id', message.id);
+            return messageSection;
+        }
+        if (!view.channelName) {
+            return;
+        }
+        var msgs = view.newMessages[view.channelName];
+        if (!msgs) {
+            msgs = [];
+        }
+        var section = $('#messages > section').filter(function (i) {
+            return $(this).attr('data-channel-name') === view.channelName;
+        });
+        var isBottom =
+            section.get(0).scrollHeight - section.scrollTop() ===
+            section.outerHeight();
+        // TODO: sort by id
+        $.each(msgs, function (i, message) {
+            // TODO: optimize
+            if (0 < $('.message').filter(function (i) {
+                return $(this).attr('data-message-id') === message.id;
+            }).length) {
+                return;
+            }
+            section.append(messageToElement(message));
+        });
+        if (isBottom) {
+            section.animate({scrollTop: section.get(0).scrollHeight});
+        }
+        view.newMessages[view.channelName] = [];
+    }
+    function updateViewUsers() {
+        var users = view.users.sort(function (a, b) {
+            if (a.name > b.name) {
+                return 1;
+            }
+            if (a.name < b.name) {
+                return -1;
+            }
+            return 0;
+        });
+        var ul = $('#users ul');
+        ul.empty();
+        $.each(users, function (i, user) {
+            var li = $('<li></li>');
+            li.text(user.name);
+            ul.append(li);
+        });
+    }
+    function update() {
+        if (session.loggedIn) {
+            $('#logInForm').hide();
+            $('#logOutLink span').text(session.userName);
+            $('#logOutLink').show();
+            $('#main input').removeAttr('disabled');
+            if (view.channelName) {
+                $('#postMessageForm input').removeAttr('disabled');
+            } else {
+                $('#postMessageForm input').attr('disabled', 'disabled');
+            }
+        } else {
+            $('#logInForm').show();
+            $('#logOutLink').hide();
+            $('#main input').attr('disabled', 'disabled');
+        }
+        updateViewChannels();
+        updateViewMessages();
+        updateViewUsers();
+    };
     function startStream() {
         if (view.stream) {
             view.stream.abort();
