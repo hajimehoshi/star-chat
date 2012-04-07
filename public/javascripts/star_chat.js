@@ -27,6 +27,7 @@ $(function() {
         channels: [],
         channelName: '',
         newMessages: {},
+        messageIdsAlreadyShown: {},
         users: [],
     };
     var updateViewChannels = (function () {
@@ -76,9 +77,10 @@ $(function() {
           var channelName = $(this).attr('data-channel-name');
           return // TODO: implement
           }).remove();*/
-        if ($('#messages > section').filter(function (i) {
-            return $(this).attr('data-channel-name') === viewState.channelName;
-        }).length === 0) {
+        if (viewState.channelName &&
+            $('#messages > section').filter(function (i) {
+                return $(this).attr('data-channel-name') === viewState.channelName;
+            }).length === 0) {
             var section = $('<section></section>');
             section.attr('data-channel-name', viewState.channelName);
             $('#messages h2').after(section);
@@ -91,6 +93,9 @@ $(function() {
                 e.hide();
             }
         });
+        if (!viewState.channelName) {
+            return;
+        }
         function messageToElement(message) {
             var messageSection = $('<section></section>');
             messageSection.addClass('message');
@@ -118,9 +123,6 @@ $(function() {
             messageSection.attr('data-message-id', message.id);
             return messageSection;
         }
-        if (!viewState.channelName) {
-            return;
-        }
         var msgs = viewState.newMessages[viewState.channelName];
         if (!msgs) {
             msgs = [];
@@ -133,13 +135,11 @@ $(function() {
             section.outerHeight();
         // TODO: sort by id
         $.each(msgs, function (i, message) {
-            // TODO: optimize
-            if (0 < $('.message').filter(function (i) {
-                return $(this).attr('data-message-id') === message.id;
-            }).length) {
+            if (viewState.messageIdsAlreadyShown[message.id]) {
                 return;
             }
             section.append(messageToElement(message));
+            viewState.messageIdsAlreadyShown[message.id] = true;
         });
         if (isBottom) {
             section.animate({scrollTop: section.get(0).scrollHeight});
@@ -270,6 +270,7 @@ $(function() {
         viewState.channels = [];
         viewState.channelName = '';
         viewState.newMessages = {};
+        viewState.messageIdsAlreadyShown = {};
         viewState.users = [];
         updateView();
         stopStream();
