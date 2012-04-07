@@ -3,17 +3,24 @@ $(function() {
         loggedIn: false,
         userName: '',
         password: '',
+        id: 0,
     };
     // TODO: channel page state (dirty)
-    var viewState = {
-        stream: null,
-        streamContinuingErrorNum: 0,
-        channels: [],
-        channelName: '',
-        newMessages: {},
-        messageIdsAlreadyShown: {},
-        userNames: {},
-    };
+    var viewStates = {};
+    function getViewState() {
+        if (!viewStates[session.id]) {
+            viewStates[session.id] = {
+                stream: null,
+                streamContinuingErrorNum: 0,
+                channels: [],
+                channelName: '',
+                newMessages: {},
+                messageIdsAlreadyShown: {},
+                userNames: {},
+            }
+        }
+        return viewStates[session.id];
+    }
     function isSameArray(a, b, func) {
         if (!func) {
             func = function (x, y) {
@@ -34,6 +41,7 @@ $(function() {
         var cachedChannels = [];
         return function () {
             // channels
+            var viewState = getViewState();
             var channels = viewState.channels.sort(function (a, b) {
                 if (a.name > b.name) {
                     return 1;
@@ -70,6 +78,7 @@ $(function() {
         }
     })();
     function updateViewMessages() {
+        var viewState = getViewState();
         if (viewState.channelName) {
             $('#messages h2').text(viewState.channelName);
         } else {
@@ -149,6 +158,7 @@ $(function() {
         viewState.newMessages[viewState.channelName] = [];
     }
     function updateViewUsers() {
+        var viewState = getViewState();
         var userNames = viewState.userNames[viewState.channelName];
         if (!userNames) {
             userNames = [];
@@ -168,7 +178,7 @@ $(function() {
             $('#logOutLink span').text(session.userName);
             $('#logOutLink').show();
             $('#main input').removeAttr('disabled');
-            if (viewState.channelName) {
+            if (getViewState().channelName) {
                 $('#postMessageForm input').removeAttr('disabled');
             } else {
                 $('#postMessageForm input').attr('disabled', 'disabled');
@@ -184,6 +194,7 @@ $(function() {
     };
     function startStream() {
         // TODO: Bug fix: ログアウト、ログイン時に違う stream がキャンセルされる
+        var viewState = getViewState();
         if (viewState.stream) {
             viewState.stream.abort();
         }
@@ -254,12 +265,12 @@ $(function() {
                     // TODO: implement showing error message
                     return;
                 }
-                setTimeout(stopStream, 0);
                 setTimeout(startStream, 10000);
             },
         });
     }
     function stopStream() {
+        var viewState = getViewState();
         if (viewState.stream) {
             viewState.stream.abort();
         }
@@ -272,6 +283,7 @@ $(function() {
         session.loggedIn = true;
         session.userName = userName;
         session.password = password;
+        session.id = (new Date()).getTime();
         updateChannelList();
         updateView();
         startStream();
@@ -282,11 +294,7 @@ $(function() {
         session.loggedIn = false;
         session.userName = '';
         session.password = '';
-        viewState.channels = [];
-        viewState.channelName = '';
-        viewState.newMessages = {};
-        viewState.messageIdsAlreadyShown = {};
-        viewState.userNames = {};
+        session.id = 0;
         updateView();
         stopStream();
     }
@@ -317,6 +325,7 @@ $(function() {
         });
     }
     function updateChannelList() {
+        var viewState = getViewState();
         $.ajax({
             url: '/users/' + encodeURIComponent(session.userName) + '/channels',
             type: 'GET',
@@ -330,6 +339,7 @@ $(function() {
         });
     }
     function updateUserList() {
+        var viewState = getViewState();
         var channelName = viewState.channelName;
         $.ajax({
             url: '/channels/' + encodeURIComponent(channelName) + '/users',
@@ -408,6 +418,8 @@ $(function() {
     (function () {
         var form = $('#postMessageForm');
         form.find('input[type="submit"]').click(function (e) {
+            var viewState = getViewState();
+            console.log(viewState);
             if (!session.loggedIn) {
                 // TODO: show alert or do something
                 return false;
@@ -419,7 +431,7 @@ $(function() {
             if (!body) {
                 return false;
             }
-            var url = '/channels/' + encodeURIComponent(viewState .channelName) +
+            var url = '/channels/' + encodeURIComponent(viewState.channelName) +
                 '/messages';
             $.ajax({
                 url: url,
