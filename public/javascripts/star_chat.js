@@ -253,7 +253,6 @@ $(function() {
                             var userNames = viewState.userNames[channelName];
                             userNames.push(obj.user_name);
                             viewState.userNames[channelName] = uniq(userNames);
-                            // TODO: bug fix
                             if (channelName === getViewState().channelName) {
                                 updateView();
                             }
