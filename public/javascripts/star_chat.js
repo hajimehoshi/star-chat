@@ -302,6 +302,9 @@ $(function() {
         session.loggedIn = false;
         session.userName = '';
         session.password = '';
+        if (session.id !== 0) {
+            delete viewStates[session.id];
+        }
         session.id = 0;
         $('#messages > section').remove();
         updateView();
