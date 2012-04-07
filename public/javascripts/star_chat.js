@@ -12,7 +12,7 @@ $(function() {
         channelName: '',
         newMessages: {},
         messageIdsAlreadyShown: {},
-        users: [],
+        userNames: {},
     };
     function isSameArray(a, b, func) {
         if (!func) {
@@ -53,7 +53,9 @@ $(function() {
                 a.text(channel.name);
                 a.click(function () {
                     viewState.channelName = channel.name;
-                    updateUserList();
+                    if (!viewState.userNames[viewState.channelName]) {
+                        updateUserList();
+                    }
                     updateView();
                     return false;
                 });
@@ -147,21 +149,16 @@ $(function() {
         viewState.newMessages[viewState.channelName] = [];
     }
     function updateViewUsers() {
-        // TODO: リアルタイム更新
-        var users = viewState.users.sort(function (a, b) {
-            if (a.name > b.name) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            return 0;
-        });
+        var userNames = viewState.userNames[viewState.channelName];
+        if (!userNames) {
+            userNames = [];
+        }
+        var userNames = userNames.sort();
         var ul = $('#users ul');
         ul.empty();
-        $.each(users, function (i, user) {
+        $.each(userNames, function (i, userName) {
             var li = $('<li></li>');
-            li.text(user.name);
+            li.text(userName);
             ul.append(li);
         });
     }
@@ -225,10 +222,20 @@ $(function() {
                                     viewState.newMessages[channelName] = [];
                                 }
                                 viewState.newMessages[channelName].push(message);
-                                updateView();
+                                if (channelName === viewState.channelName) {
+                                    updateView();
+                                }
                             }
                         } else if (obj.type === 'subscribing_created') {
-                            console.log(obj);
+                            var channelName = obj.channel_name;
+                            // TODO: merge
+                            if (!viewState.userNames[channelName]) {
+                                viewState.userNames[channelName] = [];
+                            }
+                            viewState.userNames[channelName].push(obj.user_name);
+                            if (channelName === viewState.channelName) {
+                                updateView();
+                            }
                         }
                     }
                 },
@@ -276,7 +283,7 @@ $(function() {
         viewState.channelName = '';
         viewState.newMessages = {};
         viewState.messageIdsAlreadyShown = {};
-        viewState.users = [];
+        viewState.userNames = {};
         updateView();
         stopStream();
     }
@@ -320,15 +327,26 @@ $(function() {
         });
     }
     function updateUserList() {
+        var channelName = viewState.channelName;
         $.ajax({
-            url: '/channels/' + encodeURIComponent(viewState.channelName) + '/users',
+            url: '/channels/' + encodeURIComponent(channelName) + '/users',
             type: 'GET',
             cache: false,
             beforeSend: addAuthHeader,
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
-                viewState.users = data;
-                updateView();
+                if (!viewState.userNames[channelName]) {
+                    viewState.userNames[channelName] = [];
+                }
+                var userNames = $.map(data, function (user) {
+                    return user.name;
+                });
+                // TODO: merge
+                viewState.userNames[channelName] =
+                    viewState.userNames[channelName].concat(userNames);
+                if (channelName === viewState.channelName) {
+                    updateView();
+                }
             }
         });
     }
