@@ -20,9 +20,8 @@ $(function() {
         userName: '',
         password: '',
     };
-    // TODO: channel page state (init, normal)
     // TODO: channel page state (dirty)
-    var view = {
+    var viewState = {
         stream: null,
         streamContinuingErrorNum: 0,
         channels: [],
@@ -34,7 +33,7 @@ $(function() {
         var cachedChannels = [];
         return function () {
             // channels
-            var channels = view.channels.sort(function (a, b) {
+            var channels = viewState.channels.sort(function (a, b) {
                 if (a.name > b.name) {
                     return 1;
                 }
@@ -52,9 +51,9 @@ $(function() {
                 var a = $('<a href="#"></a>');
                 a.text(channel.name);
                 a.click(function () {
-                    view.channelName = channel.name;
+                    viewState.channelName = channel.name;
                     updateUserList();
-                    update();
+                    updateView();
                     return false;
                 });
                 var li = $('<li></li>');
@@ -68,8 +67,8 @@ $(function() {
         }
     })();
     function updateViewMessages() {
-        if (view.channelName) {
-            $('#messages h2').text(view.channelName);
+        if (viewState.channelName) {
+            $('#messages h2').text(viewState.channelName);
         } else {
             $('#messages h2').text("\u00a0");
         }
@@ -78,15 +77,15 @@ $(function() {
           return // TODO: implement
           }).remove();*/
         if ($('#messages > section').filter(function (i) {
-            return $(this).attr('data-channel-name') === view.channelName;
+            return $(this).attr('data-channel-name') === viewState.channelName;
         }).length === 0) {
             var section = $('<section></section>');
-            section.attr('data-channel-name', view.channelName);
+            section.attr('data-channel-name', viewState.channelName);
             $('#messages h2').after(section);
         }
         $('#messages > section').each(function (i) {
             var e = $(this);
-            if (e.attr('data-channel-name') === view.channelName) {
+            if (e.attr('data-channel-name') === viewState.channelName) {
                 e.show();
             } else {
                 e.hide();
@@ -119,15 +118,15 @@ $(function() {
             messageSection.attr('data-message-id', message.id);
             return messageSection;
         }
-        if (!view.channelName) {
+        if (!viewState.channelName) {
             return;
         }
-        var msgs = view.newMessages[view.channelName];
+        var msgs = viewState.newMessages[viewState.channelName];
         if (!msgs) {
             msgs = [];
         }
         var section = $('#messages > section').filter(function (i) {
-            return $(this).attr('data-channel-name') === view.channelName;
+            return $(this).attr('data-channel-name') === viewState.channelName;
         });
         var isBottom =
             section.get(0).scrollHeight - section.scrollTop() ===
@@ -145,10 +144,10 @@ $(function() {
         if (isBottom) {
             section.animate({scrollTop: section.get(0).scrollHeight});
         }
-        view.newMessages[view.channelName] = [];
+        viewState.newMessages[viewState.channelName] = [];
     }
     function updateViewUsers() {
-        var users = view.users.sort(function (a, b) {
+        var users = viewState.users.sort(function (a, b) {
             if (a.name > b.name) {
                 return 1;
             }
@@ -165,13 +164,13 @@ $(function() {
             ul.append(li);
         });
     }
-    function update() {
+    function updateView() {
         if (session.loggedIn) {
             $('#logInForm').hide();
             $('#logOutLink span').text(session.userName);
             $('#logOutLink').show();
             $('#main input').removeAttr('disabled');
-            if (view.channelName) {
+            if (viewState.channelName) {
                 $('#postMessageForm input').removeAttr('disabled');
             } else {
                 $('#postMessageForm input').attr('disabled', 'disabled');
@@ -186,12 +185,12 @@ $(function() {
         updateViewUsers();
     };
     function startStream() {
-        if (view.stream) {
-            view.stream.abort();
+        if (viewState.stream) {
+            viewState.stream.abort();
         }
-        view.stream = null;
+        viewState.stream = null;
         var i = 0;
-        view.stream = $.ajax({
+        viewState.stream = $.ajax({
             url: '/users/' + encodeURIComponent(session.userName) +
                 '/stream',
             type: 'GET',
@@ -220,23 +219,23 @@ $(function() {
                         var channelName = obj.channel_name;
                         var message = obj.message;
                         if (channelName && message) {
-                            if (!view.newMessages[channelName]) {
-                                view.newMessages[channelName] = [];
+                            if (!viewState.newMessages[channelName]) {
+                                viewState.newMessages[channelName] = [];
                             }
-                            view.newMessages[channelName].push(message);
-                            update();
+                            viewState.newMessages[channelName].push(message);
+                            updateView();
                         }
                     }
                 },
             },
             success: function (data, textStatus, jqXHR) {
-                view.streamContinuingErrorNum = 0;
+                viewState.streamContinuingErrorNum = 0;
                 setTimeout(startStream, 0);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.log(textStatus);
-                view.streamContinuingErrorNum++;
-                if (10 <= view.streamContinuingErrorNum) {
+                viewState.streamContinuingErrorNum++;
+                if (10 <= viewState.streamContinuingErrorNum) {
                     console.log('Too many errors!');
                     // TODO: implement showing error message
                     return;
@@ -246,11 +245,11 @@ $(function() {
         });
     }
     function stopStream() {
-        if (view.stream) {
-            view.stream.abort();
+        if (viewState.stream) {
+            viewState.stream.abort();
         }
-        view.stream = null;
-        view.streamContinuingErrorNum = 0;
+        viewState.stream = null;
+        viewState.streamContinuingErrorNum = 0;
     }
     function logIn(userName, password) {
         localStorage.userName = userName;
@@ -259,7 +258,7 @@ $(function() {
         session.userName = userName;
         session.password = password;
         updateChannelList();
-        update();
+        updateView();
         startStream();
     }
     function logOut() {
@@ -268,11 +267,11 @@ $(function() {
         session.loggedIn = false;
         session.userName = '';
         session.password = '';
-        view.channels = [];
-        view.channelName = '';
-        view.newMessages = {};
-        view.users = [];
-        update();
+        viewState.channels = [];
+        viewState.channelName = '';
+        viewState.newMessages = {};
+        viewState.users = [];
+        updateView();
         stopStream();
     }
     function addAuthHeader(xhr) {
@@ -309,21 +308,21 @@ $(function() {
             beforeSend: addAuthHeader,
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
-                view.channels = data;
-                update();
+                viewState.channels = data;
+                updateView();
             }
         });
     }
     function updateUserList() {
         $.ajax({
-            url: '/channels/' + encodeURIComponent(view.channelName) + '/users',
+            url: '/channels/' + encodeURIComponent(viewState.channelName) + '/users',
             type: 'GET',
             cache: false,
             beforeSend: addAuthHeader,
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
-                view.users = data;
-                update();
+                viewState.users = data;
+                updateView();
             }
         });
     }
@@ -386,14 +385,14 @@ $(function() {
                 // TODO: show alert or do something
                 return false;
             }
-            if (!view.channelName) {
+            if (!viewState.channelName) {
                 return false;
             }
             var body = form.find('input[name="body"]').val();
             if (!body) {
                 return false;
             }
-            var url = '/channels/' + encodeURIComponent(view.channelName) +
+            var url = '/channels/' + encodeURIComponent(viewState .channelName) +
                 '/messages';
             $.ajax({
                 url: url,
