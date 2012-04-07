@@ -41,7 +41,8 @@ helpers do
   def broadcast(values)
     json = values.to_json
     settings.streams.each do |user_name, connection|
-      next unless yield(user_name, connection)
+      next unless yield(user_name)
+      # TODO: error handling?
       connection << json << "\n"
     end
   end
@@ -121,10 +122,9 @@ post '/channels/:channel_name/messages', provides: :json do
   rescue Exception => e
     halt 400, {error: e.to_s}.to_json
   end
-  # broadcast
   broadcast(type: 'message_created',
             channel_name: @channel.name,
-            message: message) do
+            message: message) do |user_name|
     return false unless user = StarChat::User.find(user_name)
     user.channels.any?{|channel| channel.name == @channel.name}
   end
@@ -153,7 +153,7 @@ post '/subscribings', provides: :json do
   StarChat::Subscribing.new(channel, current_user).save
   broadcast(type: 'subscribing_created',
             channel_name: channel.name,
-            user_name: current_user.name) do |user_name, connection|
+            user_name: current_user.name) do |user_name|
     return false unless user = StarChat::User.find(user_name)
     channel.users.include?(user)
   end
