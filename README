@@ -1,0 +1,9 @@
+* How to run
+
+$ thin -C (MODE).yml start
+
+
+* TODO
+
+- Add the channel 'Lobby'
+- The names of the channels should be case insencitive?

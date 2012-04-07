@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css" />
+    <title>StarChat (β)</title>
+  </head>
+  <body>
+    <header>
+      <h1>StarChat (β)</h1>
+      <form action="." id="logInForm">
+        <!-- TODO: Use cookie -->
+        <dl>
+          <dt>User Name:</dt>
+          <dd><input type="text" name="userName" value="" /></dd>
+          <dt>Password:</dt>
+          <dd><input type="password" name="password" value="" /></dd>
+        </dl>
+        <p><input type="submit" value="Log In" /></p>
+      </form>
+      <p id="logOutLink">Hello, <span></span>!&#xa0;&#xa0;&#xa0;&#xa0;<a href="#">Log Out</a></p>
+    </header>
+    <section id="main">
+      <section id="channels" class="sidebar">
+        <h2>Channels</h2>
+        <ul>
+        </ul>
+        <form id="addChannelForm">
+          <p><input type="text" name="name" value="" /><input type="submit" value="Add" /></p>
+        </form>
+      </section>
+      <section id="messages">
+        <h2>&#xa0;</h2>
+        <section>
+        </section>
+        <form action="." id="postMessageForm" method="post">
+          <p><input type="text" name="body" value="" /><input type="submit" name="send" value="Send" /></p>
+        </form>
+      </section>
+      <section id="users" class="sidebar">
+        <h2>Users</h2>
+        <ul>
+        </ul>
+      </section>
+    </section>
+    <script src="/javascripts/jquery-1.7.2.min.js"></script>
+    <script src="/javascripts/star_chat.js"></script>
+  </body>
+</html>

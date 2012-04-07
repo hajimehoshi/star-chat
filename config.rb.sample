@@ -1,0 +1,4 @@
+StarChat::User.auth_system do |name, password|
+  return true if name == 'foo' and password == 'bar'
+  false
+end
