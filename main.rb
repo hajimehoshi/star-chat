@@ -165,4 +165,5 @@ delete '/subscribings', provides: :json do
   halt 400 unless @channel
   halt 409 unless StarChat::Subscribing.exist?(@channel, current_user)
   StarChat::Subscribing.destroy(@channel, current_user)
+  # TODO: broadcasting
 end
