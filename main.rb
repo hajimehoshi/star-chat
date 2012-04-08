@@ -134,9 +134,8 @@ end
 post '/subscribings', provides: :json do
   protect!
 
-  req_json = JSON.parse(request.body.read)
-  user_name    = req_json['user_name']
-  channel_name = req_json['channel_name']
+  user_name    = params[:user_name]
+  channel_name = params[:channel_name]
 
   halt 401 if user_name != current_user.name
 

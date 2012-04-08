@@ -434,16 +434,14 @@ $(function() {
             if (!channelName) {
                 return false;
             }
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + '&' +
+                'user_name=' + encodeURIComponent(session.userName);
             $.ajax({
-                url: '/subscribings',
+                url: url,
                 type: 'POST',
                 cache: false,
                 beforeSend: addAuthHeader,
-                data: JSON.stringify({
-                    user_name: session.userName,
-                    channel_name: channelName,
-                }),
-                contentType: 'application.json; charset=utf-8',
                 dataType: 'json',
                 success: function (data, textStatus, jqXHR) {
                     form.find('input[name="name"]').val('');
