@@ -72,7 +72,7 @@ $(function() {
                     a.text(channel.name);
                     a.click(function () {
                         viewState.channelName = channel.name;
-                        if (!viewState.userNames[viewState.channelName]) {
+                        if (!(viewState.channelName in viewState.userNames)) {
                             updateUserList();
                         }
                         updateView();
@@ -220,11 +220,11 @@ $(function() {
     }
     function updateViewUsers() {
         var viewState = getViewState();
-        var userNames = viewState.userNames[viewState.channelName];
-        if (!userNames) {
-            userNames = [];
+        var userNamesObj = viewState.userNames[viewState.channelName];
+        if (!userNamesObj) {
+            userNamesObj = {};
         }
-        var userNames = userNames.sort();
+        var userNames = Object.keys(userNamesObj).sort();
         var ul = $('#users ul');
         ul.empty();
         $.each(userNames, function (i, userName) {
@@ -260,6 +260,7 @@ $(function() {
         }
         viewState.stream = null;
         var i = 0;
+        var currentUserName = session.userName;
         viewState.stream = $.ajax({
             url: '/users/' + encodeURIComponent(session.userName) +
                 '/stream',
@@ -299,14 +300,29 @@ $(function() {
                                 }
                             }
                         } else if (obj.type === 'subscribing') {
+                            if (obj.user_name === currentUserName) {
+                                return;
+                            }
                             var channelName = obj.channel_name;
-                            // TODO: update viewState.channels
-                            if (!viewState.userNames[channelName]) {
-                                viewState.userNames[channelName] = [];
+                            if (!(channelName in viewState.userNames)) {
+                                viewState.userNames[channelName] = {};
                             }
                             var userNames = viewState.userNames[channelName];
-                            userNames.push(obj.user_name);
-                            viewState.userNames[channelName] = uniq(userNames);
+                            userNames[obj.user_name] = true;
+                            if (channelName === getViewState().channelName) {
+                                updateView();
+                            }
+                        } else if (obj.type === 'delete_subscribing') {
+                            if (obj.user_name === currentUserName) {
+                                return;
+                            }
+                            var channelName = obj.channel_name;
+                            if (!(channelName in viewState.userNames)) {
+                                viewState.userNames[channelName] = {};
+                                return;
+                            }
+                            var userNames = viewState.userNames[channelName];
+                            delete userNames[obj.user_name];
                             if (channelName === getViewState().channelName) {
                                 updateView();
                             }
@@ -420,13 +436,12 @@ $(function() {
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
                 if (!viewState.userNames[channelName]) {
-                    viewState.userNames[channelName] = [];
+                    viewState.userNames[channelName] = {};
                 }
-                var userNames = $.map(data, function (user) {
-                    return user.name;
+                var userNames = viewState.userNames[channelName];
+                $.each(data, function (i, user) {
+                    userNames[user.name] = true;
                 });
-                viewState.userNames[channelName] =
-                    uniq(viewState.userNames[channelName].concat(userNames));
                 if (channelName === getViewState().channelName) {
                     updateView();
                 }
