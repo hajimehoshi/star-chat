@@ -131,30 +131,38 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
-post '/subscribings', provides: :json do
+before '/subscribings' do
   protect!
-
   user_name    = params[:user_name]
   channel_name = params[:channel_name]
-
+  halt 400 unless user_name.kind_of?(String)
+  halt 400 unless channel_name.kind_of?(String)
   halt 401 if user_name != current_user.name
+  @channel = StarChat::Channel.find(channel_name)
+end
 
-  channel = StarChat::Channel.find(channel_name)
-  unless channel
-    channel = StarChat::Channel.new(channel_name)
+post '/subscribings', provides: :json do
+  unless @channel
+    @channel = StarChat::Channel.new(params[:channel_name])
     begin
-      channel.save
+      @channel.save
     rescue Exception => e
       halt 400, {error: e.to_s}.to_json
     end
   end
-  halt 409 if StarChat::Subscribing.exist?(channel, current_user)
-  StarChat::Subscribing.new(channel, current_user).save
+  halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
+  StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
-            channel_name: channel.name,
+            channel_name: @channel.name,
             user_name: current_user.name) do |user_name|
     return false unless user = StarChat::User.find(user_name)
-    channel.users.include?(user)
+    @channel.users.include?(user)
   end
   201
+end
+
+delete '/subscribings', provides: :json do
+  halt 400 unless @channel
+  halt 409 unless StarChat::Subscribing.exist?(@channel, current_user)
+  StarChat::Subscribing.destroy(@channel, current_user)
 end
