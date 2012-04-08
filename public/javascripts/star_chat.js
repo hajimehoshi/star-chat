@@ -47,7 +47,7 @@ $(function() {
         return Object.keys(values);
     }
     var updateViewChannels = (function () {
-        // TODO: Bug fix: it should be added to the view-state
+        var lastSessionId = 0;
         var cachedChannels = [];
         return function () {
             // channels
@@ -61,7 +61,8 @@ $(function() {
                 }
                 return 0;
             });
-            if (isSameArray(channels, cachedChannels)) {
+            if (lastSessionId == session.id &&
+                isSameArray(channels, cachedChannels)) {
                 return;
             }
             var ul = $('#channels ul');
@@ -85,6 +86,7 @@ $(function() {
             for (var i = 0; i < channels.length; i++) {
                 cachedChannels[i] = channels[i];
             }
+            lastSessionId = session.id;
         }
     })();
     function updateViewMessages() {
