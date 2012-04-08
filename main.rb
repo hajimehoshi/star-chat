@@ -141,7 +141,7 @@ before '/subscribings' do
   @channel = StarChat::Channel.find(channel_name)
 end
 
-post '/subscribings', provides: :json do
+put '/subscribings', provides: :json do
   unless @channel
     @channel = StarChat::Channel.new(params[:channel_name])
     begin
@@ -166,4 +166,5 @@ delete '/subscribings', provides: :json do
   halt 409 unless StarChat::Subscribing.exist?(@channel, current_user)
   StarChat::Subscribing.destroy(@channel, current_user)
   # TODO: broadcasting
+  200
 end

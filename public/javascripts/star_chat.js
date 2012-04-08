@@ -18,8 +18,9 @@ $(function() {
                 newMessages: {},
                 messageIdsAlreadyShown: {},
                 messageScrollTops: {},
-                isNowPostingMessage: false,
+                isPostingMessage: false,
                 userNames: {},
+                isEdittingChannels: false,
             }
         }
         return viewStates[session.id];
@@ -62,32 +63,63 @@ $(function() {
                 }
                 return 0;
             });
-            if (lastSessionId == session.id &&
-                isSameArray(channels, cachedChannels)) {
-                return;
-            }
-            var ul = $('#channels ul');
-            ul.empty();
-            $.each(channels, function (i, channel) {
-                var a = $('<a href="#"></a>');
-                a.text(channel.name);
-                a.click(function () {
-                    viewState.channelName = channel.name;
-                    if (!viewState.userNames[viewState.channelName]) {
-                        updateUserList();
-                    }
-                    updateView();
-                    return false;
+            if (lastSessionId != session.id ||
+                !isSameArray(channels, cachedChannels)) {
+                var ul = $('#channels ul');
+                ul.empty();
+                $.each(channels, function (i, channel) {
+                    var a = $('<a href="#"></a>');
+                    a.text(channel.name);
+                    a.click(function () {
+                        viewState.channelName = channel.name;
+                        if (!viewState.userNames[viewState.channelName]) {
+                            updateUserList();
+                        }
+                        updateView();
+                        return false;
+                    });
+                    var channelName = channel.name;
+                    var delLink = $('<a href="#">Del</a>').click(function () {
+                        var msg = "Are you sure you want to delete subscribing '" +
+                            channelName + "'?"
+                        if (!confirm(msg)) {
+                            return false;
+                        }
+                        var url = '/subscribings?' +
+                            'channel_name=' + encodeURIComponent(channelName) + ';' +
+                            'user_name=' + encodeURIComponent(session.userName);
+                        $.ajax({
+                            url: url,
+                            type: 'DELETE',
+                            cache: false,
+                            beforeSend: addAuthHeader,
+                            dataType: 'json',
+                            success: function (data, textStatus, jqXHR) {
+                                updateChannelList();
+                            },
+                            statusCode: {
+                                401: logOut,
+                            },
+                        });
+                        return false;
+                    });
+                    var span = $('<span class="del"></span>');
+                    span.append(' (').append(delLink).append(')');
+                    var li = $('<li></li>');
+                    li.append(a).append(span);
+                    ul.append(li);
                 });
-                var li = $('<li></li>');
-                li.append(a);
-                ul.append(li);
-            });
-            cachedChannels = [];
-            for (var i = 0; i < channels.length; i++) {
-                cachedChannels[i] = channels[i];
+                cachedChannels = [];
+                for (var i = 0; i < channels.length; i++) {
+                    cachedChannels[i] = channels[i];
+                }
+                lastSessionId = session.id;
             }
-            lastSessionId = session.id;
+            if (viewState.isEdittingChannels) {
+                $('#channels li span.del').show();
+            } else {
+                $('#channels li span.del').hide();
+            }
         }
     })();
     function updateViewMessages() {
@@ -439,7 +471,7 @@ $(function() {
                 'user_name=' + encodeURIComponent(session.userName);
             $.ajax({
                 url: url,
-                type: 'POST',
+                type: 'PUT',
                 cache: false,
                 beforeSend: addAuthHeader,
                 dataType: 'json',
@@ -462,7 +494,7 @@ $(function() {
                 return false;
             }
             var viewState = getViewState();
-            if (viewState.isNowPostingMessage) {
+            if (viewState.isPostingMessage) {
                 return false;
             }
             if (!viewState.channelName) {
@@ -491,11 +523,19 @@ $(function() {
                     401: logOut,
                 },
                 complete: function (jqXHR, textStatus) {
-                    viewState.isNowPostingMessage = false;
+                    viewState.isPostingMessage = false;
                 },
             });
-            viewState.isNowPostingMessage = true;
+            viewState.isPostingMessage = true;
             e.stopPropagation();
+            return false;
+        });
+    })();
+    (function () {
+        $('#editChannelsLink a').click(function () {
+            var viewState = getViewState();
+            viewState.isEdittingChannels = !viewState.isEdittingChannels;
+            updateView();
             return false;
         });
     })();
