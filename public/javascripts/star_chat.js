@@ -174,7 +174,8 @@ $(function() {
                 section.animate({scrollTop: section.get(0).scrollHeight});
             }
         } else {
-            if (!viewState.lastChannelName) {
+            if (!viewState.lastChannelName ||
+                !(viewState.channelName in viewState.messageScrollTops)) {
                 section.scrollTop(section.get(0).scrollHeight);
             } else {
                 section.scrollTop(viewState.messageScrollTops[viewState.channelName]);
