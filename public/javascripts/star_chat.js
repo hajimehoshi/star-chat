@@ -41,13 +41,6 @@ $(function() {
         }
         return true;
     }
-    function uniq(arr) {
-        var values = {};
-        for (var i = 0; i < arr.length; i++) {
-            values[arr[i]] = true;
-        }
-        return Object.keys(values);
-    }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         var cachedChannels = [];
