@@ -70,17 +70,19 @@ end
 get '/users/:user_name/stream', provides: :json do
   user_name = params[:user_name]
   stream(true) do |out|
-    current_user.channels.inject([]) do |msgs, channel|
+    packets = current_user.channels.inject([]) do |msgs, channel|
       channel_name = channel.name
       msgs.concat(channel.messages(-100).map do |msg|
                     {
                       type: 'message',
                       channel_name: channel_name,
                       message: msg,
-                    }
+                    }.to_json
                   end.to_a)
-    end.each do |packet|
-      out << packet.to_json << "\n"
+    end
+    unless packets.empty?
+      packets_str = packets.join("\n")
+      out << packets_str << "\n"
     end
     settings.streams << [user_name, out]
     out.callback do
