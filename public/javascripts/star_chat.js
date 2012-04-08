@@ -375,7 +375,7 @@ $(function() {
             delete viewStates[session.id];
         }
         session.id = 0;
-        $('#messages > section').remove();
+        $('#messages > section[data-channel-name!=""]').remove();
         updateView();
         stopStream();
     }
