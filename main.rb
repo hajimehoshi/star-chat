@@ -158,6 +158,20 @@ put '/subscribings', provides: :json do
     return false unless user = StarChat::User.find(user_name)
     @channel.users.include?(user)
   end
+  packets = @channel.messages(-100).map do |message|
+    {
+      type: 'message',
+      channel_name: @channel.name,
+      message: message,
+    }.to_json
+  end.to_a
+  unless packets.empty?
+    packets_str = packets.join("\n")
+    settings.streams.each do |user_name, connection|
+      next if user_name != current_user.name
+      connection << packets_str << "\n"
+    end
+  end
   201
 end
 

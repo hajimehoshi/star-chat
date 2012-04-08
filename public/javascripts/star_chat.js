@@ -252,7 +252,7 @@ $(function() {
             viewState.stream.abort();
         }
         viewState.stream = null;
-        var i = 0;
+        var streamReadIndex = 0;
         var currentUserName = session.userName;
         viewState.stream = $.ajax({
             url: '/users/' + encodeURIComponent(session.userName) +
@@ -265,13 +265,13 @@ $(function() {
                     // TODO: Reconnecting if overflow
                     var xhr = this;
                     var text = xhr.responseText;
-                    var subText = text.substring(i);
+                    var subText = text.substring(streamReadIndex);
                     while (true) {
                         var tokenLength = subText.search("\n");
                         if (tokenLength === -1) {
                             break;
                         }
-                        i += tokenLength + 1;
+                        streamReadIndex += tokenLength + 1;
                         var token = subText.substring(0, tokenLength);
                         subText = subText.substring(tokenLength + 1);
                         try {
@@ -294,7 +294,7 @@ $(function() {
                             }
                         } else if (obj.type === 'subscribing') {
                             if (obj.user_name === currentUserName) {
-                                return;
+                                continue;
                             }
                             var channelName = obj.channel_name;
                             if (!(channelName in viewState.userNames)) {
@@ -307,12 +307,12 @@ $(function() {
                             }
                         } else if (obj.type === 'delete_subscribing') {
                             if (obj.user_name === currentUserName) {
-                                return;
+                                continue;
                             }
                             var channelName = obj.channel_name;
                             if (!(channelName in viewState.userNames)) {
                                 viewState.userNames[channelName] = {};
-                                return;
+                                continue;
                             }
                             var userNames = viewState.userNames[channelName];
                             delete userNames[obj.user_name];
