@@ -435,7 +435,7 @@ $(function() {
                 return false;
             }
             var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + '&' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
                 'user_name=' + encodeURIComponent(session.userName);
             $.ajax({
                 url: url,
