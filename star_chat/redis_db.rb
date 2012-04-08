@@ -21,9 +21,10 @@ module StarChat
 
     def exec(command, keys = [], *args)
       key = keys.map do |k|
-        raise 'invalid key: empty' if k.to_s.empty?
-        raise 'invalid key: colon' if k.to_s.include?(':')
-        k.to_s
+        str = k.to_s
+        raise 'invalid key: empty' if str.empty?
+        raise 'invalid key: controls' if str =~ /[[:cntrl:]]/
+        str.gsub('\\'){'\\x5c'}.gsub(':'){'\\x3a'}
       end.join(':')
       @@redis.send(command, key, *args)
     end
