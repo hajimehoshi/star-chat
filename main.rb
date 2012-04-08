@@ -34,8 +34,13 @@ helpers do
   def current_user
     return nil unless authorized?
     user_name = auth.credentials[0]
-    StarChat::User.find(user_name) or
-      StarChat::User.new(user_name).save
+    user = StarChat::User.find(user_name)
+    return user if user
+    user = StarChat::User.new(user_name).save
+    lobby_channel = StarChat::Channel.find('Lobby') or
+      StarChat::Channel.new('Lobby').save
+    StarChat::Subscribing.save(lobby_channel, user)
+    user
   end
 
   def broadcast(values)
