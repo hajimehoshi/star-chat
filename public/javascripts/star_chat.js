@@ -314,6 +314,12 @@ $(function() {
                              'Basic ' + btoa(session.userName + ':' + session.password));
     }
     function tryLogIn(userName, password) {
+        if (!userName) {
+            userName = '';
+        }
+        if (!password) {
+            password = '';
+        }
         var allAscii = /^[\x20-\x7E]*$/;
         if (!userName.match(allAscii)) {
             return;
