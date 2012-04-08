@@ -14,8 +14,10 @@ $(function() {
                 streamContinuingErrorNum: 0,
                 channels: [],
                 channelName: '',
+                lastChannelName: '',
                 newMessages: {},
                 messageIdsAlreadyShown: {},
+                messageScrollTops: {},
                 userNames: {},
             }
         }
@@ -45,6 +47,7 @@ $(function() {
         return Object.keys(values);
     }
     var updateViewChannels = (function () {
+        // TODO: Bug fix: it should be added to the view-state
         var cachedChannels = [];
         return function () {
             // channels
@@ -100,7 +103,11 @@ $(function() {
                 return $(this).attr('data-channel-name') === viewState.channelName;
             }).length === 0) {
             var section = $('<section></section>');
-            section.attr('data-channel-name', viewState.channelName);
+            var channelName = viewState.channelName;
+            section.attr('data-channel-name', channelName);
+            section.scroll(function () {
+                viewState.messageScrollTops[channelName] = section.scrollTop();
+            });
             $('#messages h2').after(section);
         }
         $('#messages > section').each(function (i) {
@@ -112,6 +119,7 @@ $(function() {
             }
         });
         if (!viewState.channelName) {
+            viewState.lastChannelName = '';
             return;
         }
         function messageToElement(message) {
@@ -159,9 +167,19 @@ $(function() {
             section.append(messageToElement(message));
             viewState.messageIdsAlreadyShown[message.id] = true;
         });
-        if (isBottom) {
-            section.animate({scrollTop: section.get(0).scrollHeight});
+        if (viewState.lastChannelName === viewState.channelName) {
+            if (isBottom) {
+                section.animate({scrollTop: section.get(0).scrollHeight});
+            }
+        } else {
+            if (!viewState.lastChannelName) {
+                section.scrollTop(section.get(0).scrollHeight);
+            } else {
+                section.scrollTop(viewState.messageScrollTops[viewState.channelName]);
+            }
         }
+        viewState.lastChannelName = viewState.channelName;
+        viewState.messageScrollTops[viewState.channelName] = section.scrollTop();
         viewState.newMessages[viewState.channelName] = [];
     }
     function updateViewUsers() {
@@ -406,6 +424,7 @@ $(function() {
         });
     })();
     (function () {
+        // TODO: 二重投稿防止
         var form = $('#addChannelForm');
         form.find('input[type="submit"]').click(function () {
             var channelName = form.find('input[name="name"]').val();
