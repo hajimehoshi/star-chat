@@ -18,6 +18,7 @@ $(function() {
                 newMessages: {},
                 messageIdsAlreadyShown: {},
                 messageScrollTops: {},
+                isNowPostingMessage: false,
                 userNames: {},
             }
         }
@@ -427,7 +428,6 @@ $(function() {
         });
     })();
     (function () {
-        // TODO: 二重投稿防止
         var form = $('#addChannelForm');
         form.find('input[type="submit"]').click(function () {
             var channelName = form.find('input[name="name"]').val();
@@ -459,9 +459,12 @@ $(function() {
     (function () {
         var form = $('#postMessageForm');
         form.find('input[type="submit"]').click(function (e) {
-            var viewState = getViewState();
             if (!session.loggedIn) {
                 // TODO: show alert or do something
+                return false;
+            }
+            var viewState = getViewState();
+            if (viewState.isNowPostingMessage) {
                 return false;
             }
             if (!viewState.channelName) {
@@ -489,7 +492,11 @@ $(function() {
                 statusCode: {
                     401: logOut,
                 },
+                complete: function (jqXHR, textStatus) {
+                    viewState.isNowPostingMessage = false;
+                },
             });
+            viewState.isNowPostingMessage = true;
             e.stopPropagation();
             return false;
         });
