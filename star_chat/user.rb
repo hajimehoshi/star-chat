@@ -73,8 +73,8 @@ module StarChat
       # TODO: validate
       RedisDB.exec(:hmset,
                    ['users', name],
-                 'name', name,
-                 'nick', nick)
+                   'name', name,
+                   'nick', nick)
       @@items_cache[name] = self
       self
     end
