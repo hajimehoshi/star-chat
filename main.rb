@@ -37,8 +37,8 @@ helpers do
     user = StarChat::User.find(user_name)
     return user if user
     user = StarChat::User.new(user_name).save
-    lobby_channel = StarChat::Channel.find('Lobby') or
-      StarChat::Channel.new('Lobby').save
+    lobby_channel = (StarChat::Channel.find('Lobby') or
+                     StarChat::Channel.new('Lobby').save)
     StarChat::Subscribing.save(lobby_channel, user)
     user
   end
