@@ -85,7 +85,7 @@ $(function() {
                             url: url,
                             type: 'DELETE',
                             cache: false,
-                            beforeSend: addAuthHeader,
+                            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
                             dataType: 'json',
                             success: function (data, textStatus, jqXHR) {
                                 updateChannelList();
@@ -259,7 +259,7 @@ $(function() {
                 '/stream',
             type: 'GET',
             cache: false,
-            beforeSend: addAuthHeader,
+            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
             xhrFields: {
                 onprogress: function () {
                     // TODO: Reconnecting if overflow
@@ -372,9 +372,11 @@ $(function() {
         updateView();
         stopStream();
     }
-    function addAuthHeader(xhr) {
-        xhr.setRequestHeader('Authorization',
-                             'Basic ' + btoa(session.userName + ':' + session.password));
+    function getAddAuthHeaderFunc(userName, password) {
+        return function (xhr) {
+            xhr.setRequestHeader('Authorization',
+                                 'Basic ' + btoa(userName + ':' + password));
+        }
     }
     function tryLogIn(userName, password) {
         if (!userName) {
@@ -392,10 +394,7 @@ $(function() {
         }
         $.ajax({
             url: '/users/' + encodeURIComponent(userName),
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Authorization',
-                                     'Basic ' + btoa(userName + ':' + password));
-            },
+            beforeSend: getAddAuthHeaderFunc(userName, password),
             success: function (data, textStatus, jqXHR) {
                 logIn(userName, password);
             },
@@ -410,7 +409,7 @@ $(function() {
             url: '/users/' + encodeURIComponent(session.userName) + '/channels',
             type: 'GET',
             cache: false,
-            beforeSend: addAuthHeader,
+            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
                 viewState.channels = data;
@@ -425,7 +424,7 @@ $(function() {
             url: '/channels/' + encodeURIComponent(channelName) + '/users',
             type: 'GET',
             cache: false,
-            beforeSend: addAuthHeader,
+            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
             dataType: 'json',
             success: function (data, textStatus, jqXHR) {
                 if (!viewState.userNames[channelName]) {
@@ -481,7 +480,7 @@ $(function() {
                 url: url,
                 type: 'PUT',
                 cache: false,
-                beforeSend: addAuthHeader,
+                beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
                 dataType: 'json',
                 success: function (data, textStatus, jqXHR) {
                     form.find('input[name="name"]').val('');
@@ -518,7 +517,7 @@ $(function() {
                 url: url,
                 type: 'POST',
                 cache: false,
-                beforeSend: addAuthHeader,
+                beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
                 data: JSON.stringify({
                     body: body,
                 }),
