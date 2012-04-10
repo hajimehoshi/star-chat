@@ -44,8 +44,8 @@ helpers do
     broadcast(type: 'subscribing',
               channel_name: lobby_channel.name,
               user_name: user_name) do |user_name|
-      return false unless user = StarChat::User.find(user_name)
-      lobby_channel.users.include?(user)
+      return false unless u = StarChat::User.find(user_name)
+      lobby_channel.users.include?(u)
     end
     user
   end

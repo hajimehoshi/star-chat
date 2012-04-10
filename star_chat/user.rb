@@ -81,8 +81,6 @@ module StarChat
     end
 
     def auth?(password)
-      return false unless password
-      # TODO: use salt?
       now = Time.now.to_i
       if @password_digest and
           @last_auth_with_system and
@@ -92,7 +90,7 @@ module StarChat
           return true
         end
       elsif auth_with_system?(password)
-        @password_digest     = Digest::SHA1.digest(@@salt + password)
+        @password_digest       = Digest::SHA1.digest(@@salt + password)
         @last_auth_with_system = Time.now.to_i
         return true
       end
