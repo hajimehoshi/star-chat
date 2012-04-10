@@ -34,6 +34,7 @@ module StarChat
     
     def self.auth?(name, password)
       return false unless name
+      return false if name.empty?
       return false unless password
       user = (StarChat::User.find(name) or
               StarChat::User.new(name))

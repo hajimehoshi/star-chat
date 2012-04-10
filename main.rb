@@ -23,6 +23,7 @@ helpers do
     end
     user_name, password = auth.credentials
     return false unless user_name
+    return false if user_name.empty?
     return false unless password
     StarChat::User.auth?(user_name, password)
   end
