@@ -40,6 +40,12 @@ helpers do
     lobby_channel = (StarChat::Channel.find('Lobby') or
                      StarChat::Channel.new('Lobby').save)
     StarChat::Subscribing.save(lobby_channel, user)
+    broadcast(type: 'subscribing',
+              channel_name: lobby_channel.name,
+              user_name: user_name) do |user_name|
+      return false unless user = StarChat::User.find(user_name)
+      lobby_channel.users.include?(user)
+    end
     user
   end
 
