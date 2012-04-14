@@ -1,6 +1,6 @@
-test("test", function () {
+test("isSomeArray", function () {
     strictEqual(starChat.isSameArray([], []), true);
     strictEqual(starChat.isSameArray(["foo", "bar"], ["foo", "bar"]), true);
-    notStrictEqual(starChat.isSameArray(["foo", "bar"], ["foo", "baz"]), true);
-    notStrictEqual(starChat.isSameArray(["foo", "bar"], ["foo", "bar", "baz"]), true);
+    strictEqual(starChat.isSameArray(["foo", "bar"], ["foo", "baz"]), false);
+    strictEqual(starChat.isSameArray(["foo", "bar"], ["foo", "bar", "baz"]), false);
 });
