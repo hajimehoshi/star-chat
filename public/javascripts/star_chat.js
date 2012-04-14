@@ -17,6 +17,41 @@ var starChat = {};
         }
         return true;
     };
+    starChat.getAddAuthHeaderFunc = function (userName, password) {
+        return function (xhr) {
+            xhr.setRequestHeader('Authorization',
+                                 'Basic ' + btoa(userName + ':' + password));
+        }
+    };
+    starChat.ajax = function (userName, password, url, method, callbacks) {
+        var args = {
+            url: url,
+            type: method,
+            cache: false,
+            beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
+            dataType: 'json',
+        }
+        // TODO: replace it!
+        if ('data' in callbacks) {
+            args.data = JSON.stringify(callbacks.data);
+            args.contentType = 'application/json; charset=utf-8';
+        }
+        if ('logOut' in callbacks) {
+            args.statusCode = {
+                401: callbacks.logOut,
+            };
+        }
+        if ('success' in callbacks) {
+            args.success = callbacks.success;
+        }
+        if ('error' in callbacks) {
+            args.error = callbacks.error;
+        }
+        if ('complete' in callbacks) {
+            args.complete = callbacks.complete;
+        }
+        $.ajax(args);
+    };
 })();
 
 $(function() {
@@ -86,19 +121,13 @@ $(function() {
                         var url = '/subscribings?' +
                             'channel_name=' + encodeURIComponent(channelName) + ';' +
                             'user_name=' + encodeURIComponent(session.userName);
-                        $.ajax({
-                            url: url,
-                            type: 'DELETE',
-                            cache: false,
-                            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
-                            dataType: 'json',
-                            success: function (data, textStatus, jqXHR) {
-                                updateChannelList();
-                            },
-                            statusCode: {
-                                401: logOut,
-                            },
-                        });
+                        starChat.ajax(session.userName, session.password,
+                                      url,
+                                      'DELETE',
+                                      {
+                                          success: updateChannelList,
+                                          logOut: logOut,
+                                      });
                         return false;
                     });
                     var span = $('<span class="del"></span>');
@@ -264,7 +293,7 @@ $(function() {
                 '/stream',
             type: 'GET',
             cache: false,
-            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
+            beforeSend: starChat.getAddAuthHeaderFunc(session.userName, session.password),
             xhrFields: {
                 onprogress: function () {
                     // TODO: Reconnecting if overflow
@@ -377,12 +406,6 @@ $(function() {
         updateView();
         stopStream();
     }
-    function getAddAuthHeaderFunc(userName, password) {
-        return function (xhr) {
-            xhr.setRequestHeader('Authorization',
-                                 'Basic ' + btoa(userName + ':' + password));
-        }
-    }
     function tryLogIn(userName, password) {
         if (!userName) {
             userName = '';
@@ -399,7 +422,7 @@ $(function() {
         }
         $.ajax({
             url: '/users/' + encodeURIComponent(userName),
-            beforeSend: getAddAuthHeaderFunc(userName, password),
+            beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
             success: function (data, textStatus, jqXHR) {
                 logIn(userName, password);
             },
@@ -410,40 +433,40 @@ $(function() {
     }
     function updateChannelList() {
         var viewState = getViewState();
-        $.ajax({
-            url: '/users/' + encodeURIComponent(session.userName) + '/channels',
-            type: 'GET',
-            cache: false,
-            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
-            dataType: 'json',
-            success: function (data, textStatus, jqXHR) {
-                viewState.channels = data;
-                updateView();
-            }
-        });
+        var success = function (data, textStatus, jqXHR) {
+            viewState.channels = data;
+            updateView();
+        };
+        starChat.ajax(session.userName, session.password,
+                      '/users/' + encodeURIComponent(session.userName) + '/channels',
+                      'GET',
+                      {
+                          success: success,
+                          logOut: logOut,
+                      });
     }
     function updateUserList() {
         var viewState = getViewState();
         var channelName = viewState.channelName;
-        $.ajax({
-            url: '/channels/' + encodeURIComponent(channelName) + '/users',
-            type: 'GET',
-            cache: false,
-            beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
-            dataType: 'json',
-            success: function (data, textStatus, jqXHR) {
-                if (!viewState.userNames[channelName]) {
-                    viewState.userNames[channelName] = {};
-                }
-                var userNames = viewState.userNames[channelName];
-                $.each(data, function (i, user) {
-                    userNames[user.name] = true;
-                });
-                if (channelName === getViewState().channelName) {
-                    updateView();
-                }
+        function success(data, textStatus, jqXHR) {
+            if (!viewState.userNames[channelName]) {
+                viewState.userNames[channelName] = {};
             }
-        });
+            var userNames = viewState.userNames[channelName];
+            $.each(data, function (i, user) {
+                userNames[user.name] = true;
+            });
+            if (channelName === getViewState().channelName) {
+                updateView();
+            }
+        }
+        starChat.ajax(session.userName, session.password,
+                      '/channels/' + encodeURIComponent(channelName) + '/users',
+                      'GET',
+                      {
+                          success: success,
+                          logOut: logOut,
+                      });
     }
     (function () {
         var form = $('#logInForm');
@@ -481,26 +504,23 @@ $(function() {
             var url = '/subscribings?' +
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
                 'user_name=' + encodeURIComponent(session.userName);
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                cache: false,
-                beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
-                dataType: 'json',
+            var callbacks = {
                 success: function (data, textStatus, jqXHR) {
                     form.find('input[name="name"]').val('');
                     updateChannelList();
                 },
-                statusCode: {
-                    401: logOut,
-                },
-            });
+                logOut: logOut,
+            };
+            starChat.ajax(session.userName, session.password,
+                          url,
+                          'PUT',
+                          callbacks);
             return false;
         });
     })();
     (function () {
         var form = $('#postMessageForm');
-        form.find('input[type="submit"]').click(function (e) {
+        form.find('input[type="submit"]').click(function () {
             if (!session.loggedIn) {
                 // TODO: show alert or do something
                 return false;
@@ -518,28 +538,23 @@ $(function() {
             }
             var url = '/channels/' + encodeURIComponent(viewState.channelName) +
                 '/messages';
-            $.ajax({
-                url: url,
-                type: 'POST',
-                cache: false,
-                beforeSend: getAddAuthHeaderFunc(session.userName, session.password),
-                data: JSON.stringify({
-                    body: body,
-                }),
-                contentType: 'application.json; charset=utf-8',
-                dataType: 'json',
+            var callbacks = {
                 success: function (data, textStatus, jqXHR) {
                     form.find('input[name="body"]').val('');
                 },
-                statusCode: {
-                    401: logOut,
-                },
+                logOut: logOut,
                 complete: function (jqXHR, textStatus) {
                     viewState.isPostingMessage = false;
                 },
-            });
+                data: {
+                    body: body,
+                },
+            }
+            starChat.ajax(session.userName, session.password,
+                          url,
+                          'POST',
+                          callbacks);
             viewState.isPostingMessage = true;
-            e.stopPropagation();
             return false;
         });
     })();
