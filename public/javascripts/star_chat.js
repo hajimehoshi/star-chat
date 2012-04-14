@@ -1,3 +1,24 @@
+var starChat = {};
+
+(function () {
+    starChat.isSameArray = function (a, b, func) {
+        if (!func) {
+            func = function (x, y) {
+                return x === y;
+            };
+        }
+        if (a.length !== b.length) {
+            return false;
+        }
+        for (var i = 0; i < a.length; i++) {
+            if (!func(a[i], b[i])) {
+                return false;
+            }
+        }
+        return true;
+    };
+})();
+
 $(function() {
     var session = {
         loggedIn: false,
@@ -25,22 +46,6 @@ $(function() {
         }
         return viewStates[session.id];
     }
-    function isSameArray(a, b, func) {
-        if (!func) {
-            func = function (x, y) {
-                return x === y;
-            };
-        }
-        if (a.length !== b.length) {
-            return false;
-        }
-        for (var i = 0; i < a.length; i++) {
-            if (!func(a[i], b[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         var cachedChannels = [];
@@ -57,7 +62,7 @@ $(function() {
                 return 0;
             });
             if (lastSessionId != session.id ||
-                !isSameArray(channels, cachedChannels)) {
+                !starChat.isSameArray(channels, cachedChannels)) {
                 var ul = $('#channels ul');
                 ul.empty();
                 $.each(channels, function (i, channel) {
