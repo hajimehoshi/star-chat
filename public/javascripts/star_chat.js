@@ -119,13 +119,14 @@ $(function() {
                         var url = '/subscribings?' +
                             'channel_name=' + encodeURIComponent(channelName) + ';' +
                             'user_name=' + encodeURIComponent(session.userName);
+                        var callbacks = {
+                            success: updateChannelList,
+                            logOut: logOut,
+                        }
                         starChat.ajax(session.userName, session.password,
                                       url,
                                       'DELETE',
-                                      {
-                                          success: updateChannelList,
-                                          logOut: logOut,
-                                      });
+                                      callbacks);
                         return false;
                     });
                     var span = $('<span class="del"></span>');
@@ -418,53 +419,54 @@ $(function() {
         if (!password.match(allAscii)) {
             return;
         }
-        $.ajax({
-            url: '/users/' + encodeURIComponent(userName),
-            beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
+        var callbacks = {
             success: function (data, textStatus, jqXHR) {
                 logIn(userName, password);
             },
-            statusCode: {
-                401: logOut,
-            },
-        });
+            logOut: logOut,
+        };
+        starChat.ajax(userName, password,
+                      '/users/' + encodeURIComponent(userName),
+                      'GET',
+                      callbacks);
     }
     function updateChannelList() {
         var viewState = getViewState();
-        var success = function (data, textStatus, jqXHR) {
-            viewState.channels = data;
-            updateView();
-        };
+        var callbacks = {
+            success: function (data, textStatus, jqXHR) {
+                viewState.channels = data;
+                updateView();
+            },
+            logOut: logOut,
+        }
         starChat.ajax(session.userName, session.password,
                       '/users/' + encodeURIComponent(session.userName) + '/channels',
                       'GET',
-                      {
-                          success: success,
-                          logOut: logOut,
-                      });
+                      callbacks);
     }
     function updateUserList() {
         var viewState = getViewState();
         var channelName = viewState.channelName;
-        function success(data, textStatus, jqXHR) {
-            if (!viewState.userNames[channelName]) {
-                viewState.userNames[channelName] = {};
-            }
-            var userNames = viewState.userNames[channelName];
-            $.each(data, function (i, user) {
-                userNames[user.name] = true;
-            });
-            if (channelName === getViewState().channelName) {
-                updateView();
-            }
-        }
+        
+        var callbacks = {
+            success: function success(data, textStatus, jqXHR) {
+                if (!viewState.userNames[channelName]) {
+                    viewState.userNames[channelName] = {};
+                }
+                var userNames = viewState.userNames[channelName];
+                $.each(data, function (i, user) {
+                    userNames[user.name] = true;
+                });
+                if (channelName === getViewState().channelName) {
+                    updateView();
+                }
+            },
+            logOut: logOut,
+        };
         starChat.ajax(session.userName, session.password,
                       '/channels/' + encodeURIComponent(channelName) + '/users',
                       'GET',
-                      {
-                          success: success,
-                          logOut: logOut,
-                      });
+                      callbacks);
     }
     (function () {
         var form = $('#logInForm');
