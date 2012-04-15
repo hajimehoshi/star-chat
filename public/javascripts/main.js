@@ -1,4 +1,36 @@
 $(function() {
+    var clickChannel = function (view) {
+        return function (channel) {
+            view.channelName = channel.name;
+            if (!(view.channelName in view.userNames)) {
+                updateUserList();
+            }
+            view.update();
+            return false;
+        };
+    }
+    var clickChannelDel = function (view) {
+        return function (channel) {
+            var channelName = channel.name;
+            var msg = "Are you sure you want to delete subscribing '" +
+                channelName + "'?"
+            if (!confirm(msg)) {
+                return false;
+            }
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
+                'user_name=' + encodeURIComponent(view.session.userName);
+            var callbacks = {
+                success: updateChannelList,
+                logOut: logOut,
+            }
+            starChat.ajax(view.session.userName, view.session.password,
+                          url,
+                          'DELETE',
+                          callbacks);
+            return false;
+        };
+    }
     var session = {
         loggedIn: false,
         userName: '',
@@ -9,7 +41,9 @@ $(function() {
     var views = {};
     function getView() {
         if (!views[session.id]) {
-            views[session.id] = new starChat.View(session);
+            var view = new starChat.View(session);
+            view.clickChannel(clickChannel(view)).clickChannelDel(clickChannelDel(view));
+            views[session.id] = view;
         }
         return views[session.id];
     }

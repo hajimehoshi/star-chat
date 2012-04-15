@@ -35,32 +35,10 @@ starChat.View = (function () {
                     var a = $('<a href="#"></a>');
                     a.text(channel.name);
                     a.click(function () {
-                        view.channelName = channel.name;
-                        if (!(view.channelName in view.userNames)) {
-                            //updateUserList(); // TODO: fix it
-                        }
-                        view.update();
-                        return false;
+                        return view.clickChannel_(channel);
                     });
-                    var channelName = channel.name;
                     var delLink = $('<a href="#">Del</a>').click(function () {
-                        var msg = "Are you sure you want to delete subscribing '" +
-                            channelName + "'?"
-                        if (!confirm(msg)) {
-                            return false;
-                        }
-                        var url = '/subscribings?' +
-                            'channel_name=' + encodeURIComponent(channelName) + ';' +
-                            'user_name=' + encodeURIComponent(view.session.userName);
-                        var callbacks = {
-                            //success: updateChannelList, // TODO: fix it
-                            // logOut: logOut, // TODO: fix it
-                        }
-                        starChat.ajax(view.session.userName, view.session.password,
-                                      url,
-                                      'DELETE',
-                                      callbacks);
-                        return false;
+                        return view.clickChannelDel_(channel);
                     });
                     var span = $('<span class="del"></span>');
                     span.append(' (').append(delLink).append(')');
@@ -209,6 +187,14 @@ starChat.View = (function () {
         updateViewChannels(this);
         updateViewMessages(this);
         updateViewUsers(this);
+    };
+    View.prototype.clickChannel = function (func) {
+        this.clickChannel_ = func;
+        return this;
+    };
+    View.prototype.clickChannelDel = function (func) {
+        this.clickChannelDel_ = func;
+        return this;
     };
     return View;
 })();
