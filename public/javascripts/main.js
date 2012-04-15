@@ -351,8 +351,8 @@ $(function () {
             self.width(self.parent().width() / 20);
         });
         $('#messages > section').height($('#messages').height() -
-                                        $('#messages > h2').height() -
-                                        $('#messages > form').height() - 7);
+                                        $('#messages > h2').outerHeight() -
+                                        $('#messages > form').height());
     });
     $(window).resize();
 });
