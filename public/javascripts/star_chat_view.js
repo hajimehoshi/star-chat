@@ -27,7 +27,7 @@ starChat.View = (function () {
                 }
                 return 0;
             });
-            if (lastSessionId != view.session.id ||
+            if (lastSessionId != view.session.id() ||
                 !starChat.isSameArray(channels, cachedChannels)) {
                 var ul = $('#channels ul');
                 ul.empty();
@@ -50,7 +50,7 @@ starChat.View = (function () {
                 for (var i = 0; i < channels.length; i++) {
                     cachedChannels[i] = channels[i];
                 }
-                lastSessionId = view.session.id;
+                lastSessionId = view.session.id();
             }
             if (view.isEdittingChannels) {
                 $('#channels li span.del').show();
@@ -169,9 +169,9 @@ starChat.View = (function () {
         });
     }
     View.prototype.update = function () {
-        if (this.session.loggedIn) {
+        if (this.session.isLoggedIn()) {
             $('#logInForm').hide();
-            $('#logOutLink span').text(this.session.userName);
+            $('#logOutLink span').text(this.session.userName());
             $('#logOutLink').show();
             $('#main input').removeAttr('disabled');
             if (this.channelName) {

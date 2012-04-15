@@ -19,33 +19,28 @@ $(function() {
             }
             var url = '/subscribings?' +
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(view.session.userName);
+                'user_name=' + encodeURIComponent(view.session.userName());
             var callbacks = {
                 success: updateChannelList,
                 logOut: logOut,
             }
-            starChat.ajax(view.session.userName, view.session.password,
+            starChat.ajax(view.session.userName(), view.session.password(),
                           url,
                           'DELETE',
                           callbacks);
             return false;
         };
     }
-    var session = {
-        loggedIn: false,
-        userName: '',
-        password: '',
-        id: 0,
-    };
+    var session = new starChat.Session();
     // TODO: channel page state (dirty)
     var views = {};
     function getView() {
-        if (!views[session.id]) {
+        if (!views[session.id()]) {
             var view = new starChat.View(session);
             view.clickChannel(clickChannel(view)).clickChannelDel(clickChannelDel(view));
-            views[session.id] = view;
+            views[session.id()] = view;
         }
-        return views[session.id];
+        return views[session.id()];
     }
     function processPacketMessage(obj, view) {
         var channelName = obj.channel_name;
@@ -93,7 +88,7 @@ $(function() {
         }
         view.stream = null;
         var streamReadIndex = 0;
-        var url = '/users/' + encodeURIComponent(session.userName) + '/stream';
+        var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
         var callbacks = {
             onprogress: function () {
                 // TODO: Reconnecting if overflow
@@ -138,7 +133,7 @@ $(function() {
                 setTimeout(startStream, 10000);
             },
         };
-        starChat.ajax(session.userName, session.password,
+        starChat.ajax(session.userName(), session.password(),
                       url,
                       'GET',
                       callbacks);
@@ -154,10 +149,7 @@ $(function() {
     function logIn(userName, password) {
         localStorage.userName = userName;
         localStorage.password = password;
-        session.loggedIn = true;
-        session.userName = userName;
-        session.password = password;
-        session.id = (new Date()).getTime();
+        session = new starChat.Session((new Date()).getTime(), userName, password);
         updateChannelList();
         var view = getView();
         view.update();
@@ -166,13 +158,10 @@ $(function() {
     function logOut() {
         delete localStorage.userName;
         delete localStorage.password;
-        session.loggedIn = false;
-        session.userName = '';
-        session.password = '';
-        if (session.id !== 0) {
-            delete views[session.id];
+        if (session.id() !== 0) {
+            delete views[session.id()];
         }
-        session.id = 0;
+        session = new starChat.Session();
         $('#messages > section[data-channel-name!=""]').remove();
         var view = getView();
         view.update();
@@ -212,8 +201,9 @@ $(function() {
             },
             logOut: logOut,
         }
-        starChat.ajax(session.userName, session.password,
-                      '/users/' + encodeURIComponent(session.userName) + '/channels',
+        var url = '/users/' + encodeURIComponent(session.userName()) + '/channels';
+        starChat.ajax(session.userName(), session.password(),
+                      url,
                       'GET',
                       callbacks);
     }
@@ -236,8 +226,9 @@ $(function() {
             },
             logOut: logOut,
         };
-        starChat.ajax(session.userName, session.password,
-                      '/channels/' + encodeURIComponent(channelName) + '/users',
+        var url = '/channels/' + encodeURIComponent(channelName) + '/users';
+        starChat.ajax(session.userName(), session.password(),
+                      url,
                       'GET',
                       callbacks);
     }
@@ -276,7 +267,7 @@ $(function() {
             }
             var url = '/subscribings?' +
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(session.userName);
+                'user_name=' + encodeURIComponent(session.userName());
             var callbacks = {
                 success: function (data, textStatus, jqXHR) {
                     form.find('input[name="name"]').val('');
@@ -284,7 +275,7 @@ $(function() {
                 },
                 logOut: logOut,
             };
-            starChat.ajax(session.userName, session.password,
+            starChat.ajax(session.userName(), session.password(),
                           url,
                           'PUT',
                           callbacks);
@@ -294,7 +285,7 @@ $(function() {
     (function () {
         var form = $('#postMessageForm');
         form.find('input[type="submit"]').click(function () {
-            if (!session.loggedIn) {
+            if (!session.isLoggedIn()) {
                 // TODO: show alert or do something
                 return false;
             }
@@ -320,7 +311,7 @@ $(function() {
                     view.isPostingMessage = false;
                 },
             }
-            starChat.ajax(session.userName, session.password,
+            starChat.ajax(session.userName(), session.password(),
                           url,
                           'POST',
                           callbacks,
