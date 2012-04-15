@@ -283,6 +283,42 @@ $(function() {
         updateViewMessages();
         updateViewUsers();
     };
+    function processPacketMessage(obj, viewState) {
+        var channelName = obj.channel_name;
+        var message = obj.message;
+        if (channelName && message) {
+            if (!viewState.newMessages[channelName]) {
+                viewState.newMessages[channelName] = [];
+            }
+            viewState.newMessages[channelName].push(message);
+            if (channelName === getViewState().channelName) {
+                updateView();
+            }
+        }
+    }
+    function processPacketSubscribing(obj, viewState) {
+        var channelName = obj.channel_name;
+        if (!(channelName in viewState.userNames)) {
+            viewState.userNames[channelName] = {};
+        }
+        var userNames = viewState.userNames[channelName];
+        userNames[obj.user_name] = true;
+        if (channelName === getViewState().channelName) {
+            updateView();
+        }
+    }
+    function processPacketDeleteSubscribing(obj, viewState) {
+        var channelName = obj.channel_name;
+        if (!(channelName in viewState.userNames)) {
+            viewState.userNames[channelName] = {};
+            return;
+        }
+        var userNames = viewState.userNames[channelName];
+        delete userNames[obj.user_name];
+        if (channelName === getViewState().channelName) {
+            updateView();
+        }
+    }
     function startStream() {
         var viewState = getViewState();
         if (viewState.stream) {
@@ -290,7 +326,6 @@ $(function() {
         }
         viewState.stream = null;
         var streamReadIndex = 0;
-        var currentUserName = session.userName;
         var url = '/users/' + encodeURIComponent(session.userName) + '/stream';
         var callbacks = {
             onprogress: function () {
@@ -313,44 +348,11 @@ $(function() {
                         continue;
                     }
                     if (obj.type === 'message') {
-                        var channelName = obj.channel_name;
-                        var message = obj.message;
-                        if (channelName && message) {
-                            if (!viewState.newMessages[channelName]) {
-                                viewState.newMessages[channelName] = [];
-                            }
-                            viewState.newMessages[channelName].push(message);
-                            if (channelName === getViewState().channelName) {
-                                updateView();
-                            }
-                        }
+                        processPacketMessage(obj, viewState);
                     } else if (obj.type === 'subscribing') {
-                        if (obj.user_name === currentUserName) {
-                            continue;
-                        }
-                        var channelName = obj.channel_name;
-                        if (!(channelName in viewState.userNames)) {
-                            viewState.userNames[channelName] = {};
-                        }
-                        var userNames = viewState.userNames[channelName];
-                        userNames[obj.user_name] = true;
-                        if (channelName === getViewState().channelName) {
-                            updateView();
-                        }
+                        processPacketSubscribing(obj, viewState);
                     } else if (obj.type === 'delete_subscribing') {
-                        if (obj.user_name === currentUserName) {
-                            continue;
-                        }
-                        var channelName = obj.channel_name;
-                        if (!(channelName in viewState.userNames)) {
-                            viewState.userNames[channelName] = {};
-                            continue;
-                        }
-                        var userNames = viewState.userNames[channelName];
-                        delete userNames[obj.user_name];
-                        if (channelName === getViewState().channelName) {
-                            updateView();
-                        }
+                        processPacketDeleteSubscribing(obj, viewState);
                     }
                 }
             },
