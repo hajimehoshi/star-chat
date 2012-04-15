@@ -1,3 +1,5 @@
+'use strict';
+
 starChat.Session = (function () {
     var Session = function (id, userName, password) {
         if (id !== void(0)) {

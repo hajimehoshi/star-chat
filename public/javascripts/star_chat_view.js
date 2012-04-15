@@ -1,3 +1,5 @@
+'use strict';
+
 starChat.View = (function () {
     var View = function (session) {
         this.session = session;

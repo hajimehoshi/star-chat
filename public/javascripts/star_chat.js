@@ -1,3 +1,5 @@
+'use strict';
+
 var starChat = {};
 
 starChat.isSameArray = function (a, b, func) {

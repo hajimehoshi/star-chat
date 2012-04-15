@@ -1,3 +1,5 @@
+'use strict';
+
 $(function() {
     var clickChannel = function (view) {
         return function (channel) {
