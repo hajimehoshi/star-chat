@@ -30,13 +30,17 @@ var starChat = {};
             cache: false,
             beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
             dataType: 'json',
+            statusCode: {},
         }
         if (data) {
             args.data = data;
         }
         if ('logOut' in callbacks) {
-            args.statusCode = {
-                401: callbacks.logOut,
+            args.statusCode[401] = callbacks.logOut;
+        }
+        if ('onprogress' in callbacks) {
+            args.xhrFields = {
+                onprogress: callbacks.onprogress,
             };
         }
         if ('success' in callbacks) {
@@ -287,74 +291,68 @@ $(function() {
         viewState.stream = null;
         var streamReadIndex = 0;
         var currentUserName = session.userName;
-        viewState.stream = $.ajax({
-            url: '/users/' + encodeURIComponent(session.userName) +
-                '/stream',
-            type: 'GET',
-            cache: false,
-            beforeSend: starChat.getAddAuthHeaderFunc(session.userName, session.password),
-            xhrFields: {
-                onprogress: function () {
-                    // TODO: Reconnecting if overflow
-                    var xhr = this;
-                    var text = xhr.responseText;
-                    var subText = text.substring(streamReadIndex);
-                    while (true) {
-                        var tokenLength = subText.search("\n");
-                        if (tokenLength === -1) {
-                            break;
+        var url = '/users/' + encodeURIComponent(session.userName) + '/stream';
+        var callbacks = {
+            onprogress: function () {
+                // TODO: Reconnecting if overflow
+                var xhr = this;
+                var text = xhr.responseText;
+                var subText = text.substring(streamReadIndex);
+                while (true) {
+                    var tokenLength = subText.search("\n");
+                    if (tokenLength === -1) {
+                        break;
+                    }
+                    streamReadIndex += tokenLength + 1;
+                    var token = subText.substring(0, tokenLength);
+                    subText = subText.substring(tokenLength + 1);
+                    try {
+                        var obj = JSON.parse(token);
+                    } catch (e) {
+                        console.log(e);
+                        continue;
+                    }
+                    if (obj.type === 'message') {
+                        var channelName = obj.channel_name;
+                        var message = obj.message;
+                        if (channelName && message) {
+                            if (!viewState.newMessages[channelName]) {
+                                viewState.newMessages[channelName] = [];
+                            }
+                            viewState.newMessages[channelName].push(message);
+                            if (channelName === getViewState().channelName) {
+                                updateView();
+                            }
                         }
-                        streamReadIndex += tokenLength + 1;
-                        var token = subText.substring(0, tokenLength);
-                        subText = subText.substring(tokenLength + 1);
-                        try {
-                            var obj = JSON.parse(token);
-                        } catch (e) {
-                            console.log(e);
+                    } else if (obj.type === 'subscribing') {
+                        if (obj.user_name === currentUserName) {
                             continue;
                         }
-                        if (obj.type === 'message') {
-                            var channelName = obj.channel_name;
-                            var message = obj.message;
-                            if (channelName && message) {
-                                if (!viewState.newMessages[channelName]) {
-                                    viewState.newMessages[channelName] = [];
-                                }
-                                viewState.newMessages[channelName].push(message);
-                                if (channelName === getViewState().channelName) {
-                                    updateView();
-                                }
-                            }
-                        } else if (obj.type === 'subscribing') {
-                            if (obj.user_name === currentUserName) {
-                                continue;
-                            }
-                            var channelName = obj.channel_name;
-                            if (!(channelName in viewState.userNames)) {
-                                viewState.userNames[channelName] = {};
-                            }
-                            var userNames = viewState.userNames[channelName];
-                            userNames[obj.user_name] = true;
-                            if (channelName === getViewState().channelName) {
-                                updateView();
-                            }
-                        } else if (obj.type === 'delete_subscribing') {
-                            if (obj.user_name === currentUserName) {
-                                continue;
-                            }
-                            var channelName = obj.channel_name;
-                            if (!(channelName in viewState.userNames)) {
-                                viewState.userNames[channelName] = {};
-                                continue;
-                            }
-                            var userNames = viewState.userNames[channelName];
-                            delete userNames[obj.user_name];
-                            if (channelName === getViewState().channelName) {
-                                updateView();
-                            }
+                        var channelName = obj.channel_name;
+                        if (!(channelName in viewState.userNames)) {
+                            viewState.userNames[channelName] = {};
+                        }
+                        var userNames = viewState.userNames[channelName];
+                        userNames[obj.user_name] = true;
+                        if (channelName === getViewState().channelName) {
+                            updateView();
+                        }
+                    } else if (obj.type === 'delete_subscribing') {
+                        if (obj.user_name === currentUserName) {
+                            continue;
+                        }
+                        var channelName = obj.channel_name;
+                        if (!(channelName in viewState.userNames)) {
+                            viewState.userNames[channelName] = {};
+                            continue;
+                        }
+                        var userNames = viewState.userNames[channelName];
+                        delete userNames[obj.user_name];
+                        if (channelName === getViewState().channelName) {
+                            updateView();
                         }
                     }
-                },
+                }
             },
             success: function (data, textStatus, jqXHR) {
                 viewState.streamContinuingErrorNum = 0;
@@ -370,7 +368,11 @@ $(function() {
                 }
                 setTimeout(startStream, 10000);
             },
-        });
+        };
+        starChat.ajax(session.userName, session.password,
+                      url,
+                      'GET',
+                      callbacks);
     }
     function stopStream() {
         var viewState = getViewState();
