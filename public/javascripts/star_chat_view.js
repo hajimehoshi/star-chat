@@ -187,6 +187,7 @@ starChat.View = (function () {
         updateViewChannels(this);
         updateViewMessages(this);
         updateViewUsers(this);
+        $(window).resize();
     };
     View.prototype.clickChannel = function (func) {
         this.clickChannel_ = func;

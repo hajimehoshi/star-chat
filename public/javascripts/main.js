@@ -331,3 +331,26 @@ $(function() {
         });
     })();
 });
+
+$(function () {
+    var userAgent = navigator.userAgent;
+    if (userAgent.indexOf('Firefox') === -1) {
+        return;
+    }
+    $(window).resize(function () {
+        var main = $('#main');
+        $('#users').add('#channels').width(main.width() / 5);
+        $('.message > .userName').each(function () {
+            var self = $(this);
+            self.width(self.parent().width() / 5);
+        });
+        $('.message > .createdAt').each(function () {
+            var self = $(this);
+            self.width(self.parent().width() / 20);
+        });
+        $('#messages > section').height($('#messages').height() -
+                                        $('#messages > h2').height() -
+                                        $('#messages > form').height() - 7);
+    });
+    $(window).resize();
+});
