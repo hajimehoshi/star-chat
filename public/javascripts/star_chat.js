@@ -23,7 +23,7 @@ var starChat = {};
                                  'Basic ' + btoa(userName + ':' + password));
         }
     };
-    starChat.ajax = function (userName, password, url, method, callbacks) {
+    starChat.ajax = function (userName, password, url, method, callbacks, data) {
         var args = {
             url: url,
             type: method,
@@ -31,10 +31,8 @@ var starChat = {};
             beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
             dataType: 'json',
         }
-        // TODO: replace it!
-        if ('data' in callbacks) {
-            args.data = JSON.stringify(callbacks.data);
-            args.contentType = 'application/json; charset=utf-8';
+        if (data) {
+            args.data = data;
         }
         if ('logOut' in callbacks) {
             args.statusCode = {
@@ -546,14 +544,14 @@ $(function() {
                 complete: function (jqXHR, textStatus) {
                     viewState.isPostingMessage = false;
                 },
-                data: {
-                    body: body,
-                },
             }
             starChat.ajax(session.userName, session.password,
                           url,
                           'POST',
-                          callbacks);
+                          callbacks,
+                          {
+                              body: body,
+                          });
             viewState.isPostingMessage = true;
             return false;
         });

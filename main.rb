@@ -129,8 +129,7 @@ get '/channels/:channel_name/messages/:range', provides: :json do
 end
 
 post '/channels/:channel_name/messages', provides: :json do
-  req_json = JSON.parse(request.body.read)
-  body = req_json['body']
+  body = params['body']
   begin
     message = @channel.post_message(current_user, body)
   rescue Exception => e
