@@ -339,7 +339,7 @@ $(function () {
     if (userAgent.indexOf('Firefox') === -1) {
         return;
     }
-    $(window).resize(function () {
+    function relayout() {
         var main = $('#main');
         $('#users').add('#channels').width(main.width() / 5);
         $('.message > .userName').each(function () {
@@ -353,6 +353,20 @@ $(function () {
         $('#messages > section').height($('#messages').height() -
                                         $('#messages > h2').outerHeight() -
                                         $('#messages > form').height());
+    }
+    var isRequestedRelayouting = false;
+    $(window).resize(function () {
+        isRequestedRelayouting = true;
     });
-    $(window).resize();
+    function loop() {
+        (function () {
+            if (!isRequestedRelayouting) {
+                return;
+            }
+            relayout();
+        })();
+        setTimeout(loop, 500);
+    }
+    loop();
+    relayout();
 });
