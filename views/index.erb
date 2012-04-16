@@ -43,10 +43,11 @@
         </ul>
       </section>
     </section>
+    <% now = Time.now.to_i %>
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
-    <script src="/javascripts/star_chat.js"></script>
-    <script src="/javascripts/star_chat/session.js"></script>
-    <script src="/javascripts/star_chat/view.js"></script>
-    <script src="/javascripts/main.js"></script>
+    <script src="/javascripts/star_chat.js?_=<%= now %>"></script>
+    <script src="/javascripts/star_chat/session.js?_=<%= now %>"></script>
+    <script src="/javascripts/star_chat/view.js?_=<%= now %>"></script>
+    <script src="/javascripts/main.js?_=<%= now %>"></script>
   </body>
 </html>
