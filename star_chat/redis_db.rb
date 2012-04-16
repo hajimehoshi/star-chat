@@ -6,12 +6,14 @@ module StarChat
 
   module RedisDB
 
-    # TODO: configuration
-    @@redis = ::Redis.new(host: '127.0.0.1',
-                          port: 6379,
-                          thread_safe: true)
-
     module_function
+
+    def setup(host, port)
+      @@redis.quit if defined?(@@redis) and @@redis
+      @@redis = ::Redis.new(host: host,
+                            port: port,
+                            thread_safe: true)
+    end
 
     def multi
       @@redis.multi do

@@ -2,3 +2,4 @@ environment: development
 port: 4567
 rackup: ./config.ru
 timeout: 1800
+foo: bar
