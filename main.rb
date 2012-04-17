@@ -6,7 +6,7 @@ require 'erubis'
 
 set :server, :thin
 set :sessions, false
-set :erubis, escape_html: true
+set :erb, escape_html: true
 set :streams, []
 
 require './config'
@@ -62,7 +62,7 @@ helpers do
 end
 
 get '/', provides: :html do
-  erubis(:index)
+  erb(:index)
 end
 
 before %r{^/users/([^/]+)} do
