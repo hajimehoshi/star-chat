@@ -81,7 +81,7 @@ end
 
 get '/users/:user_name/stream', provides: :json do
   user_name = params[:user_name]
-  stream(true) do |out|
+  stream(:keep_open) do |out|
     packets = current_user.channels.inject([]) do |msgs, channel|
       channel_name = channel.name
       msgs.concat(channel.messages(-100).map do |msg|
