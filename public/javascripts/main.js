@@ -225,7 +225,9 @@ $(function() {
                     var msg = "Are you sure you want to join '" +
                         channelName + "'?"
                     if (confirm(msg)) {
-                        postSubscribing(channelName, session.userName());      
+                        postSubscribing(channelName, session.userName(), function () {
+                            view.channelName = channelName;
+                        });
                     }
                 } finally {
                     delete params['channel_name'];
