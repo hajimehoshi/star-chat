@@ -57,3 +57,29 @@ starChat.ajax = function (userName, password, url, method, callbacks, data) {
     }
     $.ajax(args);
 };
+
+starChat.getQueryParams = function () {
+    var params = {};
+    $.each(location.search.substring(1).split(';'), function (i, pairStr) {
+        var pair = pairStr.split('=');
+        var key   = decodeURIComponent(pair[0]);
+        var value = decodeURIComponent(pair[1]);
+        params[key] = value;
+    });
+    return params;
+};
+
+starChat.setQueryParams = function (params) {
+    var state = (new Date()).getTime();
+    var newURL = location.origin + location.pathname;
+    if (params) {
+        var queryStr = '?';
+        queryStr += $.map(params, function(key, value) {
+            return encodeURIComponent(key) + '=' +
+                encodeURIComponent(value);
+        }).join(';');
+        newURL += queryStr;
+    }
+    console.log(newURL);
+    history.replaceState(state, null, newURL);
+};
