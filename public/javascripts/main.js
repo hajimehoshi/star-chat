@@ -334,9 +334,9 @@ $(function() {
     })();
 });
 
+// Firefox Modification
 $(function () {
-    var userAgent = navigator.userAgent;
-    if (userAgent.indexOf('Firefox') === -1) {
+    if (!$.browser.mozilla) {
         return;
     }
     function relayout() {
