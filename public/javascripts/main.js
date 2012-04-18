@@ -220,6 +220,8 @@ $(function() {
                 });
                 try {
                     if (isAlreadyJoined) {
+                        view.channelName = channelName;
+                        view.update();
                         return;
                     }
                     var msg = "Are you sure you want to join '" +
