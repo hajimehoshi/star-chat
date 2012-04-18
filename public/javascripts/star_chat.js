@@ -98,6 +98,15 @@ starChat.setFragmentParams = function (params) {
         currentFragment = currentFragment.substring(1);
     }
     if (fragment !== currentFragment) {
-        location.hash = fragment;
+        if (0 < fragment.length) {
+            location.hash = fragment;
+        } else {
+            var newURL = location.href;
+            var i = newURL.indexOf('#');
+            if (i !== -1) {
+                newURL = newURL.substring(0, i);
+            }
+            history.replaceState($.now(), null, newURL);
+        }
     }
 };
