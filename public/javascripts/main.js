@@ -221,6 +221,9 @@ $(function() {
                 try {
                     if (isAlreadyJoined) {
                         view.channelName = channelName;
+                        if (!(view.channelName in view.userNames)) {
+                            updateUserList();
+                        }
                         view.update();
                         return;
                     }
@@ -229,6 +232,9 @@ $(function() {
                     if (confirm(msg)) {
                         postSubscribing(channelName, session.userName(), function () {
                             view.channelName = channelName;
+                            if (!(view.channelName in view.userNames)) {
+                                updateUserList();
+                            }
                         });
                     }
                 } finally {
