@@ -58,6 +58,7 @@ starChat.ajax = function (userName, password, url, method, callbacks, data) {
     $.ajax(args);
 };
 
+// TODO: Test
 starChat.getQueryParams = function () {
     var params = {};
     var pairsStr = location.search.substring(1).split(';');
@@ -78,6 +79,7 @@ starChat.getQueryParams = function () {
     return params;
 };
 
+// TODO: Test
 starChat.setQueryParams = function (params) {
     var state = (new Date()).getTime();
     var newURL = location.origin + location.pathname;
