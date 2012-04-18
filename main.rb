@@ -59,6 +59,15 @@ helpers do
     end
   end
 
+  def uri_encode(str)
+    # Rack::Utils.escape is not for URI but for application/x-www-form-urlencoded
+    Rack::Utils.escape(str).gsub('+', '%20')
+  end
+
+  def uri_decode(str)
+    Rack::Utils.unescape(str.gsub('+', '%2B'))
+  end
+
 end
 
 get '/', provides: :html do
@@ -150,7 +159,7 @@ end
 
 get '/ch/:channel_name' do
   channel_name = params[:channel_name]
-  redirect '/#channel_name=' + Rack::Utils.escape(channel_name).gsub('+', '%20'), 302
+  redirect '/#channel_name=' + uri_encode(channel_name), 302
 end
 
 # TODO: params 使うのは変なので直したい
