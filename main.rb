@@ -150,7 +150,7 @@ end
 
 get '/ch/:channel_name' do
   channel_name = params[:channel_name]
-  redirect '/#channel_name=' + escape(channel_name), 302
+  redirect '/#channel_name=' + Rack::Utils.escape(channel_name).gsub('+', '%20'), 302
 end
 
 # TODO: params 使うのは変なので直したい
