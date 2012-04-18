@@ -74,7 +74,7 @@ starChat.setQueryParams = function (params) {
     var newURL = location.origin + location.pathname;
     if (params) {
         var queryStr = '?';
-        queryStr += $.map(params, function(key, value) {
+        queryStr += $.map(params, function(value, key) {
             return encodeURIComponent(key) + '=' +
                 encodeURIComponent(value);
         }).join(';');
