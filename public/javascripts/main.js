@@ -195,11 +195,42 @@ $(function() {
                       callbacks);
     }
     function updateChannelList() {
+        if (session.id() === 0) {
+            return;
+        }
         var view = getView();
         var callbacks = {
             success: function (data, textStatus, jqXHR) {
                 view.channels = data;
                 view.update();
+                if (session.id() === 0) {
+                    return;
+                }
+                var params = starChat.getFragmentParams();
+                if (!('channel_name' in params)) {
+                    return;
+                }
+                var channelName = params['channel_name'];
+                var isAlreadyJoined = false;
+                $.each(view.channels, function (i, channel) {
+                    if (channel.name === channelName) {
+                        isAlreadyJoined = true;
+                        return false;
+                    }
+                });
+                try {
+                    if (isAlreadyJoined) {
+                        return;
+                    }
+                    var msg = "Are you sure you want to join '" +
+                        channelName + "'?"
+                    if (confirm(msg)) {
+                        postSubscribing(channelName, session.userName());      
+                    }
+                } finally {
+                    delete params['channel_name'];
+                    starChat.setFragmentParams(params);
+                }
             },
             logOut: logOut,
         }
@@ -212,7 +243,6 @@ $(function() {
     function updateUserList() {
         var view = getView();
         var channelName = view.channelName;
-        
         var callbacks = {
             success: function success(data, textStatus, jqXHR) {
                 if (!view.userNames[channelName]) {
@@ -232,6 +262,30 @@ $(function() {
         starChat.ajax(session.userName(), session.password(),
                       url,
                       'GET',
+                      callbacks);
+    }
+    function postSubscribing(channelName, userName, success) {
+        if (!channelName) {
+            return;
+        }
+        if (!userName) {
+            return;
+        }
+        var url = '/subscribings?' +
+            'channel_name=' + encodeURIComponent(channelName) + ';' +
+            'user_name=' + encodeURIComponent(userName);
+        var callbacks = {
+            success: function (data, textStatus, jqXHR) {
+                if (success !== void(0)) {
+                    success();
+                }
+                updateChannelList();
+            },
+            logOut: logOut,
+        };
+        starChat.ajax(session.userName(), session.password(),
+                      url,
+                      'PUT',
                       callbacks);
     }
     (function () {
@@ -267,20 +321,9 @@ $(function() {
             if (!channelName) {
                 return false;
             }
-            var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(session.userName());
-            var callbacks = {
-                success: function (data, textStatus, jqXHR) {
-                    form.find('input[name="name"]').val('');
-                    updateChannelList();
-                },
-                logOut: logOut,
-            };
-            starChat.ajax(session.userName(), session.password(),
-                          url,
-                          'PUT',
-                          callbacks);
+            postSubscribing(channelName, session.userName(), function () {
+                form.find('input[name="name"]').val('');
+            });
             return false;
         });
     })();
