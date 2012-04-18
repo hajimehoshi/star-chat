@@ -114,6 +114,10 @@ before %r{^/channels/([^/]+)} do
   halt 404 unless @channel
 end
 
+get '/channels/:channel_name', provides: :json do
+  @channel.to_json
+end
+
 get '/channels/:channel_name/users', provides: :json do
   @channel.users.to_json
 end
@@ -144,6 +148,12 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
+get '/ch/:channel_name' do
+  channel_name = params[:channel_name]
+  redirect '/?channel_name=' + escape(channel_name), 302
+end
+
+# TODO: params 使うのは変なので直したい
 before '/subscribings' do
   protect!
   user_name    = params[:user_name]
