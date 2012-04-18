@@ -151,7 +151,7 @@ $(function() {
     function logIn(userName, password) {
         localStorage.userName = userName;
         localStorage.password = password;
-        session = new starChat.Session((new Date()).getTime(), userName, password);
+        session = new starChat.Session($.now(), userName, password);
         updateChannelList();
         var view = getView();
         view.update();
