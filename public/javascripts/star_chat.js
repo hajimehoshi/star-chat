@@ -60,11 +60,20 @@ starChat.ajax = function (userName, password, url, method, callbacks, data) {
 
 starChat.getQueryParams = function () {
     var params = {};
-    $.each(location.search.substring(1).split(';'), function (i, pairStr) {
+    var pairsStr = location.search.substring(1).split(';');
+    $.each(pairsStr, function (i, pairStr) {
         var pair = pairStr.split('=');
-        var key   = decodeURIComponent(pair[0]);
+        var key = decodeURIComponent(pair[0]);
+        if (!key) {
+            return;
+        }
         var value = decodeURIComponent(pair[1]);
-        params[key] = value;
+        if (value === void(0)) {
+            value = '';
+        }
+        if (!(key in params)) {
+            params[key] = value;
+        }
     });
     return params;
 };
@@ -73,12 +82,13 @@ starChat.setQueryParams = function (params) {
     var state = (new Date()).getTime();
     var newURL = location.origin + location.pathname;
     if (params) {
-        var queryStr = '?';
-        queryStr += $.map(params, function(value, key) {
+        var pairsStr = $.map(params, function(value, key) {
             return encodeURIComponent(key) + '=' +
                 encodeURIComponent(value);
         }).join(';');
-        newURL += queryStr;
+        if (0 < pairsStr.length) {
+            newURL += '?' + pairsStr;
+        }
     }
     console.log(newURL);
     history.replaceState(state, null, newURL);
