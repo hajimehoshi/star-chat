@@ -218,6 +218,7 @@ $(function() {
                 if (channelName === void(0)) {
                     return;
                 }
+                channelName = decodeURIComponent(channelName);
                 var isAlreadyJoined = false;
                 $.each(view.channels, function (i, channel) {
                     if (channel.name === channelName) {
