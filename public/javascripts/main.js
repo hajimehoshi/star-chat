@@ -206,11 +206,18 @@ $(function() {
                 if (session.id() === 0) {
                     return;
                 }
-                var params = starChat.getFragmentParams();
-                if (!('channel_name' in params)) {
+                var fragment = starChat.getFragment();
+                var segments = fragment.split('/');
+                if (segments.length !== 2) {
                     return;
                 }
-                var channelName = params['channel_name'];
+                if (segments[0] !== 'channels') {
+                    return;
+                }
+                var channelName = segments[1];
+                if (channelName === void(0)) {
+                    return;
+                }
                 var isAlreadyJoined = false;
                 $.each(view.channels, function (i, channel) {
                     if (channel.name === channelName) {
@@ -238,8 +245,7 @@ $(function() {
                         });
                     }
                 } finally {
-                    delete params['channel_name'];
-                    starChat.setFragmentParams(params);
+                    starChat.clearFragment();
                 }
             },
             logOut: logOut,

@@ -157,11 +157,6 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
-get '/ch/:channel_name' do
-  channel_name = params[:channel_name]
-  redirect '/#channel_name=' + uri_encode(channel_name), 302
-end
-
 # TODO: params 使うのは変なので直したい
 before '/subscribings' do
   protect!

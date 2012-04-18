@@ -58,55 +58,19 @@ starChat.ajax = function (userName, password, url, method, callbacks, data) {
     $.ajax(args);
 };
 
-// TODO: Test
-starChat.getFragmentParams = function () {
-    var params = {};
+starChat.getFragment = function () {
     var fragment = location.hash;
     if (fragment[0] === '#') {
         fragment = fragment.substring(1);
     }
-    var pairStrs = fragment.split(';');
-    $.each(pairStrs, function (i, pairStr) {
-        var pair = pairStr.split('=');
-        var key = decodeURIComponent(pair[0]);
-        if (!key) {
-            return;
-        }
-        if (pair[1] === void(0)) {
-            pair[1] = '';
-        }
-        var value = decodeURIComponent(pair[1]);
-        if (!(key in params)) {
-            params[key] = value;
-        }
-    });
-    return params;
-};
+    return fragment;
+}
 
-// TODO: Test
-starChat.setFragmentParams = function (params) {
-    var state = (new Date()).getTime();
-    var fragment = '';
-    if (params) {
-        fragment = $.map(params, function(value, key) {
-            return encodeURIComponent(key) + '=' +
-                encodeURIComponent(value);
-        }).join(';');
+starChat.clearFragment = function () {
+    var newURL = location.href;
+    var i = newURL.indexOf('#');
+    if (i !== -1) {
+        newURL = newURL.substring(0, i);
     }
-    var currentFragment = location.hash;
-    if (currentFragment[0] === '#') {
-        currentFragment = currentFragment.substring(1);
-    }
-    if (fragment !== currentFragment) {
-        if (0 < fragment.length) {
-            location.hash = fragment;
-        } else {
-            var newURL = location.href;
-            var i = newURL.indexOf('#');
-            if (i !== -1) {
-                newURL = newURL.substring(0, i);
-            }
-            history.replaceState($.now(), null, newURL);
-        }
-    }
-};
+    history.replaceState($.now(), null, newURL);
+}
