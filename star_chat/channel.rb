@@ -2,13 +2,9 @@ module StarChat
 
   class Channel
 
-    @@items_cache = {}
-
     def self.find(name)
-      item = @@items_cache[name]
-      return item if item
       if RedisDB.exec(:exists, ['channels', name])
-        return @@items_cache[name] = new(name)
+        return new(name)
       end
       nil
     end
@@ -53,7 +49,6 @@ module StarChat
         RedisDB.exec(:sadd, ['channels'], name)
         RedisDB.exec(:hmset, ['channels', name], 'dummy', 'dummy')
       end
-      @@items_cache[name] = self
       self
     end
 
