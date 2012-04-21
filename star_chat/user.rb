@@ -7,7 +7,7 @@ module StarChat
   class User
 
     @@salt = SecureRandom.hex(64).freeze
-    @@items_cache = {}
+    @@password_cache = {}
 
     def self.auth_system(&block)
       if block
@@ -20,14 +20,11 @@ module StarChat
     end
 
     def self.find(name)
-      item = @@items_cache[name]
-      return item if item
       key = ['users', name]
       # TODO: lock?
       if RedisDB.exec(:exists, key)
         values = RedisDB.exec(:hmget, key, 'nick')
-        return @@items_cache[name] = new(name,
-                                         nick: values[0])
+        return new(name, nick: values[0])
       end
       nil
     end
@@ -76,26 +73,26 @@ module StarChat
                    ['users', name],
                    'name', name,
                    'nick', nick)
-      @@items_cache[name] = self
       self
     end
 
     def auth?(password)
       now = Time.now.to_i
-      if @password_digest and
-          @last_auth_with_system and
-          @last_auth_with_system <= now and
-          now - @last_auth_with_system < 60 * 30 # 30 min
-        if @password_digest == Digest::SHA1.digest(@@salt + password)
+      if cache = @@password_cache[name] and
+          cache[:last_auth_with_system] <= now and
+          now - cache[:last_auth_with_system] < 60 * 30 # 30 min
+        if cache[:digest] == Digest::SHA1.digest(@@salt + password)
           return true
         end
-      elsif auth_with_system?(password)
-        @password_digest       = Digest::SHA1.digest(@@salt + password)
-        @last_auth_with_system = Time.now.to_i
+      end
+      if auth_with_system?(password)
+        @@password_cache[name] = {
+          digest: Digest::SHA1.digest(@@salt + password),
+          last_auth_with_system: Time.now.to_i,
+        }
         return true
       end
-      @password_digest       = nil
-      @last_auth_with_system = nil        
+      @@password_cache.delete(name)
       false
     end
 
