@@ -3,15 +3,13 @@
 starChat.Stream = (function () {
     var Stream = function (packetProcessor) {
         this.packetProcessor_ = packetProcessor;
-        this.isActive_ = false;
         this.continuingErrorNum_ = 0;
         this.ajax_ = null;
     };
     Stream.prototype.start = function (view) {
-        if (this.isActive_) {
+        if (this.ajax_) {
             return;
         }
-        this.isActive_ = true;
         this.continuingErrorNum_ = 0;
         var self = this;
         var session = view.session;
@@ -64,12 +62,12 @@ starChat.Stream = (function () {
                                    callbacks);
     };
     Stream.prototype.stop = function () {
-        if (!this.isActive_) {
+        if (!this.ajax_) {
             return;
         }
-        this.isActive_ = false;
         this.continuingErrorNum_ = 0;
         this.ajax_.abort();
+        this.ajax_ = null;
     };
     return Stream;
 })();
