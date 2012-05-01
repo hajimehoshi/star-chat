@@ -44,66 +44,7 @@ $(function() {
         }
         return views[session.id()];
     }
-    function startStream() {
-        var view = getView();
-        if (view.stream) {
-            view.stream.abort();
-        }
-        view.stream = null;
-        var streamReadIndex = 0;
-        var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
-        var packetProcessor = new starChat.PacketProcessor();
-        var callbacks = {
-            onprogress: function () {
-                // TODO: Reconnecting if overflow
-                var xhr = this;
-                var text = xhr.responseText;
-                var subText = text.substring(streamReadIndex);
-                while (true) {
-                    var tokenLength = subText.search("\n");
-                    if (tokenLength === -1) {
-                        break;
-                    }
-                    streamReadIndex += tokenLength + 1;
-                    var token = subText.substring(0, tokenLength);
-                    subText = subText.substring(tokenLength + 1);
-                    try {
-                        var packet = JSON.parse(token);
-                    } catch (e) {
-                        console.log(e);
-                        continue;
-                    }
-                    packetProcessor.process(packet, view);
-                }
-            },
-            success: function (data, textStatus, jqXHR) {
-                view.streamContinuingErrorNum = 0;
-                setTimeout(startStream, 0);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log(textStatus);
-                view.streamContinuingErrorNum++;
-                if (10 <= view.streamContinuingErrorNum) {
-                    console.log('Too many errors!');
-                    // TODO: implement showing error message
-                    return;
-                }
-                setTimeout(startStream, 10000);
-            },
-        };
-        starChat.ajax(session.userName(), session.password(),
-                      url,
-                      'GET',
-                      callbacks);
-    }
-    function stopStream() {
-        var view = getView();
-        if (view.stream) {
-            view.stream.abort();
-        }
-        view.stream = null;
-        view.streamContinuingErrorNum = 0;
-    }
+    var stream = new starChat.Stream();
     function logIn(userName, password) {
         localStorage.userName = userName;
         localStorage.password = password;
@@ -111,7 +52,7 @@ $(function() {
         updateChannelList();
         var view = getView();
         view.update();
-        startStream();
+        stream.start(view);
     }
     function logOut() {
         delete localStorage.userName;
@@ -123,7 +64,7 @@ $(function() {
         $('#messages > section[data-channel-name!=""]').remove();
         var view = getView();
         view.update();
-        stopStream();
+        stream.stop();
     }
     function tryLogIn(userName, password) {
         if (!userName) {

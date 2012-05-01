@@ -48,6 +48,7 @@
     <script src="/javascripts/star_chat.js?_=<%= now %>"></script>
     <script src="/javascripts/star_chat/packet_processor.js?_=<%= now %>"></script>
     <script src="/javascripts/star_chat/session.js?_=<%= now %>"></script>
+    <script src="/javascripts/star_chat/stream.js?_=<%= now %>"></script>
     <script src="/javascripts/star_chat/view.js?_=<%= now %>"></script>
     <script src="/javascripts/main.js?_=<%= now %>"></script>
   </body>
