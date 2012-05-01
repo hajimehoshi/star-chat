@@ -1,10 +1,10 @@
 'use strict';
 
 starChat.Stream = (function () {
-    var Stream = function () {
+    var Stream = function (packetProcessor) {
+        this.packetProcessor_ = packetProcessor;
         this.isActive_ = false;
         this.continuingErrorNum_ = 0;
-        this.packetProcessor_ = new starChat.PacketProcessor();
         this.ajax_ = null;
     };
     Stream.prototype.start = function (view) {

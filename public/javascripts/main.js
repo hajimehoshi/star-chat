@@ -44,7 +44,7 @@ $(function() {
         }
         return views[session.id()];
     }
-    var stream = new starChat.Stream();
+    var stream = new starChat.Stream(new starChat.PacketProcessor());
     function logIn(userName, password) {
         localStorage.userName = userName;
         localStorage.password = password;
