@@ -45,7 +45,7 @@ helpers do
               channel_name: lobby_channel.name,
               user_name: user_name) do |user_name|
       return false unless u = StarChat::User.find(user_name)
-      lobby_channel.users.include?(u)
+      lobby_channel.users.any?{|u2| u2.name == u.name}
     end
     user
   end
@@ -183,7 +183,7 @@ put '/subscribings', provides: :json do
             channel_name: @channel.name,
             user_name: current_user.name) do |user_name|
     return false unless user = StarChat::User.find(user_name)
-    @channel.users.include?(user)
+    @channel.users.any?{|u| u.name == user.name}
   end
   packets = @channel.messages(-100).map do |message|
     {
@@ -210,7 +210,7 @@ delete '/subscribings', provides: :json do
             channel_name: @channel.name,
             user_name: current_user.name) do |user_name|
     return false unless user = StarChat::User.find(user_name)
-    @channel.users.include?(user)
+    @channel.users.any?{|u| u.name == user.name}
   end
   200
 end
