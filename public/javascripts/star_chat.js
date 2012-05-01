@@ -55,7 +55,7 @@ starChat.ajax = function (userName, password, url, method, callbacks, data) {
     if ('complete' in callbacks) {
         args.complete = callbacks.complete;
     }
-    $.ajax(args);
+    return $.ajax(args);
 };
 
 starChat.getFragment = function () {

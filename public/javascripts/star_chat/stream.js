@@ -5,6 +5,7 @@ starChat.Stream = (function () {
         this.isActive_ = false;
         this.continuingErrorNum_ = 0;
         this.packetProcessor_ = new starChat.PacketProcessor();
+        this.ajax_ = null;
     };
     Stream.prototype.start = function (view) {
         if (this.isActive_) {
@@ -16,6 +17,9 @@ starChat.Stream = (function () {
         var session = view.session;
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
+        var startStream = function () {
+            self.start(view);
+        };
         var callbacks = {
             onprogress: function () {
                 // TODO: Reconnecting if overflow
@@ -54,10 +58,10 @@ starChat.Stream = (function () {
                 setTimeout(startStream, 10000);
             },
         };
-        starChat.ajax(session.userName(), session.password(),
-                      url,
-                      'GET',
-                      callbacks);
+        this.ajax_ = starChat.ajax(session.userName(), session.password(),
+                                   url,
+                                   'GET',
+                                   callbacks);
     };
     Stream.prototype.stop = function () {
         if (!this.isActive_) {
@@ -65,6 +69,7 @@ starChat.Stream = (function () {
         }
         this.isActive_ = false;
         this.continuingErrorNum_ = 0;
+        this.ajax_.abort();
     };
     return Stream;
 })();
