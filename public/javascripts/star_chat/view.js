@@ -3,8 +3,6 @@
 starChat.View = (function () {
     var View = function (session) {
         this.session = session;
-        /*this.stream = null;
-        this.streamContinuingErrorNum = 0;*/
         this.channels = [];
         this.channelName = '';
         this.lastChannelName = '';
