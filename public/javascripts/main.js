@@ -44,45 +44,6 @@ $(function() {
         }
         return views[session.id()];
     }
-    function processPacketMessage(obj, view) {
-        var channelName = obj.channel_name;
-        var message = obj.message;
-        if (channelName && message) {
-            if (!view.newMessages[channelName]) {
-                view.newMessages[channelName] = [];
-            }
-            view.newMessages[channelName].push(message);
-            var view = getView();
-            if (channelName === view.channelName) {
-                view.update();
-            }
-        }
-    }
-    function processPacketSubscribing(obj, view) {
-        var channelName = obj.channel_name;
-        if (!(channelName in view.userNames)) {
-            view.userNames[channelName] = {};
-        }
-        var userNames = view.userNames[channelName];
-        userNames[obj.user_name] = true;
-        var view = getView();
-        if (channelName === view.channelName) {
-            view.update();
-        }
-    }
-    function processPacketDeleteSubscribing(obj, view) {
-        var channelName = obj.channel_name;
-        if (!(channelName in view.userNames)) {
-            view.userNames[channelName] = {};
-            return;
-        }
-        var userNames = view.userNames[channelName];
-        delete userNames[obj.user_name];
-        var view = getView();
-        if (channelName === view.channelName) {
-            view.update();
-        }
-    }
     function startStream() {
         var view = getView();
         if (view.stream) {
@@ -91,6 +52,7 @@ $(function() {
         view.stream = null;
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
+        var packetProcessor = new starChat.PacketProcessor();
         var callbacks = {
             onprogress: function () {
                 // TODO: Reconnecting if overflow
@@ -106,18 +68,12 @@ $(function() {
                     var token = subText.substring(0, tokenLength);
                     subText = subText.substring(tokenLength + 1);
                     try {
-                        var obj = JSON.parse(token);
+                        var packet = JSON.parse(token);
                     } catch (e) {
                         console.log(e);
                         continue;
                     }
-                    if (obj.type === 'message') {
-                        processPacketMessage(obj, view);
-                    } else if (obj.type === 'subscribing') {
-                        processPacketSubscribing(obj, view);
-                    } else if (obj.type === 'delete_subscribing') {
-                        processPacketDeleteSubscribing(obj, view);
-                    }
+                    packetProcessor.process(packet, view);
                 }
             },
             success: function (data, textStatus, jqXHR) {
