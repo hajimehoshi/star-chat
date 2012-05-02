@@ -11,9 +11,9 @@ starChat.PacketProcessor = (function () {
                 view.newMessages[channelName] = [];
             }
             view.newMessages[channelName].push(message);
-            if (channelName === view.channelName) {
-                view.update();
-            }
+            var isDirty = channelName !== view.channelName;
+            view.setDirtyFlag(channelName, isDirty);
+            view.update();
         }
     }
     function processPacketSubscribing(packet, view) {

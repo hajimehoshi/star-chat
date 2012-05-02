@@ -12,13 +12,15 @@ starChat.View = (function () {
         this.isPostingMessage = false;
         this.userNames = {};
         this.isEdittingChannels = false;
+
+        this.dirtyFlags_ = {};
     };
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         var cachedChannels = [];
-        return function (view) {
+        return function (self) {
             // channels
-            var channels = view.channels.sort(function (a, b) {
+            var channels = self.channels.sort(function (a, b) {
                 if (a.name > b.name) {
                     return 1;
                 }
@@ -27,18 +29,24 @@ starChat.View = (function () {
                 }
                 return 0;
             });
-            if (lastSessionId != view.session.id() ||
-                !starChat.isSameArray(channels, cachedChannels)) {
+            if (self.channelName) {
+                self.dirtyFlags_[self.channelName] = false;
+            }
+            (function () {
                 var ul = $('#channels ul');
                 ul.empty();
                 $.each(channels, function (i, channel) {
                     var a = $('<a href="#"></a>');
-                    a.text(channel.name);
+                    var name = channel.name;
+                    if (self.dirtyFlags_[name]) {
+                        name += ' (*)';
+                    }
+                    a.text(name);
                     a.click(function () {
-                        return view.clickChannel_(channel);
+                        return self.clickChannel_(channel);
                     });
                     var delLink = $('<a href="#">Del</a>').click(function () {
-                        return view.clickChannelDel_(channel);
+                        return self.clickChannelDel_(channel);
                     });
                     var span = $('<span class="del"></span>');
                     span.append(' (').append(delLink).append(')');
@@ -50,18 +58,18 @@ starChat.View = (function () {
                 for (var i = 0; i < channels.length; i++) {
                     cachedChannels[i] = channels[i];
                 }
-                lastSessionId = view.session.id();
-            }
-            if (view.isEdittingChannels) {
+                lastSessionId = self.session.id();
+            })();
+            if (self.isEdittingChannels) {
                 $('#channels li span.del').show();
             } else {
                 $('#channels li span.del').hide();
             }
         }
     })();
-    function updateViewMessages(view) {
-        if (view.channelName) {
-            $('#messages h2').text(view.channelName);
+    function updateViewMessages(self) {
+        if (self.channelName) {
+            $('#messages h2').text(self.channelName);
         } else {
             $('#messages h2').text("\u00a0");
         }
@@ -69,28 +77,28 @@ starChat.View = (function () {
           var channelName = $(this).attr('data-channel-name');
           return // TODO: implement
           }).remove();*/
-        if (view.channelName &&
+        if (self.channelName &&
             $('#messages > section').filter(function (i) {
-                return $(this).attr('data-channel-name') === view.channelName;
+                return $(this).attr('data-channel-name') === self.channelName;
             }).length === 0) {
             var section = $('<section></section>');
-            var channelName = view.channelName;
+            var channelName = self.channelName;
             section.attr('data-channel-name', channelName);
             section.scroll(function () {
-                view.messageScrollTops[channelName] = section.scrollTop();
+                self.messageScrollTops[channelName] = section.scrollTop();
             });
             $('#messages h2').after(section);
         }
         $('#messages > section').each(function (i) {
             var e = $(this);
-            if (e.attr('data-channel-name') === view.channelName) {
+            if (e.attr('data-channel-name') === self.channelName) {
                 e.show();
             } else {
                 e.hide();
             }
         });
-        if (!view.channelName) {
-            view.lastChannelName = '';
+        if (!self.channelName) {
+            self.lastChannelName = '';
             return;
         }
         function messageToElement(message) {
@@ -120,42 +128,42 @@ starChat.View = (function () {
             messageSection.attr('data-message-id', message.id);
             return messageSection;
         }
-        var msgs = view.newMessages[view.channelName];
+        var msgs = self.newMessages[self.channelName];
         if (!msgs) {
             msgs = [];
         }
         var section = $('#messages > section').filter(function (i) {
-            return $(this).attr('data-channel-name') === view.channelName;
+            return $(this).attr('data-channel-name') === self.channelName;
         });
         var isBottom =
             section.get(0).scrollHeight - section.scrollTop() ===
             section.outerHeight();
         // TODO: sort by id
         $.each(msgs, function (i, message) {
-            if (view.messageIdsAlreadyShown[message.id]) {
+            if (self.messageIdsAlreadyShown[message.id]) {
                 return;
             }
             section.append(messageToElement(message));
-            view.messageIdsAlreadyShown[message.id] = true;
+            self.messageIdsAlreadyShown[message.id] = true;
         });
-        if (view.lastChannelName === view.channelName) {
+        if (self.lastChannelName === self.channelName) {
             if (isBottom) {
                 section.animate({scrollTop: section.get(0).scrollHeight});
             }
         } else {
-            if (!view.lastChannelName ||
-                !(view.channelName in view.messageScrollTops)) {
+            if (!self.lastChannelName ||
+                !(self.channelName in self.messageScrollTops)) {
                 section.scrollTop(section.get(0).scrollHeight);
             } else {
-                section.scrollTop(view.messageScrollTops[view.channelName]);
+                section.scrollTop(self.messageScrollTops[self.channelName]);
             }
         }
-        view.lastChannelName = view.channelName;
-        view.messageScrollTops[view.channelName] = section.scrollTop();
-        view.newMessages[view.channelName] = [];
+        self.lastChannelName = self.channelName;
+        self.messageScrollTops[self.channelName] = section.scrollTop();
+        self.newMessages[self.channelName] = [];
     }
-    function updateViewUsers(view) {
-        var userNamesObj = view.userNames[view.channelName];
+    function updateViewUsers(self) {
+        var userNamesObj = self.userNames[self.channelName];
         if (!userNamesObj) {
             userNamesObj = {};
         }
@@ -188,6 +196,9 @@ starChat.View = (function () {
         updateViewMessages(this);
         updateViewUsers(this);
         $(window).resize();
+    };
+    View.prototype.setDirtyFlag = function (channelName, value) {
+        this.dirtyFlags_[channelName] = value;
     };
     View.prototype.clickChannel = function (func) {
         this.clickChannel_ = func;
