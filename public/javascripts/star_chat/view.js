@@ -38,9 +38,7 @@ starChat.View = (function () {
                 channels.forEach(function (channel) {
                     var a = $('<a href="#"></a>');
                     var name = channel.name;
-                    if (self.dirtyFlags_[name]) {
-                        name += ' (*)';
-                    }
+                    a.toggleClass('dirty', self.dirtyFlags_[name]);
                     a.text(name);
                     a.click(function () {
                         return self.clickChannel_(channel);

@@ -98,6 +98,10 @@ h1 {
     padding: 0;
 }
 
+#channels a.dirty {
+    font-weight: bold;
+}
+
 #messages {
     background-color: #fff;
     margin: 0;
