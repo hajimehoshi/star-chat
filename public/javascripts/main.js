@@ -34,7 +34,6 @@ $(function() {
         };
     }
     var session = new starChat.Session();
-    // TODO: channel page state (dirty)
     var views = {};
     function getView() {
         if (!views[session.id()]) {
