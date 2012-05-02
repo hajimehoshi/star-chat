@@ -117,7 +117,7 @@ $(function() {
                 }
                 channelName = decodeURIComponent(channelName);
                 var isAlreadyJoined = false;
-                $.each(view.channels, function (i, channel) {
+                view.channels.forEach(function (channel) {
                     if (channel.name === channelName) {
                         isAlreadyJoined = true;
                         return false;
@@ -163,7 +163,7 @@ $(function() {
                     view.userNames[channelName] = {};
                 }
                 var userNames = view.userNames[channelName];
-                $.each(data, function (i, user) {
+                data.forEach(function (user) {
                     userNames[user.name] = true;
                 });
                 if (channelName === getView().channelName) {

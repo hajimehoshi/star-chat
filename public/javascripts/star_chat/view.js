@@ -35,7 +35,7 @@ starChat.View = (function () {
             (function () {
                 var ul = $('#channels ul');
                 ul.empty();
-                $.each(channels, function (i, channel) {
+                channels.forEach(function (channel) {
                     var a = $('<a href="#"></a>');
                     var name = channel.name;
                     if (self.dirtyFlags_[name]) {
@@ -139,7 +139,7 @@ starChat.View = (function () {
             section.get(0).scrollHeight - section.scrollTop() ===
             section.outerHeight();
         // TODO: sort by id
-        $.each(msgs, function (i, message) {
+        msgs.forEach(function (message) {
             if (self.messageIdsAlreadyShown[message.id]) {
                 return;
             }
@@ -170,7 +170,7 @@ starChat.View = (function () {
         var userNames = Object.keys(userNamesObj).sort();
         var ul = $('#users ul');
         ul.empty();
-        $.each(userNames, function (i, userName) {
+        userNames.forEach(function (userName) {
             var li = $('<li></li>');
             li.text(userName);
             ul.append(li);
