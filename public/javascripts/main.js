@@ -12,14 +12,12 @@ $(function() {
             var url = '/subscribings?' +
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
                 'user_name=' + encodeURIComponent(view.session.userName());
-            var callbacks = {
-                success: updateChannelList,
-                logOut: logOut,
-            }
-            starChat.ajax(view.session.userName(), view.session.password(),
-                          url,
-                          'DELETE',
-                          callbacks);
+            starChat.ajaxRequest(session, url, 'DELETE', null, function (sessionId, uri, method, data) {
+                receiveResponse(sessionId, uri, method, data);
+                starChat.clearFragment();
+                $(window).trigger('hashchange');
+                updateChannelList();
+            });
             return false;
         };
     }
@@ -108,22 +106,18 @@ $(function() {
         var url = '/subscribings?' +
             'channel_name=' + encodeURIComponent(channelName) + ';' +
             'user_name=' + encodeURIComponent(userName);
-        var callbacks = {
-            success: function (data, textStatus, jqXHR) {
-                if (success !== void(0)) {
-                    success();
-                }
-                updateChannelList();
-            },
-        };
-        starChat.ajax(session.userName(), session.password(),
-                      url,
-                      'PUT',
-                      callbacks);
+        starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
+            receiveResponse(sessionId, uri, method, data);
+            if (success !== void(0)) {
+                success();
+            }
+            updateChannelList();
+        });
     }
 
     $(window).bind('hashchange', function () {
         var view = getView();
+        view.channelName = '';
         var session = view.session;
         if (session.id() === 0) {
             return;
