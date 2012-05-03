@@ -89,7 +89,6 @@ $(function() {
         var callbacks = {
             success: function (data, textStatus, jqXHR) {
                 receiveResponse(data, textStatus, jqXHR);
-                $(window).trigger('hashchange');
             },
             logOut: logOut,
         }
@@ -106,16 +105,7 @@ $(function() {
         var channelName = view.channelName;
         var callbacks = {
             success: function success(data, textStatus, jqXHR) {
-                if (!view.userNames[channelName]) {
-                    view.userNames[channelName] = {};
-                }
-                var userNames = view.userNames[channelName];
-                data.forEach(function (user) {
-                    userNames[user.name] = true;
-                });
-                if (channelName === getView().channelName) {
-                    view.update();
-                }
+                receiveResponse(data, textStatus, jqXHR);
             },
             logOut: logOut,
         };
@@ -123,7 +113,9 @@ $(function() {
         starChat.ajax(session.userName(), session.password(),
                       url,
                       'GET',
-                      callbacks);
+                      callbacks,
+                      null,
+                      session.id());
     }
     function postSubscribing(channelName, userName, success) {
         if (!channelName) {
@@ -227,9 +219,20 @@ $(function() {
                     segments[2] === 'channels') {
                     view.channels = data;
                 }
+            } else if (segments[0] === 'channels') {
+                if (segments.length === 3 &&
+                    segments[2] === 'users') {
+                    var channelName = segments[1];
+                    var userNames = {};
+                    data.forEach(function (user) {
+                        userNames[user.name] = true;
+                    });
+                    view.userNames[channelName] = userNames;
+                }
             }
         } finally {
             view.update();
+            $(window).trigger('hashchange');
         }
     }
     
