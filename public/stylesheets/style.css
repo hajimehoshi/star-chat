@@ -190,7 +190,6 @@ body > #main {
     width: 100%;
 }
 #main > #channels {
-    overflow: hidden;
     width: 20%;
 }
 #main > #messages {
@@ -202,7 +201,6 @@ body > #main {
     overflow: hidden;
 }
 #main > #users {
-    overflow: hidden;
     width: 20%;
 }
 
