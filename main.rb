@@ -157,20 +157,25 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
-# TODO: params 使うのは変なので直したい
-before '/subscribings' do
+before %r{^/subscribings;([^/]+)$} do
   protect!
-  user_name    = params[:user_name]
-  channel_name = params[:channel_name]
-  halt 400 unless user_name.kind_of?(String)
+  names = {}
+  params[:captures][0].split(';').each do |pair|
+    key, value = pair.split('=').map{|seg| uri_decode(seg)}
+    names[key] = value if key and value
+  end
+  channel_name = names['channel_name']
+  user_name    = names['user_name']
   halt 400 unless channel_name.kind_of?(String)
+  halt 400 unless user_name.kind_of?(String)
   halt 401 if user_name != current_user.name
   @channel = StarChat::Channel.find(channel_name)
+  @channel_name = channel_name
 end
 
-put '/subscribings', provides: :json do
+put %r{^/subscribings;([^/]+)$}, provides: :json do
   unless @channel
-    @channel = StarChat::Channel.new(params[:channel_name])
+    @channel = StarChat::Channel.new(@channel_name)
     begin
       @channel.save
     rescue Exception => e
@@ -202,7 +207,7 @@ put '/subscribings', provides: :json do
   201
 end
 
-delete '/subscribings', provides: :json do
+delete %r{^/subscribings;([^/]+)$}, provides: :json do
   halt 400 unless @channel
   halt 409 unless StarChat::Subscribing.exist?(@channel, current_user)
   StarChat::Subscribing.destroy(@channel, current_user)
