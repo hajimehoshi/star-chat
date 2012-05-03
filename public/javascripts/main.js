@@ -115,54 +115,61 @@ $(function() {
         });
     }
 
-    $(window).bind('hashchange', function () {
-        var view = getView();
-        view.channelName = '';
-        var session = view.session;
-        if (session.id() === 0) {
-            return;
-        }
-        var fragment = starChat.getFragment();
-        var segments = fragment.split('/');
-        if (segments.length !== 2) {
-            return;
-        }
-        if (segments[0] !== 'channels') {
-            return;
-        }
-        var channelName = segments[1];
-        if (channelName === void(0)) {
-            return;
-        }
-        channelName = decodeURIComponent(channelName);
-        var isAlreadyJoined = false;
-        view.channels.forEach(function (channel) {
-            if (channel.name === channelName) {
-                isAlreadyJoined = true;
-                return false;
+    var onHashchange = (function () {
+        var lastFragment = null;
+        return function () {
+            var view = getView();
+            var session = view.session;
+            if (session.id() === 0) {
+                return;
             }
-        });
-        if (isAlreadyJoined) {
-            view.channelName = channelName;
-            if (!(view.channelName in view.userNames)) {
-                updateUserList();
+            var fragment = starChat.getFragment();
+            if (fragment === lastFragment) {
+                return;
             }
-            view.update();
-            return;
-        }
-        var msg = "Are you sure you want to join '" +
-            channelName + "'?"
-        if (confirm(msg)) {
-            postSubscribing(channelName, session.userName(), function () {
+            lastFragment = fragment;
+            view.channelName = '';
+            var segments = fragment.split('/');
+            if (segments.length !== 2) {
+                return;
+            }
+            if (segments[0] !== 'channels') {
+                return;
+            }
+            var channelName = segments[1];
+            if (channelName === void(0)) {
+                return;
+            }
+            channelName = decodeURIComponent(channelName);
+            var isAlreadyJoined = false;
+            view.channels.forEach(function (channel) {
+                if (channel.name === channelName) {
+                    isAlreadyJoined = true;
+                    return false;
+                }
+            });
+            if (isAlreadyJoined) {
                 view.channelName = channelName;
                 if (!(view.channelName in view.userNames)) {
                     updateUserList();
                 }
-            });
-            /*var url = '/channels/' + encodeURIComponent(view.channelName) + '/users';
-            starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);*/
+                view.update();
+                return;
+            }
+            var msg = "Are you sure you want to join '" +
+                channelName + "'?"
+            if (confirm(msg)) {
+                postSubscribing(channelName, session.userName(), function () {
+                    view.channelName = channelName;
+                    if (!(view.channelName in view.userNames)) {
+                        updateUserList();
+                    }
+                });
+            }
         }
-    });
+    })();
+
+    $(window).bind('hashchange', onHashchange);
 
     function receiveResponse(sessionId, uri, method, data) {
         var view = getView();
