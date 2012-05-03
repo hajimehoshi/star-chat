@@ -40,6 +40,7 @@ starChat.Stream = (function () {
                     }
                     self.packetProcessor_.process(packet, view);
                 }
+                view.update();
             },
             success: function (data, textStatus, jqXHR) {
                 self.continuingErrorNum_ = 0;
