@@ -159,6 +159,8 @@ $(function() {
                     updateUserList();
                 }
             });
+            /*var url = '/channels/' + encodeURIComponent(view.channelName) + '/users';
+            starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);*/
         }
     });
 
@@ -197,6 +199,10 @@ $(function() {
                         });
                         view.userNames[channelName] = userNames;
                     }
+                }
+            } else if (method === 'PUT') {
+                if (segments[0] === 'subscribing') {
+                    // TODO
                 }
             }
         } finally {
