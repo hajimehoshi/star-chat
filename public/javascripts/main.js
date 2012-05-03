@@ -87,17 +87,18 @@ $(function() {
         var view = getView();
         var callbacks = {
             success: function (data, textStatus, jqXHR) {
-                view.channels = data;
-                view.update();
+                receiveResponse(data, textStatus, jqXHR);
                 $(window).trigger('hashchange');
             },
             logOut: logOut,
         }
         var url = '/users/' + encodeURIComponent(session.userName()) + '/channels';
-        starChat.ajax(session.userName(), session.password(),
-                      url,
-                      'GET',
-                      callbacks);
+        var jq = starChat.ajax(session.userName(), session.password(),
+                               url,
+                               'GET',
+                               callbacks);
+        // TODO: この行泥臭いのであとで直す
+        jq.starChatSessionId = session.id();
     }
     function updateUserList() {
         var view = getView();
@@ -193,6 +194,43 @@ $(function() {
             });
         }
     });
+
+    function receiveResponse(data, textStatus, jqXHR) {
+        var view = getView();
+        var session = view.session;
+        if (session.id() === 0) {
+            return;
+        }
+        if (!('starChatSessionId' in jqXHR)) {
+            return;
+        }
+        if (!('starChatRequestURI' in jqXHR)) {
+            return;
+        }
+        if (session.id() !== jqXHR.starChatSessionId) {
+            return;
+        }
+        var uri = jqXHR.starChatRequestURI;
+        var segments = uri.split('/').filter(function (seg) {
+            return $.type(seg) === 'string' && 0 < seg.length;
+        }).map(function (seg) {
+            return decodeURIComponent(seg);
+        });
+        if (segments.length <= 0) {
+            return;
+        }
+        try {
+            if (segments[0] === 'users') {
+                if (segments.length === 3 &&
+                    segments[1] === session.userName() &&
+                    segments[2] === 'channels') {
+                    view.channels = data;
+                }
+            }
+        } finally {
+            view.update();
+        }
+    }
     
     (function () {
         var form = $('#logInForm');
