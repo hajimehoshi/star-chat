@@ -81,10 +81,11 @@ $(function() {
                       callbacks);
     }
     function updateChannelList() {
+        var view = getView();
+        var session = view.session;
         if (session.id() === 0) {
             return;
         }
-        var view = getView();
         var callbacks = {
             success: function (data, textStatus, jqXHR) {
                 receiveResponse(data, textStatus, jqXHR);
@@ -93,12 +94,12 @@ $(function() {
             logOut: logOut,
         }
         var url = '/users/' + encodeURIComponent(session.userName()) + '/channels';
-        var jq = starChat.ajax(session.userName(), session.password(),
-                               url,
-                               'GET',
-                               callbacks);
-        // TODO: この行泥臭いのであとで直す
-        jq.starChatSessionId = session.id();
+        starChat.ajax(session.userName(), session.password(),
+                      url,
+                      'GET',
+                      callbacks,
+                      null,
+                      session.id());
     }
     function updateUserList() {
         var view = getView();

@@ -26,7 +26,7 @@ starChat.getAddAuthHeaderFunc = function (userName, password) {
     }
 };
 
-starChat.ajax = function (userName, password, url, method, callbacks, data) {
+starChat.ajax = function (userName, password, url, method, callbacks, data, sessionId) {
     var args = {
         url: url,
         type: method,
@@ -57,6 +57,9 @@ starChat.ajax = function (userName, password, url, method, callbacks, data) {
     }
     var jq = $.ajax(args)
     jq.starChatRequestURI = url;
+    if ($.isNumeric(sessionId)) {
+        jq.starChatSessionId = sessionId;
+    }
     return jq;
 };
 
