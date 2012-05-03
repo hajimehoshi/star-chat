@@ -168,22 +168,15 @@ $(function() {
         }
     });
 
-    function receiveResponse(data, textStatus, jqXHR) {
+    function receiveResponse(sessionId, uri, method, data) {
         var view = getView();
         var session = view.session;
         if (session.id() === 0) {
             return;
         }
-        if (!('starChatSessionId' in jqXHR)) {
+        if (session.id() !== sessionId) {
             return;
         }
-        if (!('starChatRequestURI' in jqXHR)) {
-            return;
-        }
-        if (session.id() !== jqXHR.starChatSessionId) {
-            return;
-        }
-        var uri = jqXHR.starChatRequestURI;
         var segments = uri.split('/').filter(function (seg) {
             return $.type(seg) === 'string' && 0 < seg.length;
         }).map(function (seg) {
