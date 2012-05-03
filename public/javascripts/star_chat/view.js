@@ -9,7 +9,6 @@ starChat.View = (function () {
         this.newMessages = {};
         this.messageIdsAlreadyShown = {};
         this.messageScrollTops = {};
-        this.isPostingMessage = false;
         this.userNames = {};
         this.isEdittingChannels = false;
 

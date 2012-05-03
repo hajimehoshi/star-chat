@@ -186,21 +186,23 @@ $(function() {
             return;
         }
         try {
-            if (segments[0] === 'users') {
-                if (segments.length === 3 &&
-                    segments[1] === session.userName() &&
-                    segments[2] === 'channels') {
-                    view.channels = data;
-                }
-            } else if (segments[0] === 'channels') {
-                if (segments.length === 3 &&
-                    segments[2] === 'users') {
-                    var channelName = segments[1];
-                    var userNames = {};
-                    data.forEach(function (user) {
-                        userNames[user.name] = true;
-                    });
-                    view.userNames[channelName] = userNames;
+            if (method === 'GET') {
+                if (segments[0] === 'users') {
+                    if (segments.length === 3 &&
+                        segments[1] === session.userName() &&
+                        segments[2] === 'channels') {
+                        view.channels = data;
+                    }
+                } else if (segments[0] === 'channels') {
+                    if (segments.length === 3 &&
+                        segments[2] === 'users') {
+                        var channelName = segments[1];
+                        var userNames = {};
+                        data.forEach(function (user) {
+                            userNames[user.name] = true;
+                        });
+                        view.userNames[channelName] = userNames;
+                    }
                 }
             }
         } finally {
@@ -250,13 +252,14 @@ $(function() {
     })();
     (function () {
         var form = $('#postMessageForm');
+        var isPostingMessage = false;
         form.find('input[type="submit"]').click(function () {
             if (!session.isLoggedIn()) {
                 // TODO: show alert or do something
                 return false;
             }
             var view = getView();
-            if (view.isPostingMessage) {
+            if (isPostingMessage) {
                 return false;
             }
             if (!view.channelName) {
@@ -268,22 +271,16 @@ $(function() {
             }
             var url = '/channels/' + encodeURIComponent(view.channelName) +
                 '/messages';
-            var callbacks = {
-                success: function (data, textStatus, jqXHR) {
-                    form.find('input[name="body"]').val('');
-                },
-                complete: function (jqXHR, textStatus) {
-                    view.isPostingMessage = false;
-                },
-            }
-            starChat.ajax(session.userName(), session.password(),
-                          url,
-                          'POST',
-                          callbacks,
-                          {
-                              body: body,
-                          });
-            view.isPostingMessage = true;
+            starChat.ajaxRequest(session, url, 'POST', {
+                body: body,
+            }, function (sessionId, uri, method, data) {
+                receiveResponse(sessionId, uri, method, data);
+                form.find('input[name="body"]').val('');
+            });
+            isPostingMessage = true;
+            setTimeout(function () {
+                isPostingMessage = false;
+            }, 500);
             return false;
         });
     })();
