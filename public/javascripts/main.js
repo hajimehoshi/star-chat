@@ -86,34 +86,17 @@ $(function() {
         if (session.id() === 0) {
             return;
         }
-        var callbacks = {
-            success: function (data, textStatus, jqXHR) {
-                receiveResponse(data, textStatus, jqXHR);
-            },
-        }
         var url = '/users/' + encodeURIComponent(session.userName()) + '/channels';
-        starChat.ajax(session.userName(), session.password(),
-                      url,
-                      'GET',
-                      callbacks,
-                      null,
-                      session.id());
+        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
     }
     function updateUserList() {
         var view = getView();
-        var channelName = view.channelName;
-        var callbacks = {
-            success: function success(data, textStatus, jqXHR) {
-                receiveResponse(data, textStatus, jqXHR);
-            },
-        };
-        var url = '/channels/' + encodeURIComponent(channelName) + '/users';
-        starChat.ajax(session.userName(), session.password(),
-                      url,
-                      'GET',
-                      callbacks,
-                      null,
-                      session.id());
+        var session = view.session;
+        if (session.id() === 0) {
+            return;
+        }
+        var url = '/channels/' + encodeURIComponent(view.channelName) + '/users';
+        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
     }
     function postSubscribing(channelName, userName, success) {
         if (!channelName) {

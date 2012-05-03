@@ -63,6 +63,28 @@ starChat.ajax = function (userName, password, url, method, callbacks, data, sess
     return jq;
 };
 
+starChat.ajaxRequest = function (session, url, method, data, callback) {
+    var userName = session.userName();
+    var password = session.password();
+    var args = {
+        url: url,
+        type: method,
+        cache: false,
+        beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
+        dataType: 'json',
+        statusCode: {},
+        success: callback,
+    }
+    if (data) {
+        args.data = data;
+    }
+    var jq = $.ajax(args)
+    jq.starChatRequestURI    = url;
+    jq.starChatRequestMethod = method;
+    jq.starChatSessionId     = session.id();
+    return jq;
+};
+
 starChat.getFragment = function () {
     var fragment = location.hash;
     if (fragment[0] === '#') {
