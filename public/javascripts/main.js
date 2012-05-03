@@ -1,16 +1,6 @@
 'use strict';
 
 $(function() {
-    var clickChannel = function (view) {
-        return function (channel) {
-            view.channelName = channel.name;
-            if (!(view.channelName in view.userNames)) {
-                updateUserList();
-            }
-            view.update();
-            return false;
-        };
-    }
     var clickChannelDel = function (view) {
         return function (channel) {
             var channelName = channel.name;
@@ -38,7 +28,7 @@ $(function() {
     function getView() {
         if (!views[session.id()]) {
             var view = new starChat.View(session);
-            view.clickChannel(clickChannel(view)).clickChannelDel(clickChannelDel(view));
+            view.clickChannelDel(clickChannelDel(view));
             views[session.id()] = view;
         }
         return views[session.id()];
@@ -99,51 +89,7 @@ $(function() {
             success: function (data, textStatus, jqXHR) {
                 view.channels = data;
                 view.update();
-                if (session.id() === 0) {
-                    return;
-                }
-                var fragment = starChat.getFragment();
-                var segments = fragment.split('/');
-                if (segments.length !== 2) {
-                    return;
-                }
-                if (segments[0] !== 'channels') {
-                    return;
-                }
-                var channelName = segments[1];
-                if (channelName === void(0)) {
-                    return;
-                }
-                channelName = decodeURIComponent(channelName);
-                var isAlreadyJoined = false;
-                view.channels.forEach(function (channel) {
-                    if (channel.name === channelName) {
-                        isAlreadyJoined = true;
-                        return false;
-                    }
-                });
-                try {
-                    if (isAlreadyJoined) {
-                        view.channelName = channelName;
-                        if (!(view.channelName in view.userNames)) {
-                            updateUserList();
-                        }
-                        view.update();
-                        return;
-                    }
-                    var msg = "Are you sure you want to join '" +
-                        channelName + "'?"
-                    if (confirm(msg)) {
-                        postSubscribing(channelName, session.userName(), function () {
-                            view.channelName = channelName;
-                            if (!(view.channelName in view.userNames)) {
-                                updateUserList();
-                            }
-                        });
-                    }
-                } finally {
-                    starChat.clearFragment();
-                }
+                $(window).trigger('hashchange');
             },
             logOut: logOut,
         }
@@ -201,6 +147,53 @@ $(function() {
                       'PUT',
                       callbacks);
     }
+
+    $(window).bind('hashchange', function () {
+        var view = getView();
+        var session = view.session;
+        if (session.id() === 0) {
+            return;
+        }
+        var fragment = starChat.getFragment();
+        var segments = fragment.split('/');
+        if (segments.length !== 2) {
+            return;
+        }
+        if (segments[0] !== 'channels') {
+            return;
+        }
+        var channelName = segments[1];
+        if (channelName === void(0)) {
+            return;
+        }
+        channelName = decodeURIComponent(channelName);
+        var isAlreadyJoined = false;
+        view.channels.forEach(function (channel) {
+            if (channel.name === channelName) {
+                isAlreadyJoined = true;
+                return false;
+            }
+        });
+        if (isAlreadyJoined) {
+            view.channelName = channelName;
+            if (!(view.channelName in view.userNames)) {
+                updateUserList();
+            }
+            view.update();
+            return;
+        }
+        var msg = "Are you sure you want to join '" +
+            channelName + "'?"
+        if (confirm(msg)) {
+            postSubscribing(channelName, session.userName(), function () {
+                view.channelName = channelName;
+                if (!(view.channelName in view.userNames)) {
+                    updateUserList();
+                }
+            });
+        }
+    });
+    
     (function () {
         var form = $('#logInForm');
         var userName = localStorage.userName;

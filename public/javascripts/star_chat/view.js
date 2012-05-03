@@ -36,13 +36,12 @@ starChat.View = (function () {
                 var ul = $('#channels ul');
                 ul.empty();
                 channels.forEach(function (channel) {
-                    var a = $('<a href="#"></a>');
+                    var a = $('<a></a>');
                     var name = channel.name;
+                    var href = '#channels/' + encodeURIComponent(channel.name);
+                    a.attr('href', href);
                     a.toggleClass('dirty', self.dirtyFlags_[name]);
                     a.text(name);
-                    a.click(function () {
-                        return self.clickChannel_(channel);
-                    });
                     var delLink = $('<a href="#">Del</a>').click(function () {
                         return self.clickChannelDel_(channel);
                     });
@@ -197,10 +196,6 @@ starChat.View = (function () {
     };
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
-    };
-    View.prototype.clickChannel = function (func) {
-        this.clickChannel_ = func;
-        return this;
     };
     View.prototype.clickChannelDel = function (func) {
         this.clickChannelDel_ = func;
