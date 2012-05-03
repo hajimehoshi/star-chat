@@ -90,7 +90,6 @@ $(function() {
             success: function (data, textStatus, jqXHR) {
                 receiveResponse(data, textStatus, jqXHR);
             },
-            logOut: logOut,
         }
         var url = '/users/' + encodeURIComponent(session.userName()) + '/channels';
         starChat.ajax(session.userName(), session.password(),
@@ -107,7 +106,6 @@ $(function() {
             success: function success(data, textStatus, jqXHR) {
                 receiveResponse(data, textStatus, jqXHR);
             },
-            logOut: logOut,
         };
         var url = '/channels/' + encodeURIComponent(channelName) + '/users';
         starChat.ajax(session.userName(), session.password(),
@@ -134,7 +132,6 @@ $(function() {
                 }
                 updateChannelList();
             },
-            logOut: logOut,
         };
         starChat.ajax(session.userName(), session.password(),
                       url,
@@ -299,7 +296,6 @@ $(function() {
                 success: function (data, textStatus, jqXHR) {
                     form.find('input[name="body"]').val('');
                 },
-                logOut: logOut,
                 complete: function (jqXHR, textStatus) {
                     view.isPostingMessage = false;
                 },
