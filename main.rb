@@ -161,7 +161,9 @@ before %r{^/subscribings;([^/]+)$} do
   protect!
   names = {}
   params[:captures][0].split(';').each do |pair|
-    key, value = pair.split('=').map{|seg| uri_decode(seg)}
+    key, value = pair.split('=').map{ |seg|
+      uri_decode(seg).gsub('\\x3B', ';').gsub('\\x3D', '=').gsub('\\\\'){'\\'}
+    }
     names[key] = value if key and value
   end
   channel_name = names['channel_name']

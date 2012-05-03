@@ -19,6 +19,14 @@ starChat.isSameArray = function (a, b, func) {
     return true;
 };
 
+starChat.encodeMatrixParam = function (str) {
+    return encodeURIComponent(str.replace(/\\/g, '\\\\').replace(/=/g, '\\x3D').replace(/;/g, '\\x3B'));
+}
+
+starChat.decodeMatrixParam = function (str) {
+    return decodeURIComponent(str).replace(/\\x3B/g, ';').replace(/\\x3D/g, '=').replace(/\\\\/g, '\\');
+}
+
 starChat.getAddAuthHeaderFunc = function (userName, password) {
     return function (xhr) {
         xhr.setRequestHeader('Authorization',
