@@ -100,3 +100,27 @@ starChat.clearFragment = function () {
     }
     history.replaceState($.now(), null, newURL);
 }
+
+starChat.parseQuery = function (str) {
+    var i = str.indexOf('?');
+    if (i !== -1) {
+        str = str.substring(i + 1);
+    }
+    var params = {};
+    str.split(';').forEach(function (pair) {
+        if ($.type(pair) !== 'string') {
+            return true;
+        }
+        var pairArr = pair.split('=');
+        if (pairArr.length === 0) {
+            return true;
+        }
+        var key   = decodeURIComponent(pairArr[0]);
+        var value = '';
+        if (2 <= pairArr.length) {
+            value = decodeURIComponent(pairArr[1]);
+        }
+        params[key] = value;
+    });
+    return params;
+}

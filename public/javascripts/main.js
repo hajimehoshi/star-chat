@@ -96,24 +96,6 @@ $(function() {
         var url = '/channels/' + encodeURIComponent(view.channelName) + '/users';
         starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
     }
-    function postSubscribing(channelName, userName, success) {
-        if (!channelName) {
-            return;
-        }
-        if (!userName) {
-            return;
-        }
-        var url = '/subscribings?' +
-            'channel_name=' + encodeURIComponent(channelName) + ';' +
-            'user_name=' + encodeURIComponent(userName);
-        starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
-            receiveResponse(sessionId, uri, method, data);
-            if (success !== void(0)) {
-                success();
-            }
-            updateChannelList();
-        });
-    }
 
     var onHashchange = (function () {
         var lastFragment = null;
@@ -158,14 +140,18 @@ $(function() {
             }
             var msg = "Are you sure you want to join '" +
                 channelName + "'?"
-            if (confirm(msg)) {
-                postSubscribing(channelName, session.userName(), function () {
-                    view.channelName = channelName;
-                    if (!(view.channelName in view.userNames)) {
-                        updateUserList();
-                    }
-                });
+            if (!confirm(msg)) {
+                return;
             }
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
+                'user_name=' + encodeURIComponent(session.userName());
+            starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
+                receiveResponse(sessionId, uri, method, data);
+                var view = getView();
+                view.channelName = channelName;
+                view.update();
+            });
         }
     })();
 
@@ -208,8 +194,30 @@ $(function() {
                     }
                 }
             } else if (method === 'PUT') {
-                if (segments[0] === 'subscribing') {
-                    // TODO
+                if (uri.match(/^\/subscribings\?/)) {
+                    var params = starChat.parseQuery(uri);
+                    var channelName = params['channel_name'];
+                    var r = $.grep(view.channels, function (channel) {
+                        return channel.name === channelName;
+                    });
+                    if (r.length === 0) {
+                        view.channels.push({name: channelName});
+                    }
+                }
+            } else if (method === 'DELETE') {
+                if (uri.match(/^subscribings\?/)) {
+                    var params = starChat.parseQuery(uri);
+                    var channelName = params['channel_name'];
+                    var idx = -1;
+                    for (var i = 0; i < view.channels.length; i++) {
+                        if (view.channels[i].name === channelName) {
+                            idx = i;
+                            break;
+                        }
+                    }
+                    if (idx !== -1) {
+                        view.channels.splice(i, 1);
+                    }
                 }
             }
         } finally {
@@ -251,8 +259,13 @@ $(function() {
             if (!channelName) {
                 return false;
             }
-            postSubscribing(channelName, session.userName(), function () {
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
+                'user_name=' + encodeURIComponent(session.userName());
+            starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
                 form.find('input[name="name"]').val('');
+                receiveResponse(sessionId, uri, method, data);
+                location.hash = 'channels/' + encodeURIComponent(channelName);
             });
             return false;
         });
