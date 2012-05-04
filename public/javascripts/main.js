@@ -35,10 +35,9 @@ $(function() {
         localStorage.userName = userName;
         localStorage.password = password;
         session = new starChat.Session($.now(), userName, password);
-        updateChannelList();
-        var view = getView();
-        view.update();
-        stream.start(view);
+        var url = '/users/' + encodeURIComponent(userName) + '/channels';
+        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+        stream.start(getView());
     }
     function logOut() {
         delete localStorage.userName;
@@ -77,24 +76,6 @@ $(function() {
                       'GET',
                       callbacks);
     }
-    function updateChannelList() {
-        var view = getView();
-        var session = view.session;
-        if (session.id() === 0) {
-            return;
-        }
-        var url = '/users/' + encodeURIComponent(session.userName()) + '/channels';
-        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-    }
-    function updateUserList() {
-        var view = getView();
-        var session = view.session;
-        if (session.id() === 0) {
-            return;
-        }
-        var url = '/channels/' + encodeURIComponent(view.channelName) + '/users';
-        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-    }
 
     var onHashchange = (function () {
         var lastFragment = null;
@@ -131,10 +112,8 @@ $(function() {
             });
             if (isAlreadyJoined) {
                 view.channelName = channelName;
-                if (!(view.channelName in view.userNames)) {
-                    updateUserList();
-                }
-                view.update();
+                var url = '/channels/' + encodeURIComponent(channelName) + '/users';
+                starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                 return;
             }
             var msg = "Are you sure you want to join '" +
