@@ -12,7 +12,7 @@ starChat.Stream = (function () {
         }
         this.continuingErrorNum_ = 0;
         var self = this;
-        var session = view.session;
+        var session = view.session();
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
         var startStream = function () {

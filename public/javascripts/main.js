@@ -11,8 +11,8 @@ $(function() {
             }
             var url = '/subscribings?' +
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(view.session.userName());
-            starChat.ajaxRequest(session, url, 'DELETE', null, function (sessionId, uri, method, data) {
+                'user_name=' + encodeURIComponent(view.session().userName());
+            starChat.ajaxRequest(view.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
                 starChat.clearFragment();
                 getView().channelName = '';
                 receiveResponse(sessionId, uri, method, data);
@@ -20,34 +20,32 @@ $(function() {
             return false;
         };
     }
-    var session = new starChat.Session();
-    var views = {};
-    function getView() {
-        if (!views[session.id()]) {
-            var view = new starChat.View(session);
-            view.clickChannelDel(clickChannelDel(view));
-            views[session.id()] = view;
-        }
-        return views[session.id()];
-    }
+    var getView = (function () {
+        var view = null;
+        return function () {
+            if (view === null) {
+                view = new starChat.View(starChat.Session);
+                view.clickChannelDel(clickChannelDel(view));
+            }
+            return view;
+        };
+    })();
     var stream = new starChat.Stream(new starChat.PacketProcessor());
     function logIn(userName, password) {
         localStorage.userName = userName;
         localStorage.password = password;
-        session = new starChat.Session($.now(), userName, password);
+        var view = getView();
+        view.logIn(userName, password);
         var url = '/users/' + encodeURIComponent(userName) + '/channels';
-        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-        stream.start(getView());
+        starChat.ajaxRequest(view.session(), url, 'GET', null, receiveResponse);
+        stream.start(view);
     }
     function logOut() {
         delete localStorage.userName;
         delete localStorage.password;
-        if (session.id() !== 0) {
-            delete views[session.id()];
-        }
-        session = new starChat.Session();
-        $('#messages > section[data-channel-name!=""]').remove();
         var view = getView();
+        view.logOut();
+        $('#messages > section[data-channel-name!=""]').remove();
         view.update();
         stream.stop();
     }
@@ -81,7 +79,7 @@ $(function() {
         var lastFragment = null;
         return function () {
             var view = getView();
-            var session = view.session;
+            var session = view.session();
             if (session.id() === 0) {
                 return;
             }
@@ -137,7 +135,7 @@ $(function() {
 
     function receiveResponse(sessionId, uri, method, data) {
         var view = getView();
-        var session = view.session;
+        var session = view.session();
         if (session.id() === 0) {
             return;
         }
@@ -233,6 +231,7 @@ $(function() {
     (function () {
         var form = $('#addChannelForm');
         form.find('input[type="submit"]').click(function () {
+            var session = getView().session();
             var channelName = form.find('input[name="name"]').val();
             if (!channelName) {
                 return false;
@@ -252,6 +251,7 @@ $(function() {
         var form = $('#postMessageForm');
         var isPostingMessage = false;
         form.find('input[type="submit"]').click(function () {
+            var session = getView().session();
             if (!session.isLoggedIn()) {
                 // TODO: show alert or do something
                 return false;

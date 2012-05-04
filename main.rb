@@ -214,3 +214,4 @@ delete '/subscribings', provides: :json do
   end
   200
 end
+

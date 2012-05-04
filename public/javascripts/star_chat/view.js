@@ -1,19 +1,25 @@
 'use strict';
 
 starChat.View = (function () {
-    var View = function (session) {
-        this.session = session;
-        this.channels = [];
-        this.channelName = '';
-        this.lastChannelName = '';
-        this.newMessages = {};
-        this.messageIdsAlreadyShown = {};
-        this.messageScrollTops = {};
-        this.userNames = {};
-        this.isEdittingChannels = false;
+    var View = function (sessionClass) {
+        this.sessionClass_ = sessionClass;
 
-        this.dirtyFlags_ = {};
+        initialize(this);
     };
+    function initialize(self) {
+        self.session_ = new self.sessionClass_();
+
+        self.channels = [];
+        self.channelName = '';
+        self.lastChannelName = '';
+        self.newMessages = {};
+        self.messageIdsAlreadyShown = {};
+        self.messageScrollTops = {};
+        self.userNames = {};
+        self.isEdittingChannels = false;
+
+        self.dirtyFlags_ = {};
+    }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         var cachedChannels = [];
@@ -54,7 +60,7 @@ starChat.View = (function () {
                 for (var i = 0; i < channels.length; i++) {
                     cachedChannels[i] = channels[i];
                 }
-                lastSessionId = self.session.id();
+                lastSessionId = self.session_.id();
             })();
             if (self.isEdittingChannels) {
                 $('#channels li span.del').show();
@@ -173,9 +179,9 @@ starChat.View = (function () {
         });
     }
     View.prototype.update = function () {
-        if (this.session.isLoggedIn()) {
+        if (this.session_.isLoggedIn()) {
             $('#logInForm').hide();
-            $('#logOutLink span').text(this.session.userName());
+            $('#logOutLink span').text(this.session_.userName());
             $('#logOutLink').show();
             $('#main input').removeAttr('disabled');
             if (this.channelName) {
@@ -192,6 +198,16 @@ starChat.View = (function () {
         updateViewMessages(this);
         updateViewUsers(this);
         $(window).resize();
+    };
+    View.prototype.logIn = function (userName, password) {
+        this.session_ = new this.sessionClass_($.now, userName, password);
+    };
+    View.prototype.logOut = function () {
+        this.session_ = new this.sessionClass_();
+        initialize(this);
+    };
+    View.prototype.session = function () {
+        return this.session_;
     };
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
