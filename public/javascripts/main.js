@@ -13,10 +13,9 @@ $(function() {
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
                 'user_name=' + encodeURIComponent(view.session.userName());
             starChat.ajaxRequest(session, url, 'DELETE', null, function (sessionId, uri, method, data) {
-                receiveResponse(sessionId, uri, method, data);
                 starChat.clearFragment();
-                $(window).trigger('hashchange');
-                updateChannelList();
+                getView().channelName = '';
+                receiveResponse(sessionId, uri, method, data);
             });
             return false;
         };
@@ -205,7 +204,7 @@ $(function() {
                     }
                 }
             } else if (method === 'DELETE') {
-                if (uri.match(/^subscribings\?/)) {
+                if (uri.match(/^\/subscribings\?/)) {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
                     var idx = -1;
