@@ -9,9 +9,9 @@ $(function() {
             if (!confirm(msg)) {
                 return false;
             }
-            var url = '/subscribings;' +
-                'channel_name=' + starChat.encodeMatrixParam(channelName) + ';' +
-                'user_name=' + starChat.encodeMatrixParam(view.session.userName());
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
+                'user_name=' + encodeURIComponent(view.session.userName());
             starChat.ajaxRequest(session, url, 'DELETE', null, function (sessionId, uri, method, data) {
                 receiveResponse(sessionId, uri, method, data);
                 starChat.clearFragment();
@@ -103,9 +103,9 @@ $(function() {
         if (!userName) {
             return;
         }
-        var url = '/subscribings;' +
-            'channel_name=' + starChat.encodeMatrixParam(channelName) + ';' +
-            'user_name=' + starChat.encodeMatrixParam(userName);
+        var url = '/subscribings?' +
+            'channel_name=' + encodeURIComponent(channelName) + ';' +
+            'user_name=' + encodeURIComponent(userName);
         starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
             receiveResponse(sessionId, uri, method, data);
             if (success !== void(0)) {

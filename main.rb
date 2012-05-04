@@ -157,17 +157,10 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
-before %r{^/subscribings;([^/]+)$} do
+before '/subscribings' do
   protect!
-  names = {}
-  params[:captures][0].split(';').each do |pair|
-    key, value = pair.split('=').map{ |seg|
-      uri_decode(seg).gsub('\\x3B', ';').gsub('\\x3D', '=').gsub('\\\\'){'\\'}
-    }
-    names[key] = value if key and value
-  end
-  channel_name = names['channel_name']
-  user_name    = names['user_name']
+  channel_name = params[:channel_name]
+  user_name    = params[:user_name]
   halt 400 unless channel_name.kind_of?(String)
   halt 400 unless user_name.kind_of?(String)
   halt 401 if user_name != current_user.name
@@ -175,7 +168,7 @@ before %r{^/subscribings;([^/]+)$} do
   @channel_name = channel_name
 end
 
-put %r{^/subscribings;([^/]+)$}, provides: :json do
+put '/subscribings', provides: :json do
   unless @channel
     @channel = StarChat::Channel.new(@channel_name)
     begin
@@ -209,7 +202,7 @@ put %r{^/subscribings;([^/]+)$}, provides: :json do
   201
 end
 
-delete %r{^/subscribings;([^/]+)$}, provides: :json do
+delete '/subscribings', provides: :json do
   halt 400 unless @channel
   halt 409 unless StarChat::Subscribing.exist?(@channel, current_user)
   StarChat::Subscribing.destroy(@channel, current_user)
