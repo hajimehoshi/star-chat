@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module StarChat
 
   class Channel
@@ -21,8 +22,13 @@ module StarChat
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     end
 
-    def messages(num)
-      Message.find_by_list(['channels', name, 'messages'], num)
+    def messages(idx, len)
+      Message.find_by_list(['channels', name, 'messages'], idx, len)
+    end
+
+    def messages_by_time(start_time, end_time)
+      # TODO: impl
+      # 単なる二分探索でいける
     end
 
     def post_message(user, body)

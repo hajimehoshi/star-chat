@@ -93,7 +93,7 @@ get '/users/:user_name/stream', provides: :json do
   stream(:keep_open) do |out|
     packets = current_user.channels.inject([]) do |msgs, channel|
       channel_name = channel.name
-      msgs.concat(channel.messages(-100).map do |msg|
+      msgs.concat(channel.messages(-100, 100).map do |msg|
                     {
                       type: 'message',
                       channel_name: channel_name,
@@ -132,13 +132,16 @@ get '/channels/:channel_name/users', provides: :json do
 end
 
 get '/channels/:channel_name/messages/:range', provides: :json do
-  case params[:range]
-  when 'recent'
-    num = -100
+  range = params[:range]
+  if range == 'recent'
+    idx, len = -100, 100
+  elsif m = /^time=(\d+),(\d+)$/.match(range)
+    start_time, end_time = m[1].to_i, m[2].to_i
+    halt 404
   else
     halt 404
   end
-  @channel.messages(num).to_json
+  @channel.messages(idx, len).to_json
 end
 
 post '/channels/:channel_name/messages', provides: :json do
@@ -185,7 +188,7 @@ put '/subscribings', provides: :json do
     return false unless user = StarChat::User.find(user_name)
     @channel.users.any?{|u| u.name == user.name}
   end
-  packets = @channel.messages(-100).map do |message|
+  packets = @channel.messages(-100, 100).map do |message|
     {
       type: 'message',
       channel_name: @channel.name,

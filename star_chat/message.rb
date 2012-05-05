@@ -6,16 +6,14 @@ module StarChat
       RedisDB.exec(:incr, ['messages', 'id_num']).to_i
     end
 
-    def self.find_by_list(redis_key, num)
-      if 0 <= num
-        limit = [0, num]
-      else
-        len = RedisDB.exec(:llen, redis_key)
-        limit = [len + num, -num]
-      end
+    def self.find_by_list(redis_key, idx, len)
+      # TODO: Cache
+      # TODO: Lock
+      idx += RedisDB.exec(:llen, redis_key) if idx < 0
+      limit = [idx, len]
       values = RedisDB.exec(:sort,
                             redis_key,
-                            by: 'nosort',
+                            by: 'nosort', # Is it OK?
                             get: ['#',
                                   'messages:*->user_name',
                                   'messages:*->body',
