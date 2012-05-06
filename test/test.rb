@@ -38,6 +38,14 @@ end
 
 class ChannelTest < Test::Unit::TestCase
 
+  def setup
+    StarChat::RedisDB.exec(:flushall)
+  end
+
+  def teardown
+    StarChat::RedisDB.exec(:flushall)
+  end
+
   def test_foo
   end
 

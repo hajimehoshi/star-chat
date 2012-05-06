@@ -28,7 +28,11 @@ module StarChat
         raise 'invalid key: controls' if str =~ /[[:cntrl:]]/
         str.gsub('\\'){'\\x5c'}.gsub(':'){'\\x3a'}
       end.join(':')
-      @@redis.send(command, key, *args)
+      if key.empty?
+        @@redis.send(command, *args)
+      else
+        @@redis.send(command, key, *args)
+      end
     end
 
   end
