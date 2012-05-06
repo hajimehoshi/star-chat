@@ -135,13 +135,13 @@ get '/channels/:channel_name/messages/:range', provides: :json do
   range = params[:range]
   if range == 'recent'
     idx, len = -100, 100
-  elsif m = /^time=(\d+),(\d+)$/.match(range)
+    @channel.messages(idx, len).to_json
+  elsif m = /^by_time_span;(\d+),(\d+)$/.match(range)
     start_time, end_time = m[1].to_i, m[2].to_i
-    halt 404
+    @channel.message_by_time_span(start_time, end_time).to_json
   else
     halt 404
   end
-  @channel.messages(idx, len).to_json
 end
 
 post '/channels/:channel_name/messages', provides: :json do

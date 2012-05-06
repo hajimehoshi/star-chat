@@ -26,9 +26,16 @@ module StarChat
       Message.find_by_list(['channels', name, 'messages'], idx, len)
     end
 
-    def messages_by_time(start_time, end_time)
-      # TODO: impl
-      # 単なる二分探索でいける
+    def messages_by_time_span(start_time, end_time)
+      redis_key = ['channels', name, 'messages']
+      len = RedisDB.exec(:llen, redis_key)
+      idx1 = BinarySearch.search(start_time, 0, len) do |i|
+        Message.find_by_list(redis_key, i, 1)[0].created_at
+      end
+      idx2 = BinarySearch.search(end_time, 0, len) do |i|
+        Message.find_by_list(redis_key, i, 1)[0].created_at
+      end
+      Message.find_by_list(redis_key, idx1, idx2 - idx1)
     end
 
     def post_message(user, body)
