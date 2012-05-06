@@ -9,6 +9,7 @@ module StarChat
     def self.find_by_list(redis_key, idx, len)
       # TODO: Cache
       # TODO: Lock
+      return [] if len <= 0
       idx += RedisDB.exec(:llen, redis_key) if idx < 0
       limit = [idx, len]
       values = RedisDB.exec(:sort,
@@ -40,7 +41,7 @@ module StarChat
       }.merge(options)
       @user_name  = user_name
       @body       = body.gsub(/[[:cntrl:]]/, '')
-      @created_at = options[:created_at]
+      @created_at = options[:created_at].to_i
       @id         = options[:id]
     end
 

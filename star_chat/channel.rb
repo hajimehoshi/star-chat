@@ -38,8 +38,8 @@ module StarChat
       Message.find_by_list(redis_key, idx1, idx2 - idx1)
     end
 
-    def post_message(user, body)
-      message = Message.new(user.name, body).save
+    def post_message(user, body, created_at = Time.now.to_i)
+      message = Message.new(user.name, body, created_at: created_at).save
       RedisDB.exec(:rpush, ['channels', name, 'messages'], message.id)
       message
     end

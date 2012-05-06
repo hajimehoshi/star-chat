@@ -8,8 +8,6 @@ module StarChat
       search_rec(target, i, j, i, j, &block)
     end
 
-    private
-
     def search_rec(target, i, j, orig_i, orig_j, &block)
       return i if j <= i
       m = (i + j) / 2
