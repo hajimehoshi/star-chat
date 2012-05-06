@@ -1,8 +1,10 @@
+require 'sinatra'
+
+set :environment, :test
+
 require './main.rb'
 require 'test/unit'
 require 'rack/test'
-
-set :environment, :test
 
 class BinarySearchTest < Test::Unit::TestCase
 
@@ -30,6 +32,13 @@ class BinarySearchTest < Test::Unit::TestCase
     assert_equal(5, search(15, 0, size) {|i| arr[i].to_i})
     assert_equal(5, search(16, 0, size) {|i| arr[i].to_i})
     assert_equal(6, search(17, 0, size) {|i| arr[i].to_i})
+  end
+
+end
+
+class ChannelTest < Test::Unit::TestCase
+
+  def test_foo
   end
 
 end

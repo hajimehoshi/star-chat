@@ -8,5 +8,9 @@ configure :development do
 end
 
 configure :production do
-  StarChat::RedisDB.setup('127.0.0.1', 6379)
+  StarChat::RedisDB.setup('127.0.0.1', 6380)
+end
+
+configure :test do
+  StarChat::RedisDB.setup('127.0.0.1', 6381)
 end
