@@ -38,6 +38,7 @@ starChat.Stream = (function () {
                         console.log(e);
                         continue;
                     }
+                    self.continuingErrorNum_ = 0;
                     self.packetProcessor_.process(packet, view);
                 }
                 view.update();
