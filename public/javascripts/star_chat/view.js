@@ -133,9 +133,10 @@ starChat.View = (function () {
                 m = '0' + m;
             }
             var timeStr = h + ':' + m;
-            var createdAtP = $('<p></p>').text(timeStr);
-            createdAtP.addClass('createdAt');
-            messageSection.append(createdAtP);
+            var createdAt = $('<time></time>').text(timeStr);
+            createdAt.addClass('createdAt');
+            createdAt.attr('data-unix-time', message.created_at)
+            messageSection.append(createdAt);
             messageSection.attr('data-message-id', message.id);
             return messageSection;
         }
