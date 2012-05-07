@@ -89,45 +89,56 @@ $(function() {
             }
             lastFragment = fragment;
             view.channelName = '';
+            view.resetTimeSpan();
             var segments = fragment.split('/');
-            if (segments.length !== 2) {
-                return;
-            }
-            if (segments[0] !== 'channels') {
-                return;
-            }
-            var channelName = segments[1];
-            if (channelName === void(0)) {
-                return;
-            }
-            channelName = decodeURIComponent(channelName);
-            var isAlreadyJoined = false;
-            view.channels.forEach(function (channel) {
-                if (channel.name === channelName) {
-                    isAlreadyJoined = true;
-                    return false;
+            if (fragment.match(/^channels\//)) {
+                if (fragment.match(/^channels\/([^\/]+)$/)) {
+                    var channelName = decodeURIComponent(RegExp.$1);
+                    var startTime   = null;
+                    var endTime     = null;
+                } else if (fragment.match(/^channels\/([^\/]+)\/old_logs\/(\d+),(\d+)$/)) {
+                    var channelName = decodeURIComponent(RegExp.$1);
+                    var startTime   = parseInt(decodeURIComponent(RegExp.$2));
+                    var endTime     = parseInt(decodeURIComponent(RegExp.$3));
+                } else {
+                    return;
                 }
-            });
-            if (isAlreadyJoined) {
-                view.channelName = channelName;
-                var url = '/channels/' + encodeURIComponent(channelName) + '/users';
-                starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-                return;
+                console.log(startTime, endTime);
+                var isAlreadyJoined = false;
+                view.channels.forEach(function (channel) {
+                    if (channel.name === channelName) {
+                        isAlreadyJoined = true;
+                        return false;
+                    }
+                });
+                if (isAlreadyJoined) {
+                    view.channelName = channelName;
+                    if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
+                        view.setTimeSpan(startTime, endTime);
+                    }
+                    var url = '/channels/' + encodeURIComponent(channelName) + '/users';
+                    starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+                    return;
+                }
+                // Confirming joining the new channel
+                var msg = "Are you sure you want to join '" +
+                    channelName + "'?"
+                if (!confirm(msg)) {
+                    return;
+                }
+                var url = '/subscribings?' +
+                    'channel_name=' + encodeURIComponent(channelName) + ';' +
+                    'user_name=' + encodeURIComponent(session.userName());
+                starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
+                    receiveResponse(sessionId, uri, method, data);
+                    var view = getView();
+                    view.channelName = channelName;
+                    if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
+                        view.setTimeSpan(startTime, endTime);
+                    }
+                    view.update();
+                });
             }
-            var msg = "Are you sure you want to join '" +
-                channelName + "'?"
-            if (!confirm(msg)) {
-                return;
-            }
-            var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(session.userName());
-            starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
-                receiveResponse(sessionId, uri, method, data);
-                var view = getView();
-                view.channelName = channelName;
-                view.update();
-            });
         }
     })();
 

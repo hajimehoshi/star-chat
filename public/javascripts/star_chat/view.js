@@ -19,6 +19,8 @@ starChat.View = (function () {
         self.isEdittingChannels = false;
 
         self.dirtyFlags_ = {};
+        self.startTime_ = null;
+        self.endTime_ = null;
     }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
@@ -212,9 +214,21 @@ starChat.View = (function () {
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
     };
+    // TODO: 関数名直すべき?
     View.prototype.clickChannelDel = function (func) {
         this.clickChannelDel_ = func;
         return this;
+    };
+    View.prototype.resetTimeSpan = function () {
+        this.startTime_ = null;
+        this.endTime_   = null;
+    };
+    View.prototype.setTimeSpan = function (startTime, endTime) {
+        this.startTime_ = startTime;
+        this.endTime_   = endTime;
+    };
+    View.prototype.isShowingOldMessages = function () {
+        return $.isNumeric(this.startTime_) && $.isNumeric(this.endTime_);
     };
     return View;
 })();
