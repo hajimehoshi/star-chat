@@ -90,7 +90,7 @@ starChat.getFragment = function () {
         fragment = fragment.substring(1);
     }
     return fragment;
-}
+};
 
 starChat.clearFragment = function () {
     var newURL = location.href;
@@ -99,7 +99,7 @@ starChat.clearFragment = function () {
         newURL = newURL.substring(0, i);
     }
     history.replaceState($.now(), null, newURL);
-}
+};
 
 starChat.parseQuery = function (str) {
     var i = str.indexOf('?');
@@ -123,4 +123,4 @@ starChat.parseQuery = function (str) {
         params[key] = value;
     });
     return params;
-}
+};
