@@ -114,6 +114,10 @@ $(function() {
                 if (isAlreadyJoined) {
                     view.channelName = channelName;
                     if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
+                        var url = '/channels/' + encodeURIComponent(channelName) +
+                            '/messages/by_time_span/' +
+                            encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
+                        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                         view.setTimeSpan(startTime, endTime);
                     }
                     var url = '/channels/' + encodeURIComponent(channelName) + '/users';
@@ -134,6 +138,10 @@ $(function() {
                     var view = getView();
                     view.channelName = channelName;
                     if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
+                        var url = '/channels/' + encodeURIComponent(channelName) +
+                            '/messages/by_time_span/' +
+                            encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
+                        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                         view.setTimeSpan(startTime, endTime);
                     }
                     view.update();
