@@ -96,7 +96,7 @@ $(function() {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = null;
                     var endTime     = null;
-                } else if (fragment.match(/^channels\/([^\/]+)\/old_logs\/(\d+),(\d+)$/)) {
+                } else if (fragment.match(/^channels\/([^\/]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = parseInt(decodeURIComponent(RegExp.$2));
                     var endTime     = parseInt(decodeURIComponent(RegExp.$3));
