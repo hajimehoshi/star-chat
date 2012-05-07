@@ -73,7 +73,14 @@ starChat.View = (function () {
     })();
     function updateViewMessages(self) {
         if (self.channelName) {
-            $('#messages h2').text(self.channelName);
+            if (self.isShowingOldLogs()) {
+                var startTime = starChat.toISO8601(new Date(self.startTime_ * 1000));
+                var endTime   = starChat.toISO8601(new Date(self.endTime_   * 1000));
+                var oldLogs = '(Old Logs: ' + startTime + '/' + endTime + ')';
+                $('#messages h2').text(self.channelName + ' ' + oldLogs);
+            } else {
+                $('#messages h2').text(self.channelName);
+            }
         } else {
             $('#messages h2').text("\u00a0");
         }
@@ -186,7 +193,7 @@ starChat.View = (function () {
             $('#logOutLink span').text(this.session_.userName());
             $('#logOutLink').show();
             $('#main input').removeAttr('disabled');
-            if (this.channelName) {
+            if (this.channelName && !this.isShowingOldLogs()) {
                 $('#postMessageForm input').removeAttr('disabled');
             } else {
                 $('#postMessageForm input').attr('disabled', 'disabled');
@@ -227,7 +234,7 @@ starChat.View = (function () {
         this.startTime_ = startTime;
         this.endTime_   = endTime;
     };
-    View.prototype.isShowingOldMessages = function () {
+    View.prototype.isShowingOldLogs = function () {
         return $.isNumeric(this.startTime_) && $.isNumeric(this.endTime_);
     };
     return View;

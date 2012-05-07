@@ -124,3 +124,24 @@ starChat.parseQuery = function (str) {
     });
     return params;
 };
+
+starChat.toISO8601 = function (date) {
+    function fillZero(d) {
+        if (d < 10) {
+            return '0' + d;
+        } else {
+            return d;
+        }
+    }
+    var offsetSeconds = date.getTimezoneOffset();
+    var offset =
+        (offsetSeconds <= 0 ? '+' : '-') +
+        fillZero(Math.abs(offsetSeconds) / 60) + ':' +
+        fillZero(Math.abs(offsetSeconds) % 60);
+    return date.getFullYear() + '-' +
+        fillZero(date.getMonth() + 1) + '-' +
+        fillZero(date.getDate()) + 'T' +
+        fillZero(date.getHours()) + ':' +
+        fillZero(date.getMinutes()) + ':' +
+        fillZero(date.getSeconds()) + offset;
+};
