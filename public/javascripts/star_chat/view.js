@@ -126,7 +126,6 @@ starChat.View = (function () {
                 '/old_logs/by_time_span/' +
                 encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
             location.hash = fragment;
-            console.log(fragment);
             return false;
         });
         section.append(oldLogsForm);
