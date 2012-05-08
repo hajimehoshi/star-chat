@@ -9,6 +9,8 @@ starChat.View = (function () {
     function initialize(self) {
         self.session_ = new self.sessionClass_();
 
+        // TODO: Model に相当するクラスを作る?
+        // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channels = [];
         self.channelName = '';
         self.lastChannelName = '';
@@ -84,10 +86,6 @@ starChat.View = (function () {
         } else {
             $('#messages h2').text("\u00a0");
         }
-        /*$('#messages > section').filter(function (i) {
-          var channelName = $(this).attr('data-channel-name');
-          return // TODO: implement
-          }).remove();*/
         if (self.channelName &&
             $('#messages > section').filter(function (i) {
                 return $(this).attr('data-channel-name') === self.channelName;
@@ -121,7 +119,6 @@ starChat.View = (function () {
             var bodyP = $('<p></p>').text(message.body);
             bodyP.addClass('body');
             messageSection.append(bodyP);
-            // TODO: Use the element <time>?
             var time = new Date();
             time.setTime(message.created_at * 1000);
             var h = time.getHours() + '';
