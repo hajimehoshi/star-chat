@@ -33,6 +33,12 @@ class BinarySearchTest < Test::Unit::TestCase
     assert_equal(5, search(15, 0, size) {|i| arr[i].to_i})
     assert_equal(5, search(16, 0, size) {|i| arr[i].to_i})
     assert_equal(6, search(17, 0, size) {|i| arr[i].to_i})
+    assert_equal(0, search(0, 0, 1) {|i| arr[i].to_i})
+
+    assert_equal(0, search(-1, 0, 1) {|i| arr[i].to_i})
+    assert_equal(0, search(0, 0, 1) {|i| arr[i].to_i})
+    assert_equal(0, search(1, 0, 1) {|i| arr[i].to_i})
+    assert_equal(1, search(2, 0, 1) {|i| arr[i].to_i})
   end
 
 end
@@ -55,6 +61,8 @@ class ChannelTest < Test::Unit::TestCase
     channel1.post_message(user1, 'body7', 1022)
     channel1.post_message(user2, 'body8', 1100)
     channel1.post_message(user1, 'body9', 1101)
+    channel2 = Channel.new('channel2').save
+    channel2.post_message(user1, 'body1', 1000)
   end
 
   def teardown
@@ -117,6 +125,11 @@ class ChannelTest < Test::Unit::TestCase
     begin
       msgs = channel1.messages_by_time_span(1020, 1020)
       assert_equal(0, msgs.size)
+    end
+    channel2 = Channel.find('channel2')
+    begin
+      msgs = channel2.messages_by_time_span(0, 2000)
+      assert_equal(1, msgs.size)
     end
   end
 

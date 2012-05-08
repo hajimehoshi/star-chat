@@ -11,7 +11,10 @@ module StarChat
     def search_rec(target, i, j, orig_i, orig_j, &block)
       return i if j <= i
       m = (i + j) / 2
-      return m if m - 1 < orig_i
+      if m - 1 < orig_i
+        obj = yield(m)
+        return (obj < target) ? (m + 1) : m
+      end
       obj1 = yield(m-1)
       obj2 = yield(m)
       raise 'invalid sequence' unless obj1 <= obj2
