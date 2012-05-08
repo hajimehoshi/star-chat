@@ -162,9 +162,18 @@ starChat.View = (function () {
     function updateViewMessages(self) {
         if (self.channelName) {
             if (self.isShowingOldLogs()) {
-                var startTime = starChat.toISO8601(new Date(self.startTime_ * 1000));
-                var endTime   = starChat.toISO8601(new Date(self.endTime_   * 1000));
-                var oldLogs = '(Old Logs: ' + startTime + '/' + endTime + ')';
+                var d = new Date(self.startTime_ * 1000);
+                if ((self.endTime_ - self.startTime_) === 60 * 60 * 24 &&
+                    d.getHours() === 0 &&
+                    d.getMinutes() === 0 &&
+                    d.getSeconds() === 0) {
+                    var startTime = starChat.toISO8601(new Date(self.startTime_ * 1000), 'date');
+                    var oldLogs = '(Old Logs: ' + startTime + ')';
+                } else {
+                    var startTime = starChat.toISO8601(new Date(self.startTime_ * 1000));
+                    var endTime   = starChat.toISO8601(new Date(self.endTime_   * 1000));
+                    var oldLogs = '(Old Logs: ' + startTime + '/' + endTime + ')';
+                }
                 $('#messages h2').text(self.channelName + ' ' + oldLogs);
             } else {
                 $('#messages h2').text(self.channelName);

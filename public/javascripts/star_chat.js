@@ -125,7 +125,10 @@ starChat.parseQuery = function (str) {
     return params;
 };
 
-starChat.toISO8601 = function (date) {
+starChat.toISO8601 = function (date, type) {
+    if (type === void(0)) {
+        type = 'datetime';
+    }
     function fillZero(d) {
         if (d < 10) {
             return '0' + d;
@@ -133,15 +136,21 @@ starChat.toISO8601 = function (date) {
             return d;
         }
     }
-    var offsetSeconds = date.getTimezoneOffset();
-    var offset =
-        (offsetSeconds <= 0 ? '+' : '-') +
-        fillZero(Math.abs(offsetSeconds) / 60) + ':' +
-        fillZero(Math.abs(offsetSeconds) % 60);
-    return date.getFullYear() + '-' +
-        fillZero(date.getMonth() + 1) + '-' +
-        fillZero(date.getDate()) + 'T' +
-        fillZero(date.getHours()) + ':' +
-        fillZero(date.getMinutes()) + ':' +
-        fillZero(date.getSeconds()) + offset;
+    if (type === 'datetime') {
+        var offsetSeconds = date.getTimezoneOffset();
+        var offset =
+            (offsetSeconds <= 0 ? '+' : '-') +
+            fillZero(Math.abs(offsetSeconds) / 60) + ':' +
+            fillZero(Math.abs(offsetSeconds) % 60);
+        return date.getFullYear() + '-' +
+            fillZero(date.getMonth() + 1) + '-' +
+            fillZero(date.getDate()) + 'T' +
+            fillZero(date.getHours()) + ':' +
+            fillZero(date.getMinutes()) + ':' +
+            fillZero(date.getSeconds()) + offset;
+    } else if (type === 'date') {
+        return date.getFullYear() + '-' +
+            fillZero(date.getMonth() + 1) + '-' +
+            fillZero(date.getDate());
+    }
 };
