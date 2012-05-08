@@ -109,7 +109,7 @@ $(function() {
                         return false;
                     }
                 });
-                if (isAlreadyJoined) {
+                if (isAlreadyJoined || view.isShowingOldLogs()) {
                     view.channelName = channelName;
                     if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
                         var url = '/channels/' + encodeURIComponent(channelName) +
@@ -177,7 +177,7 @@ $(function() {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = decodeURIComponent(RegExp.$2);
                     var endTime     = decodeURIComponent(RegExp.$3);
-                    
+                    view.setOldMessages(channelName, startTime, endTime, data);
                 }
             } else if (method === 'PUT') {
                 if (uri.match(/^\/subscribings\?/)) {

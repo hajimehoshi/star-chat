@@ -74,6 +74,67 @@ starChat.View = (function () {
             }
         }
     })();
+    function getSectionElement(self) {
+        if (!self.channelName) {
+            return null;
+        }
+        var sections = $('#messages > section').filter(function (i) {
+            return $(this).attr('data-channel-name') === self.channelName &&
+                (!self.isShowingOldLogs() &&
+                 !$(this).attr('data-start-time') &&
+                 !$(this).attr('data-end-time')) ||
+                (self.isShowingOldLogs() &&
+                 parseInt($(this).attr('data-start-time')) === self.startTime_ &&
+                 parseInt($(this).attr('data-end-time'))   === self.endTime_);
+        });
+        if (sections.length === 1) {
+            return sections;
+        }
+        if (2 <= sections.length) {
+            throw 'invalid sections';
+        }
+        var section = $('<section></section>');
+        var channelName = self.channelName;
+        section.attr('data-channel-name', channelName);
+        if (self.isShowingOldLogs()) {
+            section.attr('data-start-time', self.startTime_);
+            section.attr('data-end-time',   self.endTime_);
+        }
+        if (!self.isShowingOldLogs()) {
+            section.scroll(function () {
+                self.messageScrollTops[channelName] = section.scrollTop();
+            });
+        }
+        $('#messages h2').after(section);
+        return section;
+    }
+    function messageToElement(message) {
+        var messageSection = $('<section></section>');
+        messageSection.addClass('message');
+        var userNameP = $('<p></p>').text(message.user_name);
+        userNameP.addClass('userName');
+        messageSection.append(userNameP);
+        var bodyP = $('<p></p>').text(message.body);
+        bodyP.addClass('body');
+        messageSection.append(bodyP);
+        var time = new Date();
+        time.setTime(message.created_at * 1000);
+        var h = time.getHours() + '';
+        var m = time.getMinutes() + '';
+        if (h.length < 2) {
+            h = '0' + h;
+        }
+        if (m.length < 2) {
+            m = '0' + m;
+        }
+        var timeStr = h + ':' + m;
+        var createdAt = $('<time></time>').text(timeStr);
+        createdAt.addClass('createdAt');
+        createdAt.attr('data-unix-time', message.created_at)
+        messageSection.append(createdAt);
+        messageSection.attr('data-message-id', message.id);
+        return messageSection;
+    }
     function updateViewMessages(self) {
         if (self.channelName) {
             if (self.isShowingOldLogs()) {
@@ -87,64 +148,40 @@ starChat.View = (function () {
         } else {
             $('#messages h2').text("\u00a0");
         }
-        if (self.channelName &&
+        if (!self.isShowingOldLogs()) {
             $('#messages > section').filter(function (i) {
-                return $(this).attr('data-channel-name') === self.channelName;
-            }).length === 0) {
-            var section = $('<section></section>');
-            var channelName = self.channelName;
-            section.attr('data-channel-name', channelName);
-            section.scroll(function () {
-                self.messageScrollTops[channelName] = section.scrollTop();
-            });
-            $('#messages h2').after(section);
+                return $(this).attr('data-start-time') || $(this).attr('data-end-time');
+            }).remove();
         }
+        if (!self.channelName) {
+            $('#messages > section').hide();
+            self.lastChannelName = '';
+            return;
+        }
+        var section = getSectionElement(self);
         $('#messages > section').each(function (i) {
             var e = $(this);
-            if (e.attr('data-channel-name') === self.channelName) {
+            if (e.attr('data-channel-name') === self.channelName &&
+                (!self.isShowingOldLogs() ||
+                 (parseInt(e.attr('data-start-time')) === self.startTime_ &&
+                  parseInt(e.attr('data-end-time'))   === self.endTime_))) {
                 e.show();
             } else {
                 e.hide();
             }
         });
-        if (!self.channelName) {
-            self.lastChannelName = '';
-            return;
-        }
-        function messageToElement(message) {
-            var messageSection = $('<section></section>');
-            messageSection.addClass('message');
-            var userNameP = $('<p></p>').text(message.user_name);
-            userNameP.addClass('userName');
-            messageSection.append(userNameP);
-            var bodyP = $('<p></p>').text(message.body);
-            bodyP.addClass('body');
-            messageSection.append(bodyP);
-            var time = new Date();
-            time.setTime(message.created_at * 1000);
-            var h = time.getHours() + '';
-            var m = time.getMinutes() + '';
-            if (h.length < 2) {
-                h = '0' + h;
-            }
-            if (m.length < 2) {
-                m = '0' + m;
-            }
-            var timeStr = h + ':' + m;
-            var createdAt = $('<time></time>').text(timeStr);
-            createdAt.addClass('createdAt');
-            createdAt.attr('data-unix-time', message.created_at)
-            messageSection.append(createdAt);
-            messageSection.attr('data-message-id', message.id);
-            return messageSection;
-        }
-        var section = $('#messages > section').filter(function (i) {
-            return $(this).attr('data-channel-name') === self.channelName;
-        });
         // TODO: sort by id
-        var msgs = self.newMessages[self.channelName];
-        if (!msgs) {
-            msgs = [];
+        var msgs = [];
+        if (!self.isShowingOldLogs()) {
+            if (self.channelName in self.newMessages) {
+                msgs = self.newMessages[self.channelName];
+            }
+        } else {
+            var key = self.startTime_ + '_' + self.endTime_;
+            if (self.channelName in self.oldMessages_ &&
+                key in self.oldMessages_[self.channelName]) {
+                msgs = self.oldMessages_[self.channelName][key];
+            }
         }
         msgs.forEach(function (message) {
             if (self.messageIdsAlreadyInSection_[message.id]) {
@@ -153,23 +190,25 @@ starChat.View = (function () {
             section.append(messageToElement(message));
             self.messageIdsAlreadyInSection_[message.id] = true;
         });
-        if (self.lastChannelName === self.channelName) {
-            var isBottom =
-                section.get(0).scrollHeight - section.scrollTop() ===
-                section.outerHeight();
-            if (isBottom) {
-                section.animate({scrollTop: section.get(0).scrollHeight});
-            }
-        } else {
-            if (!self.lastChannelName ||
-                !(self.channelName in self.messageScrollTops)) {
-                section.scrollTop(section.get(0).scrollHeight);
+        if (!self.isShowingOldLogs()) {
+            if (self.lastChannelName === self.channelName) {
+                var isBottom =
+                    section.get(0).scrollHeight - section.scrollTop() ===
+                    section.outerHeight();
+                if (isBottom) {
+                    section.animate({scrollTop: section.get(0).scrollHeight});
+                }
             } else {
-                section.scrollTop(self.messageScrollTops[self.channelName]);
+                if (!self.lastChannelName ||
+                    !(self.channelName in self.messageScrollTops)) {
+                    section.scrollTop(section.get(0).scrollHeight);
+                } else {
+                    section.scrollTop(self.messageScrollTops[self.channelName]);
+                }
             }
+            self.messageScrollTops[self.channelName] = section.scrollTop();
         }
         self.lastChannelName = self.channelName;
-        self.messageScrollTops[self.channelName] = section.scrollTop();
         self.newMessages[self.channelName] = [];
     }
     function updateViewUsers(self) {
@@ -235,6 +274,16 @@ starChat.View = (function () {
     };
     View.prototype.isShowingOldLogs = function () {
         return $.isNumeric(this.startTime_) && $.isNumeric(this.endTime_);
+    };
+    View.prototype.setOldMessages = function (channelName, startTime, endTime, messages) {
+        if (!(channelName in this.oldMessages_)) {
+            this.oldMessages_[channelName] = {};
+        }
+        var key = startTime + '_' + endTime;
+        if (key in this.oldMessages_[channelName]) {
+            return;
+        }
+        this.oldMessages_[channelName][key] = messages;
     };
     return View;
 })();
