@@ -195,27 +195,30 @@ starChat.View = (function () {
             }
         });
         // TODO: sort by id
-        var msgs = [];
         if (!self.isShowingOldLogs()) {
             if (self.channelName in self.newMessages) {
-                msgs = self.newMessages[self.channelName];
+                var msgs = self.newMessages[self.channelName];
+                msgs.forEach(function (message) {
+                    if (self.messageIdsAlreadyInSection_[message.id]) {
+                        return;
+                    }
+                    self.messageIdsAlreadyInSection_[message.id] = true;
+                    section.append(messageToElement(message));
+                });
             }
         } else {
             var key = self.startTime_ + '_' + self.endTime_;
             if (self.channelName in self.oldMessages_ &&
                 key in self.oldMessages_[self.channelName]) {
-                msgs = self.oldMessages_[self.channelName][key];
+                // TODO: Refactoring
+                section.find('section.message').remove();
+                var msgs = self.oldMessages_[self.channelName][key];
+                msgs.forEach(function (message) {
+                    section.append(messageToElement(message));
+                });
             }
         }
-        msgs.forEach(function (message) {
-            if (!self.isShowingOldLogs()) {
-                if (self.messageIdsAlreadyInSection_[message.id]) {
-                    return;
-                }
-                self.messageIdsAlreadyInSection_[message.id] = true;
-            }
-            section.append(messageToElement(message));
-        });
+        
         if (!self.isShowingOldLogs()) {
             if (self.lastChannelName_ === self.channelName) {
                 var isBottom =
