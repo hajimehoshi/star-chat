@@ -99,6 +99,7 @@ $(function() {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = parseInt(decodeURIComponent(RegExp.$2));
                     var endTime     = parseInt(decodeURIComponent(RegExp.$3));
+                    view.setTimeSpan(startTime, endTime);
                 } else {
                     return;
                 }
@@ -116,7 +117,6 @@ $(function() {
                             '/messages/by_time_span/' +
                             encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
                         starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-                        view.setTimeSpan(startTime, endTime);
                     }
                     var url = '/channels/' + encodeURIComponent(channelName) + '/users';
                     starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
