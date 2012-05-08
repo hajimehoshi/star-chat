@@ -208,11 +208,13 @@ starChat.View = (function () {
             }
         }
         msgs.forEach(function (message) {
-            if (self.messageIdsAlreadyInSection_[message.id]) {
-                return;
+            if (!self.isShowingOldLogs()) {
+                if (self.messageIdsAlreadyInSection_[message.id]) {
+                    return;
+                }
+                self.messageIdsAlreadyInSection_[message.id] = true;
             }
             section.append(messageToElement(message));
-            self.messageIdsAlreadyInSection_[message.id] = true;
         });
         if (!self.isShowingOldLogs()) {
             if (self.lastChannelName_ === self.channelName) {
@@ -304,9 +306,6 @@ starChat.View = (function () {
             this.oldMessages_[channelName] = {};
         }
         var key = startTime + '_' + endTime;
-        if (key in this.oldMessages_[channelName]) {
-            return;
-        }
         this.oldMessages_[channelName][key] = messages;
     };
     return View;
