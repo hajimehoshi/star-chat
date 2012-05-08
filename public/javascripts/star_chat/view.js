@@ -232,9 +232,9 @@ starChat.View = (function () {
                 }
             }
             self.messageScrollTops[self.channelName] = section.scrollTop();
+            self.newMessages[self.channelName] = [];
+            self.lastChannelName_ = self.channelName;
         }
-        self.lastChannelName_ = self.channelName;
-        self.newMessages[self.channelName] = [];
     }
     function updateViewUsers(self) {
         var userNamesObj = self.userNames[self.channelName];
