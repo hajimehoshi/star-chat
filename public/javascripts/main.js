@@ -90,7 +90,6 @@ $(function() {
             lastFragment = fragment;
             view.channelName = '';
             view.resetTimeSpan();
-            var segments = fragment.split('/');
             if (fragment.match(/^channels\//)) {
                 if (fragment.match(/^channels\/([^\/]+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
@@ -161,32 +160,20 @@ $(function() {
         if (session.id() !== sessionId) {
             return;
         }
-        var segments = uri.split('/').filter(function (seg) {
-            return $.type(seg) === 'string' && 0 < seg.length;
-        }).map(function (seg) {
-            return decodeURIComponent(seg);
-        });
-        if (segments.length <= 0) {
-            return;
-        }
         try {
             if (method === 'GET') {
-                if (segments[0] === 'users') {
-                    if (segments.length === 3 &&
-                        segments[1] === session.userName() &&
-                        segments[2] === 'channels') {
+                if (uri.match(/^\/users\/([^\/]+)\/channels$/)) {
+                    var userName = decodeURIComponent(RegExp.$1);
+                    if (userName === session.userName()) {
                         view.channels = data;
                     }
-                } else if (segments[0] === 'channels') {
-                    if (segments.length === 3 &&
-                        segments[2] === 'users') {
-                        var channelName = segments[1];
-                        var userNames = {};
-                        data.forEach(function (user) {
-                            userNames[user.name] = true;
-                        });
-                        view.userNames[channelName] = userNames;
-                    }
+                } else if (uri.match(/^\/channels\/([^\/]+)\/users$/)) {
+                    var channelName = decodeURIComponent(RegExp.$1);
+                    var userNames = {};
+                    data.forEach(function (user) {
+                        userNames[user.name] = true;
+                    });
+                    view.userNames[channelName] = userNames;
                 }
             } else if (method === 'PUT') {
                 if (uri.match(/^\/subscribings\?/)) {
