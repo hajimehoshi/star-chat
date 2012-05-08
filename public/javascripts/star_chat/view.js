@@ -214,6 +214,7 @@ starChat.View = (function () {
                     self.messageIdsAlreadyInSection_[message.id] = true;
                     section.append(messageToElement(message));
                 });
+                self.newMessages[self.channelName] = [];
             }
         } else {
             var key = self.startTime_ + '_' + self.endTime_;
@@ -227,7 +228,6 @@ starChat.View = (function () {
                 });
             }
         }
-        
         if (!self.isShowingOldLogs()) {
             if (self.lastChannelName_ === self.channelName) {
                 var isBottom =
@@ -245,7 +245,6 @@ starChat.View = (function () {
                 }
             }
             self.messageScrollTops[self.channelName] = section.scrollTop();
-            self.newMessages[self.channelName] = [];
             self.lastChannelName_ = self.channelName;
         }
     }
