@@ -15,14 +15,15 @@ starChat.View = (function () {
         self.channelName = '';
         self.lastChannelName = '';
         self.newMessages = {};
-        self.messageIdsAlreadyShown = {};
         self.messageScrollTops = {};
         self.userNames = {};
         self.isEdittingChannels = false;
 
+        self.messageIdsAlreadyInSection_ = {};
         self.dirtyFlags_ = {};
         self.startTime_ = null;
         self.endTime_ = null;
+        self.oldMessages_ = {};
     }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
@@ -137,25 +138,25 @@ starChat.View = (function () {
             messageSection.attr('data-message-id', message.id);
             return messageSection;
         }
+        var section = $('#messages > section').filter(function (i) {
+            return $(this).attr('data-channel-name') === self.channelName;
+        });
+        // TODO: sort by id
         var msgs = self.newMessages[self.channelName];
         if (!msgs) {
             msgs = [];
         }
-        var section = $('#messages > section').filter(function (i) {
-            return $(this).attr('data-channel-name') === self.channelName;
-        });
-        var isBottom =
-            section.get(0).scrollHeight - section.scrollTop() ===
-            section.outerHeight();
-        // TODO: sort by id
         msgs.forEach(function (message) {
-            if (self.messageIdsAlreadyShown[message.id]) {
+            if (self.messageIdsAlreadyInSection_[message.id]) {
                 return;
             }
             section.append(messageToElement(message));
-            self.messageIdsAlreadyShown[message.id] = true;
+            self.messageIdsAlreadyInSection_[message.id] = true;
         });
         if (self.lastChannelName === self.channelName) {
+            var isBottom =
+                section.get(0).scrollHeight - section.scrollTop() ===
+                section.outerHeight();
             if (isBottom) {
                 section.animate({scrollTop: section.get(0).scrollHeight});
             }

@@ -102,7 +102,6 @@ $(function() {
                 } else {
                     return;
                 }
-                console.log(startTime, endTime);
                 var isAlreadyJoined = false;
                 view.channels.forEach(function (channel) {
                     if (channel.name === channelName) {
@@ -174,6 +173,11 @@ $(function() {
                         userNames[user.name] = true;
                     });
                     view.userNames[channelName] = userNames;
+                } else if (uri.match(/^\/channels\/([^\/]+)\/messages\/by_time_span\/(\d+),(\d+)$/)) {
+                    var channelName = decodeURIComponent(RegExp.$1);
+                    var startTime   = decodeURIComponent(RegExp.$2);
+                    var endTime     = decodeURIComponent(RegExp.$3);
+                    
                 }
             } else if (method === 'PUT') {
                 if (uri.match(/^\/subscribings\?/)) {
