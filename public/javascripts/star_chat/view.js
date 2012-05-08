@@ -13,12 +13,12 @@ starChat.View = (function () {
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channels = [];
         self.channelName = '';
-        self.lastChannelName = '';
         self.newMessages = {};
         self.messageScrollTops = {};
         self.userNames = {};
         self.isEdittingChannels = false;
 
+        self.lastChannelName_ = '';
         self.messageIdsAlreadyInSection_ = {};
         self.dirtyFlags_ = {};
         self.startTime_ = null;
@@ -155,7 +155,7 @@ starChat.View = (function () {
         }
         if (!self.channelName) {
             $('#messages > section').hide();
-            self.lastChannelName = '';
+            self.lastChannelName_ = '';
             return;
         }
         var section = getSectionElement(self);
@@ -191,7 +191,7 @@ starChat.View = (function () {
             self.messageIdsAlreadyInSection_[message.id] = true;
         });
         if (!self.isShowingOldLogs()) {
-            if (self.lastChannelName === self.channelName) {
+            if (self.lastChannelName_ === self.channelName) {
                 var isBottom =
                     section.get(0).scrollHeight - section.scrollTop() ===
                     section.outerHeight();
@@ -199,7 +199,7 @@ starChat.View = (function () {
                     section.animate({scrollTop: section.get(0).scrollHeight});
                 }
             } else {
-                if (!self.lastChannelName ||
+                if (!self.lastChannelName_ ||
                     !(self.channelName in self.messageScrollTops)) {
                     section.scrollTop(section.get(0).scrollHeight);
                 } else {
@@ -208,7 +208,7 @@ starChat.View = (function () {
             }
             self.messageScrollTops[self.channelName] = section.scrollTop();
         }
-        self.lastChannelName = self.channelName;
+        self.lastChannelName_ = self.channelName;
         self.newMessages[self.channelName] = [];
     }
     function updateViewUsers(self) {
