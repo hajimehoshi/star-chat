@@ -88,7 +88,11 @@ starChat.View = (function () {
                  parseInt($(this).attr('data-end-time'))   === self.endTime_);
         });
         if (sections.length === 1) {
-            return sections;
+            var section = sections;
+            section.find('input[name="year"]').val('');
+            section.find('input[name="month"]').val('');
+            section.find('input[name="day"]').val('');
+            return section;
         }
         if (2 <= sections.length) {
             throw 'invalid sections';
@@ -105,6 +109,27 @@ starChat.View = (function () {
                 self.messageScrollTops[channelName] = section.scrollTop();
             });
         }
+        var inputYear   = $('<input type="number" name="year" min="0" max="9999" value="" />');
+        var inputMonth  = $('<input type="number" name="month" min="1" max="12" value="" />');
+        var inputDay    = $('<input type="number" name="day" min="1" max="31" value="" />');
+        var inputSubmit = $('<input type="submit" value="Show Old Logs" />');
+        var oldLogsForm = $('<form action="." method="get"></form>');
+        oldLogsForm.append(inputYear).append('-').append(inputMonth).append('-').append(inputDay);
+        oldLogsForm.append(inputSubmit);
+        inputSubmit.click(function () {
+            var year  = inputYear.val();
+            var month = inputMonth.val();
+            var day   = inputDay.val();
+            var startTime = (new Date(year, month - 1, day)).getTime() / 1000;
+            var endTime   = startTime + 60 * 60 * 24;
+            var fragment = 'channels/' + encodeURIComponent(channelName) +
+                '/old_logs/by_time_span/' +
+                encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
+            location.hash = fragment;
+            console.log(fragment);
+            return false;
+        });
+        section.append(oldLogsForm);
         $('#messages h2').after(section);
         return section;
     }
