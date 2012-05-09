@@ -286,7 +286,7 @@ $(function() {
         });
     })();
     (function () {
-        $('#editChannelsLink a').click(function () {
+        $('#channels menu img[data-tool-id="edit"]').click(function () {
             var view = getView();
             view.isEdittingChannels = !view.isEdittingChannels;
             view.update();

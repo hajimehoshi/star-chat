@@ -22,13 +22,12 @@
     <section id="main">
       <section id="channels" class="sidebar">
         <h2>Channels</h2>
-        <menu><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackWrench" /></menu>
+        <menu><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackCog" data-tool-id="edit" class="toolIcon" /></menu>
         <ul>
         </ul>
         <form id="addChannelForm">
           <p><input type="text" name="name" value="" /><input type="submit" value="Add" /></p>
         </form>
-        <p id="editChannelsLink"><a href="#">Edit</a></p>
       </section>
       <section id="messages">
         <h2>&#xa0;</h2>

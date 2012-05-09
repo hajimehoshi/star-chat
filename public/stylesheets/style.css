@@ -163,6 +163,10 @@ h1 {
     text-align: right;
 }
 
+.toolIcon {
+    cursor: pointer;
+}
+
 /* box */
 
 body {
