@@ -304,7 +304,7 @@ starChat.View = (function () {
         $(window).resize();
     };
     View.prototype.logIn = function (userName, password) {
-        this.session_ = new this.sessionClass_($.now, userName, password);
+        this.session_ = new this.sessionClass_($.now(), userName, password);
     };
     View.prototype.logOut = function () {
         this.session_ = new this.sessionClass_();
