@@ -112,10 +112,12 @@ starChat.View = (function () {
         var inputYear   = $('<input type="number" name="year" min="0" max="9999" value="" />');
         var inputMonth  = $('<input type="number" name="month" min="1" max="12" value="" />');
         var inputDay    = $('<input type="number" name="day" min="1" max="31" value="" />');
-        var inputSubmit = $('<input type="submit" value="Show Old Logs" />');
+        var inputSubmit = $('<input type="submit" value="Show" />');
+        var oldLogsP    = $('<p></p>').append('Old Logs: ');
+        oldLogsP.append(inputYear).append('-').append(inputMonth).append('-').append(inputDay);
+        oldLogsP.append(inputSubmit);
         var oldLogsForm = $('<form action="." method="get"></form>');
-        oldLogsForm.append(inputYear).append('-').append(inputMonth).append('-').append(inputDay);
-        oldLogsForm.append(inputSubmit);
+        oldLogsForm.append(oldLogsP);
         inputSubmit.click(function () {
             var year  = inputYear.val();
             var month = inputMonth.val();
