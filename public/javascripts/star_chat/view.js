@@ -27,9 +27,7 @@ starChat.View = (function () {
     }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
-        var cachedChannels = [];
         return function (self) {
-            // channels
             var channels = self.channels.sort(function (a, b) {
                 if (a.name > b.name) {
                     return 1;
@@ -44,28 +42,43 @@ starChat.View = (function () {
             }
             (function () {
                 var ul = $('#channels ul');
-                ul.empty();
-                channels.forEach(function (channel) {
+                ul.find('li').filter(function (i) {
+                    var channelName = $(this).attr('data-channel-name');
+                    return channels.every(function (channel) {
+                        return channel.name !== channelName;
+                    });
+                }).remove();
+                var existChannelNames = $.map(ul.find('li'), function (e) {
+                    return $(e).attr('data-channel-name');
+                });
+                var newChannels = channels.filter(function (channel) {
+                    return existChannelNames.every(function (name) {
+                        return name !== channel.name;
+                    });
+                });
+                // TODO: sort
+                newChannels.forEach(function (channel) {
                     var a = $('<a></a>');
                     var name = channel.name;
                     var href = '#channels/' + encodeURIComponent(channel.name);
                     a.attr('href', href);
-                    a.toggleClass('dirty', self.dirtyFlags_[name] === true);
                     a.text(name);
-                    var delLink = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackTrash" data-tool-id="delete" />').click(function () {
+                    var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackTrash" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
                     });
-                    var li = $('<li></li>').append(a).append(delLink);
+                    var li = $('<li></li>').attr('data-channel-name', channel.name);
+                    li.append(a).append(icon);
                     ul.append(li);
                 });
-                cachedChannels = [];
-                for (var i = 0; i < channels.length; i++) {
-                    cachedChannels[i] = channels[i];
-                }
+                ul.find('li').each(function () {
+                    var e = $(this);
+                    var channelName = e.attr('data-channel-name');
+                    e.find('a').toggleClass('dirty', self.dirtyFlags_[channelName] === true);
+                });
                 lastSessionId = self.session_.id();
             })();
             if (self.isEdittingChannels) {
-                $('#channels li img[data-tool-id="delete"]').show();
+                $('#channels li img[data-tool-id="delete"]').show().css('display', 'inline');
             } else {
                 $('#channels li img[data-tool-id="delete"]').hide();
             }
