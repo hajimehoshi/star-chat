@@ -22,7 +22,7 @@
     <section id="main">
       <section id="channels" class="sidebar">
         <h2>Channels</h2>
-        <p><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackWrench" /></p>
+        <menu><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackWrench" /></menu>
         <ul>
         </ul>
         <form id="addChannelForm">
