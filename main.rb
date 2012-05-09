@@ -1,5 +1,6 @@
 # coding: utf-8
 
+require 'bundler/setup'
 require './star_chat/models'
 require 'sinatra'
 require 'erubis'
