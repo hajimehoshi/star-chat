@@ -295,6 +295,14 @@ $(function() {
     })();
 });
 
+$(function () {
+    $('img[data-image-icon-name]').each(function () {
+        var e = $(this);
+        var iconName = e.attr('data-image-icon-name');
+        e.attr('src', starChat.Icons[iconName]);
+    });
+});
+
 // Firefox Modification
 $(function () {
     if (!$.browser.mozilla) {

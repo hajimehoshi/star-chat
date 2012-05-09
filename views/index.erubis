@@ -9,7 +9,6 @@
     <header>
       <h1>StarChat (β)</h1>
       <form action="." id="logInForm">
-        <!-- TODO: Use cookie -->
         <dl>
           <dt>User Name:</dt>
           <dd><input type="text" name="userName" value="" /></dd>
@@ -23,6 +22,7 @@
     <section id="main">
       <section id="channels" class="sidebar">
         <h2>Channels</h2>
+        <p><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackWrench" /></p>
         <ul>
         </ul>
         <form id="addChannelForm">
@@ -43,9 +43,11 @@
         </ul>
       </section>
     </section>
+    <!-- TODO: write footer -->
     <% now = Time.now.to_i %>
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
     <script src="/javascripts/star_chat.js?_=<%= now %>"></script>
+    <script src="/javascripts/star_chat/icons.js?_=<%= now %>"></script>
     <script src="/javascripts/star_chat/packet_processor.js?_=<%= now %>"></script>
     <script src="/javascripts/star_chat/session.js?_=<%= now %>"></script>
     <script src="/javascripts/star_chat/stream.js?_=<%= now %>"></script>
