@@ -48,6 +48,7 @@ $(function() {
         $('#messages > section[data-channel-name!=""]').remove();
         view.update();
         stream.stop();
+        starChat.clearFragment();
     }
     function tryLogIn(userName, password) {
         if (!userName) {
