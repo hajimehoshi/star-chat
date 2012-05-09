@@ -240,13 +240,16 @@ starChat.View = (function () {
                 });
             }
         }
-        if (!self.isShowingOldLogs()) {
+        if (!self.isShowingOldLogs() && !section.is(':animated')) {
             if (self.lastChannelName_ === self.channelName) {
                 var isBottom =
                     section.get(0).scrollHeight - section.scrollTop() ===
                     section.outerHeight();
                 if (isBottom) {
-                    section.animate({scrollTop: section.get(0).scrollHeight});
+                    section.animate({scrollTop: section.get(0).scrollHeight}, {
+                        duration: 1000,
+                        queue: false,
+                    });
                 }
             } else {
                 if (!self.lastChannelName_ ||
