@@ -280,7 +280,6 @@ starChat.View = (function () {
         updateViewChannels(this);
         updateViewMessages(this);
         updateViewUsers(this);
-        $(window).resize();
         $('img[data-image-icon-name]').each(function () {
             var e = $(this);
             if (e.attr('src')) {
@@ -289,6 +288,7 @@ starChat.View = (function () {
             var iconName = e.attr('data-image-icon-name');
             e.attr('src', starChat.Icons[iconName]);
         });
+        $(window).resize();
     };
     View.prototype.logIn = function (userName, password) {
         this.session_ = new this.sessionClass_($.now, userName, password);
