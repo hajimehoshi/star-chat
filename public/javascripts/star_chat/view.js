@@ -50,7 +50,7 @@ starChat.View = (function () {
                     var name = channel.name;
                     var href = '#channels/' + encodeURIComponent(channel.name);
                     a.attr('href', href);
-                    a.toggleClass('dirty', self.dirtyFlags_[name]);
+                    a.toggleClass('dirty', self.dirtyFlags_[name] === true);
                     a.text(name);
                     var delLink = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackTrash" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
