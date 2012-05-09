@@ -107,7 +107,7 @@ h1 {
 }
 
 #channels a.dirty {
-    font-weight: bold;
+    color: #900;
 }
 
 #messages {
