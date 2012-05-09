@@ -167,6 +167,11 @@ h1 {
     cursor: pointer;
 }
 
+li .toolIcon {
+    margin-left: 5px;
+    position: absolute;
+}
+
 /* box */
 
 body {

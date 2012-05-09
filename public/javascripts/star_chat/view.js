@@ -52,13 +52,10 @@ starChat.View = (function () {
                     a.attr('href', href);
                     a.toggleClass('dirty', self.dirtyFlags_[name]);
                     a.text(name);
-                    var delLink = $('<a href="#">Del</a>').click(function () {
+                    var delLink = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackTrash" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
                     });
-                    var span = $('<span class="del"></span>');
-                    span.append(' (').append(delLink).append(')');
-                    var li = $('<li></li>');
-                    li.append(a).append(span);
+                    var li = $('<li></li>').append(a).append(delLink);
                     ul.append(li);
                 });
                 cachedChannels = [];
@@ -68,9 +65,9 @@ starChat.View = (function () {
                 lastSessionId = self.session_.id();
             })();
             if (self.isEdittingChannels) {
-                $('#channels li span.del').show();
+                $('#channels li img[data-tool-id="delete"]').show();
             } else {
-                $('#channels li span.del').hide();
+                $('#channels li img[data-tool-id="delete"]').hide();
             }
         }
     })();
@@ -284,6 +281,14 @@ starChat.View = (function () {
         updateViewMessages(this);
         updateViewUsers(this);
         $(window).resize();
+        $('img[data-image-icon-name]').each(function () {
+            var e = $(this);
+            if (e.attr('src')) {
+                return true;
+            }
+            var iconName = e.attr('data-image-icon-name');
+            e.attr('src', starChat.Icons[iconName]);
+        });
     };
     View.prototype.logIn = function (userName, password) {
         this.session_ = new this.sessionClass_($.now, userName, password);
