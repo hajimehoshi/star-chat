@@ -55,7 +55,7 @@ starChat.Stream = (function () {
                     // TODO: implement showing error message
                     return;
                 }
-                setTimeout(startStream, 10000);
+                setTimeout(startStream, 1000);
             },
         };
         this.ajax_ = starChat.ajax(session.userName(), session.password(),
