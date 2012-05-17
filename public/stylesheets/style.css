@@ -153,7 +153,7 @@ h1 {
 #messages > section .body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    word-wrap: break-word;
 }
 #messages > section .createdAt {
     color: #999;
