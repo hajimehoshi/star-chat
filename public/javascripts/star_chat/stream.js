@@ -8,6 +8,7 @@ starChat.Stream = (function () {
     };
     Stream.prototype.start = function (view) {
         if (this.ajax_) {
+            console.error('An ajax object already exists!');
             return;
         }
         this.continuingErrorNum_ = 0;
@@ -16,10 +17,15 @@ starChat.Stream = (function () {
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
         var startStream = function () {
+            if (self.ajax_) {
+                self.ajax_.abort();
+                self.ajax_ = null;
+            }
             self.start(view);
         };
         var callbacks = {
             onprogress: function () {
+                console.log('Reading stream...');
                 // TODO: Reconnecting if overflow
                 var xhr = this;
                 var text = xhr.responseText;
@@ -48,16 +54,18 @@ starChat.Stream = (function () {
                 setTimeout(startStream, 0);
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log(textStatus);
+                console.error('Stream Error!');
+                console.error(textStatus);
                 self.continuingErrorNum_++;
-                if (10 <= self.ontinuingErrorNum_) {
-                    console.log('Too many errors!');
+                if (20 <= self.ontinuingErrorNum_) {
+                    console.error('Too many errors!');
                     // TODO: implement showing error message
                     return;
                 }
                 setTimeout(startStream, 1000);
             },
         };
+        console.log('Connection stream...');
         this.ajax_ = starChat.ajax(session.userName(), session.password(),
                                    url,
                                    'GET',
