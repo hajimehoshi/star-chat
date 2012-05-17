@@ -204,6 +204,9 @@ starChat.View = (function () {
             return;
         }
         var section = getSectionElement(self);
+        // isBottom should be gotten before appending new message elements
+        var isBottom = section.get(0).scrollHeight - section.scrollTop() ===
+            section.outerHeight();
         $('#messages > section').each(function (i) {
             var e = $(this);
             if (e.attr('data-channel-name') === self.channelName &&
@@ -242,13 +245,9 @@ starChat.View = (function () {
         }
         if (!self.isShowingOldLogs() && !section.is(':animated')) {
             if (self.lastChannelName_ === self.channelName) {
-                var isBottom =
-                    section.get(0).scrollHeight - section.scrollTop() ===
-                    section.outerHeight();
                 if (isBottom) {
                     section.animate({scrollTop: section.get(0).scrollHeight}, {
                         duration: 1000,
-                        queue: false,
                     });
                 }
             } else {
