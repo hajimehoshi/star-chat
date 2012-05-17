@@ -207,7 +207,7 @@ body > #main {
     width: 100%;
 }
 #main > #channels {
-    width: 20%;
+    width: 200px;
 }
 #main > #messages {
     box-flex: 1;
@@ -218,7 +218,7 @@ body > #main {
     overflow: hidden;
 }
 #main > #users {
-    width: 20%;
+    width: 200px;
 }
 
 #addChannelForm p {
@@ -254,6 +254,7 @@ body > #main {
     -ms-box-orient: vertical;
 }
 #messages > h2 {
+    height: auto;
 }
 #messages > section {
     box-flex: 1;
@@ -264,6 +265,7 @@ body > #main {
 }
 #messages > form {
     width: 100%;
+    height: auto;
 }
 
 .message {
@@ -274,7 +276,7 @@ body > #main {
     display: -ms-box;
 }
 .message > .userName {
-    width: 20%;
+    width: 100px;
 }
 .message > .body {
     box-flex: 1;
@@ -284,7 +286,7 @@ body > #main {
     -ms-box-flex: 1;
 }
 .message > .createdAt {
-    width: 5%;
+    width: 50px;
 }
 
 #postMessageForm p {

@@ -302,16 +302,6 @@ $(function () {
         return;
     }
     function relayout() {
-        var main = $('#main');
-        $('#users').add('#channels').width(main.width() / 5);
-        $('.message > .userName').each(function () {
-            var self = $(this);
-            self.width(self.parent().width() / 5);
-        });
-        $('.message > .createdAt').each(function () {
-            var self = $(this);
-            self.width(self.parent().width() / 20);
-        });
         $('#messages > section').height($('#messages').height() -
                                         $('#messages > h2').outerHeight() -
                                         $('#messages > form').height());
