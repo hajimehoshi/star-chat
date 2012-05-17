@@ -65,7 +65,7 @@ starChat.Stream = (function () {
                 setTimeout(startStream, 1000);
             },
         };
-        console.log('Connection stream...');
+        console.log('Connecting stream...');
         this.ajax_ = starChat.ajax(session.userName(), session.password(),
                                    url,
                                    'GET',
