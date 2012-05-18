@@ -144,13 +144,15 @@ starChat.View = (function () {
         $('#messages h2').after(section);
         return section;
     }
-    function messageToElement(message) {
+    function messageToElement(message, keywords) {
         var messageTR = $('<tr></tr>');
         messageTR.addClass('message');
         var userNameTD = $('<td></td>').text(message.user_name);
         userNameTD.addClass('userName');
         messageTR.append(userNameTD);
-        var bodyTD = $('<td></td>').text(message.body).addClass('body');
+        var bodyTD = $('<td></td>').addClass('body');
+        // TODO: use keywords
+        bodyTD.text(message.body);
         messageTR.append(bodyTD);
         var time = new Date();
         time.setTime(message.created_at * 1000);
@@ -232,8 +234,12 @@ starChat.View = (function () {
                         return;
                     }
                     self.messageIdsAlreadyInSection_[message.id] = true;
-                    var e = messageToElement(message);
-                    // TODO: キーワード反応
+                    var userName = self.session().userName();
+                    if (message.user_name !== userName) {
+                        var e = messageToElement(message, [userName]);
+                    } else {
+                        var e = messageToElement(message, []);
+                    }
                     table.append(e);
                 });
                 self.newMessages_[self.channelName] = [];
@@ -246,7 +252,7 @@ starChat.View = (function () {
                 section.find('section.message').remove();
                 var msgs = self.oldMessages_[self.channelName][key];
                 msgs.forEach(function (message) {
-                    table.append(messageToElement(message));
+                    table.append(messageToElement(message, []));
                 });
             }
         }
