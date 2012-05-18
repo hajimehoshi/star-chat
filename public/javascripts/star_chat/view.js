@@ -13,12 +13,12 @@ starChat.View = (function () {
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channels = [];
         self.channelName = '';
-        self.newMessages = {};
         self.messageScrollTops = {};
         self.userNames = {};
         self.isEdittingChannels = false;
 
         self.lastChannelName_ = '';
+        self.newMessages_ = {};
         self.messageIdsAlreadyInSection_ = {};
         self.dirtyFlags_ = {};
         self.startTime_ = null;
@@ -220,8 +220,8 @@ starChat.View = (function () {
         });
         // TODO: sort by id
         if (!self.isShowingOldLogs()) {
-            if (self.channelName in self.newMessages) {
-                var msgs = self.newMessages[self.channelName];
+            if (self.channelName in self.newMessages_) {
+                var msgs = self.newMessages_[self.channelName];
                 msgs.forEach(function (message) {
                     if (self.messageIdsAlreadyInSection_[message.id]) {
                         return;
@@ -229,7 +229,7 @@ starChat.View = (function () {
                     self.messageIdsAlreadyInSection_[message.id] = true;
                     section.append(messageToElement(message));
                 });
-                self.newMessages[self.channelName] = [];
+                self.newMessages_[self.channelName] = [];
             }
         } else {
             var key = self.startTime_ + '_' + self.endTime_;
@@ -314,6 +314,16 @@ starChat.View = (function () {
     };
     View.prototype.session = function () {
         return this.session_;
+    };
+    View.prototype.addNewMessage = function (channelName, message) {
+        if (!this.newMessages_[channelName]) {
+            this.newMessages_[channelName] = [];
+        }
+        this.newMessages_[channelName].push(message);
+        if (channelName !== this.channelName) {
+            // TODO:一個でも新しいものを含んでいたら、に限定する
+            this.setDirtyFlag(channelName, true);
+        }
     };
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
