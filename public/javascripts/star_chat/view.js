@@ -228,7 +228,10 @@ starChat.View = (function () {
                         return;
                     }
                     self.messageIdsAlreadyInSection_[message.id] = true;
-                    section.append(messageToElement(message));
+                    var e = messageToElement(message);
+                    // TODO: キーワード反応
+                    console.log(e.text());
+                    section.append(e);
                 });
                 self.newMessages_[self.channelName] = [];
             }
