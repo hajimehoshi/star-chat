@@ -205,8 +205,9 @@ starChat.View = (function () {
         }
         var section = getSectionElement(self);
         // isBottom should be gotten before appending new message elements
-        var isBottom = section.get(0).scrollHeight - section.scrollTop() ===
-            section.outerHeight();
+        var diff = section.outerHeight() -
+            (section.get(0).scrollHeight - section.scrollTop())
+        var isBottom = diff < 20;
         $('#messages > section').each(function (i) {
             var e = $(this);
             if (e.attr('data-channel-name') === self.channelName &&
