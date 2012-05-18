@@ -137,30 +137,31 @@ h1 {
     overflow-y: scroll;
     padding: 10px 20px;
 }
-#messages > section .message {
-    margin: 0 0 5px 0;
+#messages > section table.messages {
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
     width: 100%;
 }
-#messages > section .message:last-child {
-    margin-bottom: 0;
+#messages > section td {
+    vertical-align: top;
 }
-#messages > section .userName {
+#messages > section td.userName {
     color: #999;
-    margin: 0 0.5em 0 0;
-    padding: 0;
+    padding-right: 10px;
     text-align: right;
-}
-#messages > section .body {
-    margin: 0;
-    padding: 0;
+    width: 100px;
     word-wrap: break-word;
 }
-#messages > section .createdAt {
+#messages > section td.body {
+    word-wrap: break-word;
+}
+#messages > section td.createdAt {
     color: #999;
     font-size: 80%;
-    margin: 0 0 0 0.5em;
-    padding: 0;
+    padding-left: 10px;
     text-align: right;
+    width: 50px;
 }
 
 .toolIcon {
@@ -266,28 +267,6 @@ body > #main {
 #messages > form {
     width: 100%;
     height: auto;
-}
-
-/* TODO: use a table */
-.message {
-    display: box;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -o-box;
-    display: -ms-box;
-}
-.message > .userName {
-    width: 100px;
-}
-.message > .body {
-    box-flex: 1;
-    -webkit-box-flex: 1;
-    -moz-box-flex: 1;
-    -o-box-flex: 1;
-    -ms-box-flex: 1;
-}
-.message > .createdAt {
-    width: 50px;
 }
 
 #postMessageForm p {

@@ -145,14 +145,13 @@ starChat.View = (function () {
         return section;
     }
     function messageToElement(message) {
-        var messageSection = $('<section></section>');
-        messageSection.addClass('message');
-        var userNameP = $('<p></p>').text(message.user_name);
-        userNameP.addClass('userName');
-        messageSection.append(userNameP);
-        var bodyP = $('<p></p>').text(message.body);
-        bodyP.addClass('body');
-        messageSection.append(bodyP);
+        var messageTR = $('<tr></tr>');
+        messageTR.addClass('message');
+        var userNameTD = $('<td></td>').text(message.user_name);
+        userNameTD.addClass('userName');
+        messageTR.append(userNameTD);
+        var bodyTD = $('<td></td>').text(message.body).addClass('body');
+        messageTR.append(bodyTD);
         var time = new Date();
         time.setTime(message.created_at * 1000);
         var h = time.getHours() + '';
@@ -164,12 +163,12 @@ starChat.View = (function () {
             m = '0' + m;
         }
         var timeStr = h + ':' + m;
-        var createdAtP = $('<p></p>');
+        var createdAtTD = $('<td></td>');
         var createdAtTime = $('<time></time>').text(timeStr).attr('data-unix-time', message.created_at);;
-        createdAtP.append(createdAtTime).addClass('createdAt');
-        messageSection.append(createdAtP);
-        messageSection.attr('data-message-id', message.id);
-        return messageSection;
+        createdAtTD.append(createdAtTime).addClass('createdAt');
+        messageTR.append(createdAtTD);
+        messageTR.attr('data-message-id', message.id);
+        return messageTR;
     }
     function updateViewMessages(self) {
         if (self.channelName) {
@@ -220,6 +219,11 @@ starChat.View = (function () {
             }
         });
         // TODO: sort by id
+        var table = section.find('table.messages');
+        if (table.length === 0) {
+            table = $('<table></table>').addClass('messages');
+            section.append(table);
+        }
         if (!self.isShowingOldLogs()) {
             if (self.channelName in self.newMessages_) {
                 var msgs = self.newMessages_[self.channelName];
@@ -230,8 +234,7 @@ starChat.View = (function () {
                     self.messageIdsAlreadyInSection_[message.id] = true;
                     var e = messageToElement(message);
                     // TODO: キーワード反応
-                    console.log(e.text());
-                    section.append(e);
+                    table.append(e);
                 });
                 self.newMessages_[self.channelName] = [];
             }
@@ -243,7 +246,7 @@ starChat.View = (function () {
                 section.find('section.message').remove();
                 var msgs = self.oldMessages_[self.channelName][key];
                 msgs.forEach(function (message) {
-                    section.append(messageToElement(message));
+                    table.append(messageToElement(message));
                 });
             }
         }
