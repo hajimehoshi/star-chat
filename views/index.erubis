@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
+  <% last_updated = '20120518' %>
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css" />
+    <link rel="stylesheet" href="/stylesheets/style.css?_=<%= last_updated %>" type="text/css" />
     <title>StarChat (β)</title>
   </head>
   <body>
@@ -43,14 +44,13 @@
       </section>
     </section>
     <!-- TODO: write footer -->
-    <% now = Time.now.to_i %>
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
-    <script src="/javascripts/star_chat.js?_=<%= now %>"></script>
-    <script src="/javascripts/star_chat/icons.js?_=<%= now %>"></script>
-    <script src="/javascripts/star_chat/packet_processor.js?_=<%= now %>"></script>
-    <script src="/javascripts/star_chat/session.js?_=<%= now %>"></script>
-    <script src="/javascripts/star_chat/stream.js?_=<%= now %>"></script>
-    <script src="/javascripts/star_chat/view.js?_=<%= now %>"></script>
-    <script src="/javascripts/main.js?_=<%= now %>"></script>
+    <script src="/javascripts/star_chat.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/star_chat/icons.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/star_chat/packet_processor.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/star_chat/session.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/star_chat/stream.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/star_chat/view.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/main.js?_=<%= last_updated %>"></script>
   </body>
 </html>
