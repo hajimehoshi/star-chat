@@ -1,8 +1,3 @@
 * How to run
 
 $ thin -C (MODE).yml start
-
-
-* TODO
-
-- Use http://glyphicons.com/
