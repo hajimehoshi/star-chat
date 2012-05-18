@@ -32,6 +32,7 @@ $(function() {
     })();
     var stream = new starChat.Stream(new starChat.PacketProcessor());
     function logIn(userName, password) {
+        console.log('Logging in...');
         localStorage.userName = userName;
         localStorage.password = password;
         var view = getView();
@@ -41,6 +42,7 @@ $(function() {
         stream.start(view);
     }
     function logOut() {
+        console.log('Logging out...');
         delete localStorage.userName;
         delete localStorage.password;
         var view = getView();

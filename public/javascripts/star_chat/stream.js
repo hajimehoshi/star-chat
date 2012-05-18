@@ -16,10 +16,13 @@ starChat.Stream = (function () {
         var session = view.session();
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
-        var startStream = function () {
+        var restartStream = function () {
             if (self.ajax_) {
                 self.ajax_.abort();
                 self.ajax_ = null;
+            }
+            if (!view.session().isLoggedIn()) {
+                return;
             }
             self.start(view);
         };
@@ -51,7 +54,7 @@ starChat.Stream = (function () {
             },
             success: function (data, textStatus, jqXHR) {
                 self.continuingErrorNum_ = 0;
-                setTimeout(startStream, 0);
+                setTimeout(restartStream, 0);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error('Stream Error!');
@@ -62,7 +65,7 @@ starChat.Stream = (function () {
                     // TODO: implement showing error message
                     return;
                 }
-                setTimeout(startStream, 1000);
+                setTimeout(restartStream, 1000);
             },
         };
         console.log('Connecting stream...');
