@@ -79,10 +79,11 @@ h1 {
     border-style: solid;
     border-width: 1px;
     margin: 0;
-    overflow-x: hidden;
     overflow-y: scroll;
     padding: 10px 20px;
     position: relative;
+    width: 200px;
+    word-wrap: break-word;
 }
 .sidebar h2 {
     font-size: 100%;
@@ -105,6 +106,9 @@ h1 {
     list-style-type: none;
     margin: 0;
     padding: 0;
+}
+.sidebar li {
+    margin-bottom: 5px;
 }
 
 #channels a.dirty {
@@ -145,6 +149,7 @@ h1 {
     width: 100%;
 }
 #messages > section td {
+    padding-bottom: 5px;
     vertical-align: top;
 }
 #messages > section td.userName {
@@ -209,7 +214,6 @@ body > #main {
     width: 100%;
 }
 #main > #channels {
-    width: 200px;
 }
 #main > #messages {
     box-flex: 1;
@@ -220,7 +224,6 @@ body > #main {
     overflow: hidden;
 }
 #main > #users {
-    width: 200px;
 }
 
 #addChannelForm p {
