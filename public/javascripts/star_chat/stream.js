@@ -26,6 +26,7 @@ starChat.Stream = (function () {
         var callbacks = {
             onprogress: function () {
                 console.log('Reading stream...');
+                self.continuingErrorNum_ = 0;
                 // TODO: Reconnecting if overflow
                 var xhr = this;
                 var text = xhr.responseText;
@@ -44,7 +45,6 @@ starChat.Stream = (function () {
                         console.log(e);
                         continue;
                     }
-                    self.continuingErrorNum_ = 0;
                     self.packetProcessor_.process(packet, view);
                 }
                 view.update();
