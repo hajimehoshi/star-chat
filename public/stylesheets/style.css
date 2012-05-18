@@ -79,7 +79,8 @@ h1 {
     border-style: solid;
     border-width: 1px;
     margin: 0;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
     padding: 10px 20px;
     position: relative;
 }
