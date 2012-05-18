@@ -224,7 +224,7 @@ starChat.View = (function () {
             if (self.channelName in self.newMessages_) {
                 var msgs = self.newMessages_[self.channelName];
                 msgs.forEach(function (message) {
-                    if (self.messageIdsAlreadyInSection_[message.id]) {
+                    if (message.id in self.messageIdsAlreadyInSection_) {
                         return;
                     }
                     self.messageIdsAlreadyInSection_[message.id] = true;
@@ -320,9 +320,11 @@ starChat.View = (function () {
         if (!this.newMessages_[channelName]) {
             this.newMessages_[channelName] = [];
         }
+        if (message.id in this.messageIdsAlreadyInSection_) {
+            return;
+        }
         this.newMessages_[channelName].push(message);
         if (channelName !== this.channelName) {
-            // TODO:一個でも新しいものを含んでいたら、に限定する
             this.setDirtyFlag(channelName, true);
         }
     };
