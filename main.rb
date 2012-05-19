@@ -97,7 +97,8 @@ end
 get '/users/:user_name/stream', provides: :json do
   user_name = params[:user_name]
   stream(:keep_open) do |out|
-    settings.streams << [user_name, out]
+    subscribe = [user_name, out]
+    settings.streams << subscribe
     if params[:start_time]
       start_time = params[:start_time].to_i
       end_time   = Time.now.to_i + 1
