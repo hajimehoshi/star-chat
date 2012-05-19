@@ -19,6 +19,11 @@ a {
     color: #000;
 }
 
+em {
+    font-style: normal;
+    font-weight: bold;
+}
+
 header {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0.80, #334), color-stop(0.00, #001));
     background: -webkit-linear-gradient(top, #334 0%, #001 80%);
