@@ -151,7 +151,7 @@ starChat.View = (function () {
         userNameTD.addClass('userName');
         messageTR.append(userNameTD);
         var bodyTD = $('<td></td>').addClass('body');
-        // TODO: use keywords
+        // TODO: emphasize keywords
         bodyTD.text(message.body);
         messageTR.append(bodyTD);
         var time = new Date();

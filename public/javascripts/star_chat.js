@@ -154,3 +154,34 @@ starChat.toISO8601 = function (date, type) {
             fillZero(date.getDate());
     }
 };
+
+starChat.escapeHTML = function (str) {
+    return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+};
+
+jQuery.fn.outerHTML = function(s) {
+    return (s)
+        ? this.before(s).remove()
+        : jQuery("<p>").append(this.eq(0).clone()).html();
+}
+
+starChat.emphasizeKeyword = function (element, keyword) {
+    if (!keyword) {
+        return;
+    }
+    var html = '';
+    element.contents().each(function () {
+        if (this.nodeType === Node.TEXT_NODE) {
+            var text = this.nodeValue;
+            html += text.split(keyword).map(function (segment) {
+                return starChat.escapeHTML(segment);
+            }).join('<em>' + starChat.escapeHTML(keyword) + '</em>');
+        } else if (this.nodeType === Node.ELEMENT_NODE && this.tagName.toLowerCase() !== 'em') {
+            starChat.emphasizeKeyword($(this), keyword);
+            html += $(this).outerHTML();
+        } else {
+            html += $(this).outerHTML();
+        }
+    });
+    element.html(html);
+};
