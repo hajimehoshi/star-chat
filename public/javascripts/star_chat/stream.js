@@ -17,10 +17,7 @@ starChat.Stream = (function () {
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
         var restartStream = function () {
-            if (self.ajax_) {
-                self.ajax_.abort();
-                self.ajax_ = null;
-            }
+            self.stop();
             if (!view.session().isLoggedIn()) {
                 return;
             }
