@@ -69,7 +69,7 @@ starChat.Stream = (function () {
                 }
                 setTimeout(function () {
                     restartStream(parseInt($.now() / 1000) - 10);
-                }, 10000);
+                }, 1000);
             },
         };
         console.log('Connecting stream...');
