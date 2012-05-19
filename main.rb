@@ -92,6 +92,7 @@ end
 get '/users/:user_name/stream', provides: :json do
   user_name = params[:user_name]
   stream(:keep_open) do |out|
+=begin
     packets = current_user.channels.inject([]) do |msgs, channel|
       channel_name = channel.name
       msgs.concat(channel.messages(-100, 100).map do |msg|
@@ -106,6 +107,7 @@ get '/users/:user_name/stream', provides: :json do
       packets_str = packets.join("\n")
       out << packets_str << "\n"
     end
+=end
     settings.streams << [user_name, out]
     out.callback do
       settings.streams.delete(subscribe)

@@ -38,7 +38,21 @@ $(function() {
         var view = getView();
         view.logIn(userName, password);
         var url = '/users/' + encodeURIComponent(userName) + '/channels';
-        starChat.ajaxRequest(view.session(), url, 'GET', null, receiveResponse);
+        starChat.ajaxRequest(view.session(), url, 'GET', null, function (sessionId, url, method, data) {
+            var view = getView();
+            var session = view.session();
+            if (session.id() !== sessionId) {
+                return
+            }
+            receiveResponse(sessionId, url, method, data);
+            data.forEach(function (channel) {
+                if (!channel.name) {
+                    return;
+                }
+                var url = '/channels/' + encodeURIComponent(channel.name) + '/messages/recent';
+                starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+            });
+        });
         stream.start(view);
     }
     function logOut() {
@@ -169,6 +183,11 @@ $(function() {
                         userNames[user.name] = true;
                     });
                     view.userNames[channelName] = userNames;
+                } else if (uri.match(/^\/channels\/([^\/]+)\/messages\/recent/)) {
+                    var channelName = decodeURIComponent(RegExp.$1);
+                    data.forEach(function (message) {
+                        view.addNewMessage(channelName, message, false);
+                    });
                 } else if (uri.match(/^\/channels\/([^\/]+)\/messages\/by_time_span\/(\d+),(\d+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = decodeURIComponent(RegExp.$2);

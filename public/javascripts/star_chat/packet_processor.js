@@ -7,7 +7,7 @@ starChat.PacketProcessor = (function () {
         var channelName = packet.channel_name;
         var message = packet.message;
         if (channelName && message) {
-            view.addNewMessage(channelName, message);
+            view.addNewMessage(channelName, message, true);
         }
     }
     function processPacketSubscribing(packet, view) {

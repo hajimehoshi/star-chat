@@ -329,7 +329,7 @@ starChat.View = (function () {
     View.prototype.session = function () {
         return this.session_;
     };
-    View.prototype.addNewMessage = function (channelName, message) {
+    View.prototype.addNewMessage = function (channelName, message, setDirtyFlag) {
         if (!this.newMessages_[channelName]) {
             this.newMessages_[channelName] = [];
         }
@@ -337,7 +337,7 @@ starChat.View = (function () {
             return;
         }
         this.newMessages_[channelName].push(message);
-        if (channelName !== this.channelName) {
+        if (setDirtyFlag && channelName !== this.channelName) {
             this.setDirtyFlag(channelName, true);
         }
     };
