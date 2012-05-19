@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-  <% last_updated = '20120518' %>
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="/stylesheets/style.css?_=<%= last_updated %>" type="text/css" />
+    <link rel="stylesheet" href="/stylesheets/style.css?_=<%= launched_time %>" type="text/css" />
     <title>StarChat (β)</title>
   </head>
   <body>
@@ -45,12 +44,12 @@
     </section>
     <!-- TODO: write footer -->
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
-    <script src="/javascripts/star_chat.js?_=<%= last_updated %>"></script>
-    <script src="/javascripts/star_chat/icons.js?_=<%= last_updated %>"></script>
-    <script src="/javascripts/star_chat/packet_processor.js?_=<%= last_updated %>"></script>
-    <script src="/javascripts/star_chat/session.js?_=<%= last_updated %>"></script>
-    <script src="/javascripts/star_chat/stream.js?_=<%= last_updated %>"></script>
-    <script src="/javascripts/star_chat/view.js?_=<%= last_updated %>"></script>
-    <script src="/javascripts/main.js?_=<%= last_updated %>"></script>
+    <script src="/javascripts/star_chat.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/icons.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/packet_processor.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/session.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/stream.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/view.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/main.js?_=<%= launched_time %>"></script>
   </body>
 </html>

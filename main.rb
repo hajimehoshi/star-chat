@@ -9,10 +9,15 @@ set :server, :thin
 set :sessions, false
 set :erb, escape_html: true
 set :streams, []
+set :launched_time, Time.now.to_i
 
 require './config'
 
 helpers do
+
+  def launched_time
+    settings.launched_time
+  end
 
   def protect!
     halt 401 unless authorized?
