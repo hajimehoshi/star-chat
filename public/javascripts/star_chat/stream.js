@@ -24,7 +24,7 @@ starChat.Stream = (function () {
             if (!view.session().isLoggedIn()) {
                 return;
             }
-            // TODO: set dirty flag when receiving new messages?
+            // TODO: 取りこぼし対策
             self.start(view);
         };
         var callbacks = {
