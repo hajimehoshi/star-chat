@@ -98,6 +98,23 @@ get '/users/:user_name/stream', provides: :json do
   user_name = params[:user_name]
   stream(:keep_open) do |out|
     settings.streams << [user_name, out]
+    if params[:start_time]
+      start_time = params[:start_time].to_i
+      end_time   = Time.now.to_i + 1
+      packets = current_user.channels.inject([]) do |msgs, channel|
+        msgs.concat(channel.messages_by_time_span(start_time, end_time).map do |msg|
+                      {
+                        type: 'message',
+                        channel_name: channel.name,
+                        message: msg,
+                      }.to_json
+                    end.to_a)
+      end
+      unless packets.empty?
+        packets_str = packets.join("\n")
+        out << packets_str << "\n"
+      end
+    end
     out.callback do
       settings.streams.delete(subscribe)
     end

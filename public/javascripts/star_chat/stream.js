@@ -6,7 +6,7 @@ starChat.Stream = (function () {
         this.continuingErrorNum_ = 0;
         this.ajax_ = null;
     };
-    Stream.prototype.start = function (view) {
+    Stream.prototype.start = function (view, startTime) {
         if (this.ajax_) {
             console.error('An ajax object already exists!');
             return;
@@ -16,13 +16,15 @@ starChat.Stream = (function () {
         var session = view.session();
         var streamReadIndex = 0;
         var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
-        var restartStream = function () {
+        if (startTime !== void(0)) {
+            url += '?start_time=' + encodeURIComponent(startTime);
+        }
+        var restartStream = function (lastTime) {
             self.stop();
             if (!view.session().isLoggedIn()) {
                 return;
             }
-            // TODO: 取りこぼし対策
-            self.start(view);
+            self.start(view, lastTime);
         };
         var callbacks = {
             onprogress: function () {
@@ -52,7 +54,9 @@ starChat.Stream = (function () {
             },
             success: function (data, textStatus, jqXHR) {
                 self.continuingErrorNum_ = 0;
-                setTimeout(restartStream, 0);
+                setTimeout(function () {
+                    restartStream(parseInt($.now() / 1000) - 10);
+                }, 0);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error('Stream Error!');
@@ -63,7 +67,9 @@ starChat.Stream = (function () {
                     // TODO: implement showing error message
                     return;
                 }
-                setTimeout(restartStream, 1000);
+                setTimeout(function () {
+                    restartStream(parseInt($.now() / 1000) - 10);
+                }, 10000);
             },
         };
         console.log('Connecting stream...');
