@@ -119,7 +119,7 @@ starChat.View = (function () {
     })();
     function getSectionElement(self) {
         if (!self.channelName) {
-            return null;
+            return $('#messages > section[data-channel-name=""]');
         }
         var sections = $('#messages > section').filter(function (i) {
             return $(this).attr('data-channel-name') === self.channelName &&
@@ -238,24 +238,25 @@ starChat.View = (function () {
         if (!self.channelName) {
             $('#messages > section').hide();
             self.lastChannelName_ = '';
-            return;
         }
         var section = getSectionElement(self);
-        // isBottom should be gotten before appending new message elements
-        var diff = section.outerHeight() -
-            (section.get(0).scrollHeight - section.scrollTop())
-        var isBottom = diff < 20;
-        $('#messages > section').each(function (i) {
+        $('#messages > section').each(function () {
             var e = $(this);
-            if (e.attr('data-channel-name') === self.channelName &&
-                (!self.isShowingOldLogs() ||
-                 (parseInt(e.attr('data-start-time')) === self.startTime_ &&
-                  parseInt(e.attr('data-end-time'))   === self.endTime_))) {
+            if (e.get(0) === section.get(0)) {
                 e.show();
             } else {
                 e.hide();
             }
         });
+        if (!self.channelName) {
+            return;
+        }
+
+        // isBottom should be gotten before appending new message elements
+        var diff = section.outerHeight() -
+            (section.get(0).scrollHeight - section.scrollTop())
+        var isBottom = diff < 20;
+
         // TODO: sort by id
         var table = section.find('table.messages');
         if (table.length === 0) {
