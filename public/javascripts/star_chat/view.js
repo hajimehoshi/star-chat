@@ -19,6 +19,7 @@ starChat.View = (function () {
 
         self.lastChannelName_ = '';
         self.newMessages_ = {};
+        self.messageElements_ = {};
         self.messageIdsAlreadyInSection_ = {};
         self.dirtyFlags_ = {};
         self.startTime_ = null;
@@ -244,6 +245,27 @@ starChat.View = (function () {
                 e.hide();
             }
         });
+        var hitKeyword = false;
+        Object.keys(self.newMessages_).forEach(function (channel) {
+            self.newMessages_[channel].forEach(function (message) {
+                if (message.id in self.messageElements_) {
+                    return;
+                }
+                // TODO: Modify keywords;
+                var keywords = [];
+                var userName = self.session().userName();
+                if (message.user_name !== userName) {
+                    keywords.push(userName);
+                }
+                var e = messageToElement(message, keywords);
+                self.messageElements_[message.id] = e;
+                hitKeyword |= (0 < e.data('emphasizedNum'));
+            });
+        });
+        if (hitKeyword && !starChat.isFocused()) {
+            startBlinkingTitle(self, '(*) ' + self.title_);
+        }
+
         if (!self.channelName) {
             self.lastChannelName_ = '';
             return;
@@ -268,17 +290,7 @@ starChat.View = (function () {
                         return;
                     }
                     self.messageIdsAlreadyInSection_[message.id] = true;
-                    var userName = self.session().userName();
-                    if (message.user_name !== userName) {
-                        var e = messageToElement(message, [userName]);
-                    } else {
-                        var e = messageToElement(message, []);
-                    }
-                    table.append(e);
-                    var emphasizedNum = e.data('emphasizedNum');
-                    if (0 < emphasizedNum && !starChat.isFocused()) {
-                        startBlinkingTitle(self, '(*) ' + self.title_);
-                    }
+                    table.append(self.messageElements_[message.id]);
                 });
                 self.newMessages_[self.channelName] = [];
             }
