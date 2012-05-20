@@ -44,7 +44,7 @@
     </section>
     <div id="dialogBackground">
       <div id="userEdit" class="dialog">
-        <h2>Edit User</h2>
+        <h2>Edit User (Not Implemented)</h2>
         <dl>
           <dt>Nick:</dt>
           <dd><input type="text" name="nick" value="" /></dd>
