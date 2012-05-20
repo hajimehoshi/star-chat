@@ -167,21 +167,25 @@ jQuery.fn.outerHTML = function(s) {
 
 starChat.emphasizeKeyword = function (element, keyword) {
     if (!keyword) {
-        return;
+        return 0;
     }
+    var num = 0;
     var html = '';
     element.contents().each(function () {
         if (this.nodeType === Node.TEXT_NODE) {
             var text = this.nodeValue;
-            html += text.split(keyword).map(function (segment) {
+            var segments = text.split(keyword);
+            num += segments.length - 1;
+            html += segments.map(function (segment) {
                 return starChat.escapeHTML(segment);
             }).join('<em>' + starChat.escapeHTML(keyword) + '</em>');
         } else if (this.nodeType === Node.ELEMENT_NODE && this.tagName.toLowerCase() !== 'em') {
-            starChat.emphasizeKeyword($(this), keyword);
+            num += starChat.emphasizeKeyword($(this), keyword);
             html += $(this).outerHTML();
         } else {
             html += $(this).outerHTML();
         }
     });
     element.html(html);
+    return num;
 };

@@ -14,42 +14,42 @@ test('parseQuery', function () {
 test('emphasizeKeyword', function () {
     {
         var div = $('<div></div>');
-        starChat.emphasizeKeyword(div, '');
+        strictEqual(starChat.emphasizeKeyword(div, ''), 0);
         strictEqual(div.html(), '');
     }
     {
         var div = $('<div></div>').text('foo bar baz');
-        starChat.emphasizeKeyword(div, '');
+        strictEqual(starChat.emphasizeKeyword(div, ''), 0);
         strictEqual(div.html(), 'foo bar baz');
     }
     {
         var div = $('<div></div>').text('foo bar baz');
-        starChat.emphasizeKeyword(div, 'foo');
+        strictEqual(starChat.emphasizeKeyword(div, 'foo'), 1);
         strictEqual(div.html(), '<em>foo</em> bar baz');
     }
     {
         var div = $('<div></div>').text('foo bar baz');
-        starChat.emphasizeKeyword(div, 'bar');
+        strictEqual(starChat.emphasizeKeyword(div, 'bar'), 1);
         strictEqual(div.html(), 'foo <em>bar</em> baz');
     }
     {
         var div = $('<div></div>').text('foo bar baz');
-        starChat.emphasizeKeyword(div, 'ba');
+        strictEqual(starChat.emphasizeKeyword(div, 'ba'), 2);
         strictEqual(div.html(), 'foo <em>ba</em>r <em>ba</em>z');
     }
     {
         var div = $('<div></div>').text('foo bar baz');
-        starChat.emphasizeKeyword(div, 'qux');
+        strictEqual(starChat.emphasizeKeyword(div, 'qux'), 0);
         strictEqual(div.html(), 'foo bar baz');
     }
     {
         var div = $('<div>foo!<a href="/">foo!</a><em>foo!</em>foo!</div>');
-        starChat.emphasizeKeyword(div, 'foo');
+        strictEqual(starChat.emphasizeKeyword(div, 'foo'), 3);
         strictEqual(div.html(), '<em>foo</em>!<a href="/"><em>foo</em>!</a><em>foo!</em><em>foo</em>!');
     }
     {
         var div = $('<div></div>').text('&<>"');
-        starChat.emphasizeKeyword(div, '&');
+        strictEqual(starChat.emphasizeKeyword(div, '&'), 1);
         strictEqual(div.html(), '<em>&amp;</em>&lt;&gt;"');
     }
 });
