@@ -17,7 +17,7 @@
         </dl>
         <p><input type="submit" value="Log In" /></p>
       </form>
-      <p id="logOutLink">Hello, <span></span>!&#xa0;&#xa0;&#xa0;&#xa0;<a href="#">Log Out</a></p>
+      <p id="logOutLink">Hello, <span></span>!&#xa0;&#xa0;<img src="" alt="edit" width="16" height="16" data-image-icon-name="whiteCog" data-tool-id="edit" />&#xa0;&#xa0;&#xa0;&#xa0;<a href="#">Log Out</a></p>
     </header>
     <section id="main">
       <section id="channels" class="sidebar">
