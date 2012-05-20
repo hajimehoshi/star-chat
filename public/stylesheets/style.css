@@ -153,9 +153,9 @@ h1 {
 }
 #messages > section[data-channel-name=""] {
     background-color: #ccc;
+    box-shadow:         inset 0 0 8px #000;
     -moz-box-shadow:    inset 0 0 8px #000;
     -webkit-box-shadow: inset 0 0 8px #000;
-    box-shadow:         inset 0 0 8px #000;
 }
 #messages > section table.messages {
     border-collapse: collapse;
@@ -192,6 +192,31 @@ h1 {
 li .toolIcon {
     margin-left: 5px;
     position: absolute;
+}
+
+.dialog {
+    background-color: #fff;
+    box-shadow:         0 0 8px #000;
+    -moz-box-shadow:    0 0 8px #000;
+    -webkit-box-shadow: 0 0 8px #000;
+    display: none;
+    padding: 10px 20px;
+    position: absolute;
+    z-index: 2;
+}
+.dialog h2 {
+    font-size: 100%;
+}
+#dialogBackground {
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    left: 0;
+    padding-left: auto;
+    padding-right: auto;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
 }
 
 /* box */

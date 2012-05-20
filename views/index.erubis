@@ -17,7 +17,7 @@
         </dl>
         <p><input type="submit" value="Log In" /></p>
       </form>
-      <p id="logOutLink">Hello, <span></span>!&#xa0;&#xa0;<img src="" alt="edit" width="16" height="16" data-image-icon-name="whiteCog" data-tool-id="edit" />&#xa0;&#xa0;&#xa0;&#xa0;<a href="#">Log Out</a></p>
+      <p id="logOutLink">Hello, <span></span>!&#xa0;&#xa0;<img src="" alt="edit" width="16" height="16" data-image-icon-name="whiteCog" data-tool-id="edit" class="toolIcon" />&#xa0;&#xa0;&#xa0;&#xa0;<a href="#">Log Out</a></p>
     </header>
     <section id="main">
       <section id="channels" class="sidebar">
@@ -42,6 +42,18 @@
         </ul>
       </section>
     </section>
+    <div id="dialogBackground">
+      <div id="userEdit" class="dialog">
+        <h2>Edit User</h2>
+        <dl>
+          <dt>Nick:</dt>
+          <dd><input type="text" name="nick" value="" /></dd>
+          <dt>Keywords:</dt>
+          <dd><input type="text" name="keywords" value="" /></dd>
+        </dl>
+        <p><button>Cancel</button><input type="submit" value="OK"></p>
+      </div>
+    </div>
     <!-- TODO: write footer -->
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
     <script src="/javascripts/star_chat.js?_=<%= launched_time %>"></script>

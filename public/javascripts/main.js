@@ -314,6 +314,33 @@ $(function() {
             view.update();
             return false;
         });
+        $('#logOutLink img[data-tool-id="edit"]').click(function () {
+            var view = getView();
+            view.isEdittingUser(!view.isEdittingUser());
+            view.update();
+            return false;
+        });
+    })();
+    (function () {
+        $('.dialog').click(function () {
+            return false;
+        });
+        $('#dialogBackground').click(function () {
+            var view = getView();
+            view.closeDialogs();
+            view.update();
+            return false;
+        });
+    })();
+    (function () {
+        $(window).resize(function () {
+            $('.dialog:visible').each(function () {
+                var e = $(this);
+                var top  = (($(window).height() - e.height()) / 2 + $(window).scrollTop())  + 'px';
+                var left = (($(window).width()  - e.width())  / 2 + $(window).scrollLeft()) + 'px';
+                e.css('top', top).css('left', left);
+            });
+        });
     })();
 });
 

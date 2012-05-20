@@ -26,6 +26,7 @@ starChat.View = (function () {
         self.endTime_ = null;
         self.oldMessages_ = {};
         self.isBlinkingTitle_ = false;
+        self.isEdittingUser_ = false;
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -341,6 +342,19 @@ starChat.View = (function () {
             ul.append(li);
         });
     }
+    function updateViewDialogs(self) {
+        $('.dialog').hide();
+        var dialogIsShown = false;
+        if (self.isEdittingUser_) {
+            $('#userEdit').show();
+            dialogIsShown = true;
+        }
+        if (dialogIsShown) {
+            $('#dialogBackground').show();
+        } else {
+            $('#dialogBackground').hide();
+        }
+    }
     View.prototype.update = function () {
         if (this.session_.isLoggedIn()) {
             $('#logInForm').hide();
@@ -368,6 +382,9 @@ starChat.View = (function () {
             var iconName = e.attr('data-image-icon-name');
             e.attr('src', starChat.Icons[iconName]);
         });
+
+        updateViewDialogs(this);
+
         $(window).resize();
     };
     View.prototype.logIn = function (userName, password) {
@@ -418,5 +435,16 @@ starChat.View = (function () {
         var key = startTime + '_' + endTime;
         this.oldMessages_[channelName][key] = messages;
     };
+    View.prototype.isEdittingUser = function(value) {
+        if (value !== void(0)) {
+            this.isEdittingUser_ = value;
+            return this;
+        } else {
+            return this.isEdittingUser_;
+        }
+    };
+    View.prototype.closeDialogs = function() {
+        this.isEdittingUser_ = false;
+    }
     return View;
 })();
