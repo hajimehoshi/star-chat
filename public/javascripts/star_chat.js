@@ -189,3 +189,15 @@ starChat.emphasizeKeyword = function (element, keyword) {
     element.html(html);
     return num;
 };
+
+starChat.isFocused = (function () {
+    var isFocused_ = true;
+    $(window).focus(function () {
+        isFocused_ = true;
+    }).blur(function () {
+        isFocused_ = false;
+    })
+    return function () {
+        return isFocused_;
+    };
+})();

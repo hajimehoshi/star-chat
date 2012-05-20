@@ -24,6 +24,39 @@ starChat.View = (function () {
         self.startTime_ = null;
         self.endTime_ = null;
         self.oldMessages_ = {};
+        self.isBlinkingTitle_ = false;
+
+        self.title_ = 'StarChat (β)';
+        document.title = self.title_;
+        stopBlinkingTitle(self);
+    }
+    function startBlinkingTitle(self, anotherTitle) {
+        if (self.isBlinkingTitle_) {
+            return;
+        }
+        self.isBlinkingTitle_ = true;
+        function loop (i) {
+            if (!self.isBlinkingTitle_) {
+                stopBlinkingTitle(self);
+                return;
+            }
+            if (starChat.isFocused()) {
+                stopBlinkingTitle(self);
+                return;
+            }
+            document.title = {
+                0: self.title_,
+                1: anotherTitle,
+            }[i];
+            setTimeout(function () {
+                loop(1 - i);
+            }, 1000);
+        }
+        loop(0);
+    }
+    function stopBlinkingTitle(self) {
+        self.isBlinkingTitle_ = false;
+        document.title = self.title_;
     }
     var updateViewChannels = (function () {
         var lastSessionId = 0;
@@ -151,8 +184,9 @@ starChat.View = (function () {
         userNameTD.addClass('userName');
         messageTR.append(userNameTD);
         var bodyTD = $('<td></td>').addClass('body').text(message.body);
+        var emphasizedNum = 0;
         keywords.forEach(function (keyword) {
-            starChat.emphasizeKeyword(bodyTD, keyword);
+            emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
         });
         messageTR.append(bodyTD);
         var time = new Date();
@@ -171,6 +205,7 @@ starChat.View = (function () {
         createdAtTD.append(createdAtTime).addClass('createdAt');
         messageTR.append(createdAtTD);
         messageTR.attr('data-message-id', message.id);
+        messageTR.data('emphasizedNum', emphasizedNum);
         return messageTR;
     }
     function updateViewMessages(self) {
@@ -242,6 +277,10 @@ starChat.View = (function () {
                         var e = messageToElement(message, []);
                     }
                     table.append(e);
+                    var emphasizedNum = e.data('emphasizedNum');
+                    if (0 < emphasizedNum && !starChat.isFocused()) {
+                        startBlinkingTitle(self, '(*) ' + self.title_);
+                    }
                 });
                 self.newMessages_[self.channelName] = [];
             }
