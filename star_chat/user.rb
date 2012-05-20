@@ -23,8 +23,16 @@ module StarChat
       key = ['users', name]
       # TODO: lock?
       if RedisDB.exec(:exists, key)
-        values = RedisDB.exec(:hmget, key, 'nick')
-        return new(name, nick: values[0])
+        values = RedisDB.exec(:hmget, key, 'nick', 'keywords')
+        params = {
+          nick: values[0],
+        }
+        if values[1]
+          params[:keywords] = JSON.parse(values[1])
+        else
+          params[:keywords] = []
+        end
+        return new(name, params)
       end
       nil
     end
@@ -39,7 +47,8 @@ module StarChat
     end
 
     attr_reader :name
-    attr_reader :nick
+    attr_accessor :nick
+    attr_accessor :keywords
 
     def initialize(name, options = {})
       options = {
@@ -64,6 +73,7 @@ module StarChat
       {
         name: name,
         nick: nick,
+        keywords: keywords,
       }.to_json(*args)
     end
 
@@ -72,7 +82,8 @@ module StarChat
       RedisDB.exec(:hmset,
                    ['users', name],
                    'name', name,
-                   'nick', nick)
+                   'nick', nick,
+                   'keywords', keywords.to_json)
       self
     end
 

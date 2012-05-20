@@ -90,6 +90,17 @@ get '/users/:user_name', provides: :json do
   current_user.to_json
 end
 
+put '/users/:user_name', provides: :json do
+  if params[:nick]
+    current_user.nick = params[:nick].to_s
+  end
+  if params[:keywords] and params[:keywords].kind_of?(Array)
+    current_user.keywords = params[:keywords]
+  end
+  current_user.save
+  200
+end
+
 get '/users/:user_name/channels', provides: :json do
   current_user.channels.to_json
 end
