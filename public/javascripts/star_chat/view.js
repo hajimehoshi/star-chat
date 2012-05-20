@@ -297,9 +297,11 @@ starChat.View = (function () {
         if (!self.isShowingOldLogs() && !section.is(':animated')) {
             if (self.lastChannelName_ === self.channelName) {
                 if (isBottom) {
-                    section.animate({scrollTop: section.get(0).scrollHeight}, {
-                        duration: 1000,
-                    });
+                    setTimeout(function () {
+                        section.animate({scrollTop: section.get(0).scrollHeight}, {
+                            duration: 1000,
+                        })
+                    }, 0);
                 }
             } else {
                 if (!self.lastChannelName_ ||
