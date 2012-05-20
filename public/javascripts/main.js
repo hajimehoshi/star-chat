@@ -336,8 +336,8 @@ $(function() {
         $(window).resize(function () {
             $('.dialog:visible').each(function () {
                 var e = $(this);
-                var top  = (($(window).height() - e.height()) / 2 + $(window).scrollTop())  + 'px';
-                var left = (($(window).width()  - e.width())  / 2 + $(window).scrollLeft()) + 'px';
+                var top  = (($(window).height() - e.outerHeight()) / 2 + $(window).scrollTop())  + 'px';
+                var left = (($(window).width()  - e.outerWidth())  / 2 + $(window).scrollLeft()) + 'px';
                 e.css('top', top).css('left', left);
             });
         });
