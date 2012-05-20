@@ -235,10 +235,6 @@ starChat.View = (function () {
                 return $(this).attr('data-start-time') || $(this).attr('data-end-time');
             }).remove();
         }
-        if (!self.channelName) {
-            $('#messages > section').hide();
-            self.lastChannelName_ = '';
-        }
         var section = getSectionElement(self);
         $('#messages > section').each(function () {
             var e = $(this);
@@ -249,6 +245,7 @@ starChat.View = (function () {
             }
         });
         if (!self.channelName) {
+            self.lastChannelName_ = '';
             return;
         }
 
