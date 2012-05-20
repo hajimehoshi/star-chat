@@ -95,7 +95,7 @@ get '/users/:user_name/channels', provides: :json do
 end
 
 get '/users/:user_name/stream', provides: :json do
-  user_name = params[:user_name]
+  user_name = params[:user_name].to_s
   stream(:keep_open) do |out|
     subscribe = [user_name, out]
     settings.streams << subscribe
@@ -143,7 +143,7 @@ get '/channels/:channel_name/users', provides: :json do
 end
 
 get '/channels/:channel_name/messages/:range', provides: :json do
-  range = params[:range]
+  range = params[:range].to_s
   if range == 'recent'
     idx, len = -100, 100
     @channel.messages(idx, len).to_json
@@ -159,7 +159,7 @@ get '/channels/:channel_name/messages/by_time_span/:start_time,:end_time', provi
 end
 
 post '/channels/:channel_name/messages', provides: :json do
-  body = params['body']
+  body = params[:body].to_s
   begin
     message = @channel.post_message(current_user, body)
   rescue Exception => e
@@ -176,8 +176,8 @@ end
 
 before '/subscribings' do
   protect!
-  channel_name = params[:channel_name]
-  user_name    = params[:user_name]
+  channel_name = params[:channel_name].to_s
+  user_name    = params[:user_name].to_s
   halt 400 unless channel_name.kind_of?(String)
   halt 400 unless user_name.kind_of?(String)
   halt 401 if user_name != current_user.name
