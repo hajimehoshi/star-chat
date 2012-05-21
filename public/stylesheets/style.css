@@ -158,13 +158,12 @@ h1 {
     -webkit-box-shadow: inset 0 0 8px #000;
 }
 #messages > section table.messages {
-    border-collapse: collapse;
-    border-spacing: 0;
+    border-collapse: separate;
+    border-spacing: 0 5px;
     table-layout: fixed;
     width: 100%;
 }
 #messages > section td {
-    padding-bottom: 5px;
     vertical-align: top;
 }
 #messages > section td.userName {
@@ -206,6 +205,22 @@ li .toolIcon {
 }
 .dialog h2 {
     font-size: 100%;
+    margin: 0;
+}
+.dialog table {
+    border-collapse: separate;
+    border-spacing: 0 5px;
+    margin: 10px 0;
+}
+.dialog th {
+    font-weight: normal;
+    padding-right: 5px;
+    text-align: right;
+    vertical-align: top;
+}
+.dialog p.buttons {
+    margin: 0;
+    text-align: right;
 }
 #dialogBackground {
     background-color: rgba(0, 0, 0, 0.5);
