@@ -180,17 +180,8 @@ starChat.View = (function () {
         return section;
     }
     function messageToElement(message, keywords) {
-        var messageTR = $('<tr></tr>');
-        messageTR.addClass('message');
-        var userNameTD = $('<td></td>').text(message.user_name);
-        userNameTD.addClass('userName');
-        messageTR.append(userNameTD);
-        var bodyTD = $('<td></td>').addClass('body').text(message.body);
-        var emphasizedNum = 0;
-        keywords.forEach(function (keyword) {
-            emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
-        });
-        messageTR.append(bodyTD);
+        var messageTR = $('<tr></tr>').addClass('message');
+
         var time = new Date();
         time.setTime(message.created_at * 1000);
         var h = time.getHours() + '';
@@ -206,6 +197,18 @@ starChat.View = (function () {
         var createdAtTime = $('<time></time>').text(timeStr).attr('data-unix-time', message.created_at);;
         createdAtTD.append(createdAtTime).addClass('createdAt');
         messageTR.append(createdAtTD);
+
+        var userNameTD = $('<td></td>').text(message.user_name);
+        userNameTD.addClass('userName');
+        messageTR.append(userNameTD);
+
+        var bodyTD = $('<td></td>').addClass('body').text(message.body);
+        var emphasizedNum = 0;
+        keywords.forEach(function (keyword) {
+            emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
+        });
+        messageTR.append(bodyTD);
+
         messageTR.attr('data-message-id', message.id);
         messageTR.data('emphasizedNum', emphasizedNum);
         return messageTR;

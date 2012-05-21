@@ -167,10 +167,10 @@ h1 {
     vertical-align: top;
 }
 #messages > section td.userName {
-    color: #999;
+    color: #338;
     padding-right: 10px;
     text-align: right;
-    width: 100px;
+    width: 120px;
     word-wrap: break-word;
 }
 #messages > section td.body {
@@ -179,9 +179,9 @@ h1 {
 #messages > section td.createdAt {
     color: #999;
     font-size: 80%;
-    padding-left: 10px;
-    text-align: right;
-    width: 50px;
+    padding-top: 4px;
+    padding-right: 10px;
+    width: 40px;
 }
 #postMessageForm {
     margin: 0;
