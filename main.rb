@@ -151,8 +151,12 @@ get '/channels/:channel_name', provides: :json do
 end
 
 get '/channels/:channel_name/users', provides: :json do
-  # TODO: hide keywords!
-  @channel.users.to_json
+  # TODO: This is a temporal hack.
+  @channel.users.map do |user|
+    hash = user.to_h
+    hash.delete(:keywords) if user.name != current_user.name
+    hash
+  end.to_json
 end
 
 get '/channels/:channel_name/messages/:range', provides: :json do

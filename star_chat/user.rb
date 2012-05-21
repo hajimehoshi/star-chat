@@ -93,12 +93,16 @@ module StarChat
       end
     end
 
-    def to_json(*args)
+    def to_h
       {
         name: name,
         nick: nick,
         keywords: keywords,
-      }.to_json(*args)
+      }
+    end
+
+    def to_json(*args)
+      to_h.to_json(*args)
     end
 
     def save
