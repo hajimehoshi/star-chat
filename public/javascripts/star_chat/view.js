@@ -314,7 +314,7 @@ starChat.View = (function () {
                 if (isBottom) {
                     setTimeout(function () {
                         section.animate({scrollTop: section.get(0).scrollHeight}, {
-                            duration: 1000,
+                            duration: 750,
                         })
                     }, 0);
                 }
