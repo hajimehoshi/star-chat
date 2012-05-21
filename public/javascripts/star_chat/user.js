@@ -19,5 +19,13 @@ starChat.User = (function () {
             return this.keywords_;
         }
     };
+    User.prototype.save = function (session, callback) {
+        var url = '/users/' + encodeURIComponent(this.name_);
+        starChat.ajaxRequest(session, url, 'PUT', {
+            keywords: this.keywords_,
+        }, function (sessionId, url, method, data) {
+            callback(sessionId, url, method, data);
+        });
+    };
     return User;
 })();

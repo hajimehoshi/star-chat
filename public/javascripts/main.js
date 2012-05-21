@@ -331,6 +331,21 @@ $(function() {
             view.update();
             return false;
         });
+        $('#userEdit input[type="submit"]').click(function () {
+            var keywords = $('#userEdit *[name="keywords"]').val().split('\n');
+            var view = getView();
+            var user = view.session().user();
+            user.keywords(keywords);
+            user.save(view.session(), function (sessionId, url, method, data) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.closeDialogs();
+                view.update();
+            });
+            return false;
+        });
     })();
     (function () {
         $(window).resize(function () {

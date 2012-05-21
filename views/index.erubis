@@ -44,18 +44,20 @@
     </section>
     <div id="dialogBackground">
       <div id="userEdit" class="dialog">
-        <h2>Edit User</h2>
-        <table>
-          <tr>
-            <th>Name:</th>
-            <td data-column="name"></td>
-          </tr>
-          <tr>
-            <th>Keywords:</th>
-            <td><textarea name="keywords" cols="10" rows="10" ></textarea></td>
-          </tr>
-        </table>
-        <p class="buttons"><input type="submit" value="OK"></p>
+        <form>
+          <h2>Edit User</h2>
+          <table>
+            <tr>
+              <th>Name:</th>
+              <td data-column="name"></td>
+            </tr>
+            <tr>
+              <th>Keywords:</th>
+              <td><textarea name="keywords" cols="10" rows="10" ></textarea></td>
+            </tr>
+          </table>
+          <p class="buttons"><input type="submit" value="OK"></p>
+        </form>
       </div>
     </div>
     <!-- TODO: write footer -->
