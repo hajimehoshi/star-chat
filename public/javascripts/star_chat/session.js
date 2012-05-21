@@ -8,7 +8,7 @@ starChat.Session = (function () {
             this.id_ = 0;
         }
         if (this.id_) {
-            this.userName_ = userName;
+            this.user_ = new starChat.User(userName);
             this.password_ = password;
         }
     };
@@ -18,8 +18,11 @@ starChat.Session = (function () {
     Session.prototype.password = function () {
         return this.password_;
     };
+    Session.prototype.user = function () {
+        return this.user_;
+    }
     Session.prototype.userName = function () {
-        return this.userName_;
+        return this.user_.name();
     };
     Session.prototype.id = function () {
         return this.id_;
