@@ -273,9 +273,9 @@ starChat.View = (function () {
         }
 
         // isBottom should be gotten before appending new message elements
-        var diff = section.outerHeight() -
-            (section.get(0).scrollHeight - section.scrollTop())
-        var isBottom = diff < 20;
+        var diff = (section.get(0).scrollHeight - section.scrollTop()) -
+            section.outerHeight();
+        var isBottom = diff < 100;
 
         // TODO: sort by id
         var table = section.find('table.messages');
