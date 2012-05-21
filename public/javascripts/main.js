@@ -317,7 +317,23 @@ $(function() {
         $('#logOutLink img[data-tool-id="edit"]').click(function () {
             var view = getView();
             view.isEdittingUser(!view.isEdittingUser());
-            view.update();
+            if (view.isEdittingUser()) {
+                var session = view.session();
+                var user = session.user();
+                user.load(session, function (sessionId, url, method, data) {
+                    var view = getView();
+                    if (view.session().id() !== sessionId) {
+                        return;
+                    }
+                    var user = view.session().user();
+                    console.log(user);
+                    var val = user.keywords().join('\n');
+                    $('#userEdit *[name="keywords"]').val(val);
+                    view.update();
+                });
+            } else {
+                view.update();
+            }
             return false;
         });
     })();
