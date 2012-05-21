@@ -183,6 +183,14 @@ h1 {
     text-align: right;
     width: 50px;
 }
+#postMessageForm {
+    margin: 0;
+    padding: 0;
+}
+#postMessageForm p {
+    margin: 0;
+    padding: 0;
+}
 
 .toolIcon {
     cursor: pointer;
