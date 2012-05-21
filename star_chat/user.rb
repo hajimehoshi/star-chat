@@ -27,14 +27,12 @@ module StarChat
         params = {
           nick: values[0],
         }
+        params[:keywords] = [name]
         if values[1]
           begin
             params[:keywords] = JSON.parse(values[1])
           rescue JSON::ParserError
-            params[:keywords] = []
           end
-        else
-          params[:keywords] = []
         end
         return new(name, params)
       end
@@ -68,7 +66,7 @@ module StarChat
     end
 
     def keywords
-      @keywords ||= []
+      @keywords ||= [name]
     end
 
     def keywords=(val)
