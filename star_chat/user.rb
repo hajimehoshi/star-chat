@@ -28,7 +28,11 @@ module StarChat
           nick: values[0],
         }
         if values[1]
-          params[:keywords] = JSON.parse(values[1])
+          begin
+            params[:keywords] = JSON.parse(values[1])
+          rescue JSON::ParserError
+            params[:keywords] = []
+          end
         else
           params[:keywords] = []
         end
@@ -49,6 +53,10 @@ module StarChat
     attr_reader :name
     attr_accessor :nick
     attr_accessor :keywords
+
+    def keywords
+      @keywords ||= []
+    end
 
     def initialize(name, options = {})
       options = {
