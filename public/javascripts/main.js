@@ -37,6 +37,7 @@ $(function() {
         localStorage.password = password;
         var view = getView();
         view.logIn(userName, password);
+        view.session().user().load(view.session());
         var url = '/users/' + encodeURIComponent(userName) + '/channels';
         starChat.ajaxRequest(view.session(), url, 'GET', null, function (sessionId, url, method, data) {
             var view = getView();

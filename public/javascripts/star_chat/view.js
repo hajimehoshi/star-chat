@@ -252,11 +252,10 @@ starChat.View = (function () {
                 if (message.id in self.messageElements_) {
                     return;
                 }
-                // TODO: Modify keywords;
                 var keywords = [];
-                var userName = self.session().userName();
-                if (message.user_name !== userName) {
-                    keywords.push(userName);
+                var user = self.session().user();
+                if (message.user_name !== user.name()) {
+                    keywords = user.keywords();
                 }
                 var e = messageToElement(message, keywords);
                 self.messageElements_[message.id] = e;
