@@ -98,7 +98,7 @@ starChat.View = (function () {
                     var href = '#channels/' + encodeURIComponent(channel.name);
                     a.attr('href', href);
                     a.text(name);
-                    var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackTrash" data-tool-id="delete" />').click(function () {
+                    var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackRoundMinus" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
                     });
                     var li = $('<li></li>').attr('data-channel-name', channel.name);
