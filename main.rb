@@ -39,10 +39,11 @@ helpers do
   end
 
   def current_user
+    return @current_user if @current_user
     return nil unless authorized?
     user_name = auth.credentials[0]
     user = StarChat::User.find(user_name)
-    return user if user
+    return @current_user = user if user
     user = StarChat::User.new(user_name).save
     lobby_channel = (StarChat::Channel.find('Lobby') or
                      StarChat::Channel.new('Lobby').save)
@@ -53,7 +54,7 @@ helpers do
       return false unless u = StarChat::User.find(user_name)
       lobby_channel.users.any?{|u2| u2.name == u.name}
     end
-    user
+    @current_user = user
   end
 
   def broadcast(values)
@@ -150,6 +151,7 @@ get '/channels/:channel_name', provides: :json do
 end
 
 get '/channels/:channel_name/users', provides: :json do
+  # TODO: hide keywords!
   @channel.users.to_json
 end
 

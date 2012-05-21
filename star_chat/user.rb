@@ -50,24 +50,42 @@ module StarChat
       user.auth?(password)
     end
 
-    attr_reader :name
-    attr_accessor :nick
-    attr_accessor :keywords
+    def name
+      @name ||= ''
+    end
+
+    def name=(name)
+      @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+    end
+    private :name=
+
+    def nick
+      @nick ||= ''
+    end
+
+    def nick=(nick)
+      @nick = nick.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+    end
 
     def keywords
       @keywords ||= []
+    end
+
+    def keywords=(val)
+      @keywords = val.map do |val|
+        val.to_s.strip.gsub(/[[:cntrl:]]/, '')
+      end.select do |str|
+        !str.empty?
+      end.to_a.uniq
     end
 
     def initialize(name, options = {})
       options = {
         nick: name
       }.merge(options)
-      @name = name[0, 32]
-      @nick = options[:nick][0, 32]
-    end
-
-    def nick=(nick)
-      @nick = nick[0, 32]
+      self.name     = name
+      self.nick     = options[:nick]
+      self.keywords = options[:keywords] if options[:keywords]
     end
 
     def channels

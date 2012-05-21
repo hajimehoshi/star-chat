@@ -325,8 +325,6 @@ $(function() {
                     if (view.session().id() !== sessionId) {
                         return;
                     }
-                    var user = view.session().user();
-                    console.log(user);
                     var val = user.keywords().join('\n');
                     $('#userEdit *[name="keywords"]').val(val);
                     view.update();
