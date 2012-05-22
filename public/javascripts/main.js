@@ -276,6 +276,13 @@ $(function() {
     (function () {
         var form = $('#postMessageForm');
         var isPostingMessage = false;
+        form.find('textarea[name="body"]').keypress(function (e) {
+            if (e.which === 13) {
+                form.find('input[type="submit"]').click();
+                return false;
+            }
+            return true;
+        });
         form.find('input[type="submit"]').click(function () {
             var session = getView().session();
             if (!session.isLoggedIn()) {
