@@ -11,7 +11,6 @@ starChat.Stream = (function () {
             console.error('An ajax object already exists!');
             return;
         }
-        this.continuingErrorNum_ = 0;
         var self = this;
         var session = view.session();
         var streamReadIndex = 0;
@@ -59,17 +58,17 @@ starChat.Stream = (function () {
                 }, 0);
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.error('Stream Error!');
-                console.error(textStatus);
                 self.continuingErrorNum_++;
-                if (20 <= self.continuingErrorNum_) {
+                console.error('Stream Error! (' + self.continuingErrorNum_ + ')');
+                console.error(textStatus);
+                if (10 <= self.continuingErrorNum_) {
                     console.error('Too many errors!');
                     // TODO: implement showing error message
                     return;
                 }
                 setTimeout(function () {
                     restartStream(parseInt($.now() / 1000) - 10);
-                }, 1000);
+                }, 2000);
             },
         };
         console.log('Connecting stream...');
@@ -82,7 +81,6 @@ starChat.Stream = (function () {
         if (!this.ajax_) {
             return;
         }
-        this.continuingErrorNum_ = 0;
         this.ajax_.abort();
         this.ajax_ = null;
     };
