@@ -191,6 +191,9 @@ h1 {
     margin: 0;
     padding: 0;
 }
+#postMessageForm textarea {
+    height: 1em;
+}
 
 .toolIcon {
     cursor: pointer;
