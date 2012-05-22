@@ -28,6 +28,9 @@ helpers do
       return false
     end
     user_name, password = auth.credentials
+    def password.inspect
+      '(secret)'
+    end
     return false unless user_name
     return false if user_name.empty?
     return false unless password
