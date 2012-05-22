@@ -41,7 +41,12 @@ module StarChat
       }.merge(options)
       @user_name  = user_name
       @body       = body.gsub(/[[:cntrl:]]/) do |str|
-        str == "\n" ? "\n" : ''
+        case str
+        when "\n", "\t"
+          str
+        else
+          ''
+        end
       end
       @created_at = options[:created_at].to_i
       @id         = options[:id]
