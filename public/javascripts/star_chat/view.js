@@ -207,6 +207,7 @@ starChat.View = (function () {
         keywords.forEach(function (keyword) {
             emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
         });
+        starChat.replaceBreakLines(bodyTD);
         messageTR.append(bodyTD);
 
         messageTR.attr('data-message-id', message.id);

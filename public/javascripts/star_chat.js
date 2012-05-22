@@ -198,7 +198,6 @@ starChat.replaceBreakLines = function (element) {
             var text = this.nodeValue;
             text = text.replace(/\r\n/gm, '\n').replace(/\r/gm, '\n');
             var segments = text.split(/\n/gm);
-            console.log(segments);
             segments = segments.filter(function (segment) {
                 return segment !== void(0);
             });
@@ -213,7 +212,7 @@ starChat.replaceBreakLines = function (element) {
     });
     element.html(html);
     return num;
-}
+};
 
 starChat.isFocused = (function () {
     var isFocused_ = true;

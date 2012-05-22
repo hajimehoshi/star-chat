@@ -289,7 +289,7 @@ $(function() {
             if (!view.channelName) {
                 return false;
             }
-            var body = form.find('input[name="body"]').val();
+            var body = form.find('*[name="body"]').val();
             if (!body) {
                 return false;
             }
@@ -299,7 +299,7 @@ $(function() {
                 body: body,
             }, function (sessionId, uri, method, data) {
                 receiveResponse(sessionId, uri, method, data);
-                form.find('input[name="body"]').val('');
+                form.find('*[name="body"]').val('');
             });
             isPostingMessage = true;
             setTimeout(function () {
