@@ -62,7 +62,7 @@ starChat.Stream = (function () {
                 console.error('Stream Error!');
                 console.error(textStatus);
                 self.continuingErrorNum_++;
-                if (20 <= self.ontinuingErrorNum_) {
+                if (20 <= self.continuingErrorNum_) {
                     console.error('Too many errors!');
                     // TODO: implement showing error message
                     return;

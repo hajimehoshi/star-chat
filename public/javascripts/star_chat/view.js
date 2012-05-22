@@ -364,16 +364,16 @@ starChat.View = (function () {
             $('#logInForm').hide();
             $('#logOutLink span').text(this.session_.userName());
             $('#logOutLink').show();
-            $('#main input').removeAttr('disabled');
+            $('#main').find('input, textarea').removeAttr('disabled');
             if (this.channelName && !this.isShowingOldLogs()) {
-                $('#postMessageForm input').removeAttr('disabled');
+                $('#postMessageForm').find('input, textarea').removeAttr('disabled');
             } else {
-                $('#postMessageForm input').attr('disabled', 'disabled');
+                $('#postMessageForm').find('input, textarea').attr('disabled', 'disabled');
             }
         } else {
             $('#logInForm').show();
             $('#logOutLink').hide();
-            $('#main input').attr('disabled', 'disabled');
+            $('#main').find('input, textarea').attr('disabled', 'disabled');
         }
         updateViewChannels(this);
         updateViewMessages(this);
