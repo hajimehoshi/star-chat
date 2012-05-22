@@ -190,6 +190,31 @@ starChat.emphasizeKeyword = function (element, keyword) {
     return num;
 };
 
+starChat.replaceBreakLines = function (element) {
+    var num = 0;
+    var html = '';
+    element.contents().each(function () {
+        if (this.nodeType === Node.TEXT_NODE) {
+            var text = this.nodeValue;
+            text = text.replace(/\r\n/gm, '\n').replace(/\r/gm, '\n');
+            var segments = text.split(/\n/gm);
+            console.log(segments);
+            segments = segments.filter(function (segment) {
+                return segment !== void(0);
+            });
+            num += segments.length - 1;
+            html += segments.map(function (segment) {
+                return starChat.escapeHTML(segment);
+            }).join('<br />');
+        } else {
+            num += starChat.replaceBreakLines($(this));
+            html += $(this).outerHTML();
+        }
+    });
+    element.html(html);
+    return num;
+}
+
 starChat.isFocused = (function () {
     var isFocused_ = true;
     $(window).focus(function () {
