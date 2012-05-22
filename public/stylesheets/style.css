@@ -345,7 +345,7 @@ body > #main {
     display: -ms-box;
     width: 100%;
 }
-#postMessageForm p > input:nth-child(1) {
+#postMessageForm p > *:nth-child(1) {
     box-flex: 1;
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
@@ -353,6 +353,6 @@ body > #main {
     -ms-box-flex: 1;
     display: block;
 }
-#postMessageForm p > input:nth-child(2) {
+#postMessageForm p > *:nth-child(2) {
     display: block;
 }
