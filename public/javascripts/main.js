@@ -391,6 +391,7 @@ $(function () {
         $('#messages > section').height($('#messages').height() -
                                         $('#messages > h2').outerHeight() -
                                         $('#messages > form').height());
+        $('.sidebar').height($(window).height() - $('header').outerHeight());
     }
     var isRequestedRelayouting = false;
     $(window).resize(function () {
