@@ -154,6 +154,8 @@ $(function() {
                     var view = getView();
                     view.channelName = channelName;
                     view.update();
+                    var url = '/channels/' + encodeURIComponent(channelName) + '/users';
+                    starChat.ajaxRequest(view.session(), url, 'GET', null, receiveResponse);
                 });
             }
         }
