@@ -167,6 +167,13 @@ h1 {
 #messages > section td {
     vertical-align: top;
 }
+#messages > section td.createdAt {
+    color: #999;
+    font-size: 80%;
+    padding-top: 4px;
+    padding-right: 10px;
+    width: 40px;
+}
 #messages > section td.userName {
     color: #338;
     padding-right: 10px;
@@ -176,13 +183,6 @@ h1 {
 }
 #messages > section td.body {
     word-wrap: break-word;
-}
-#messages > section td.createdAt {
-    color: #999;
-    font-size: 80%;
-    padding-top: 4px;
-    padding-right: 10px;
-    width: 40px;
 }
 #postMessageForm {
     margin: 0;
