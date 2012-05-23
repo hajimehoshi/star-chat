@@ -30,6 +30,7 @@ module StarChat
       def each
         idx = 0
         loop do
+          # TODO: Lock!
           messages = Message.find_by_list(@key, idx, 100)
           break if messages.size == 0
           messages.each do |message|

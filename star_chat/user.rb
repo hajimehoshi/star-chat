@@ -141,6 +141,12 @@ module StarChat
       self.class.auth_system.call(name, password)
     end
 
+    public
+
+    def search_messages(keyword)
+      GroongaDB.search_messages(channels, keyword)
+    end
+
   end
 
 end
