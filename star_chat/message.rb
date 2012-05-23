@@ -40,7 +40,14 @@ module StarChat
       end
     end
 
-    attr_reader :id
+    def id
+      @id
+    end
+
+    def id=(id)
+      @id = id.to_i
+    end
+
     attr_reader :user_name
     attr_reader :body
     attr_reader :created_at
@@ -60,7 +67,7 @@ module StarChat
         end
       end
       @created_at = options[:created_at].to_i
-      @id         = options[:id]
+      @id         = options[:id].to_i
     end
 
     def to_json(*args)
