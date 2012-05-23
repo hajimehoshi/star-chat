@@ -167,6 +167,13 @@ h1 {
 #messages > section td {
     vertical-align: top;
 }
+#messages > section td.createdAt {
+    color: #999;
+    font-size: 80%;
+    padding-top: 4px;
+    padding-right: 10px;
+    width: 40px;
+}
 #messages > section td.userName {
     color: #338;
     padding-right: 10px;
@@ -176,13 +183,6 @@ h1 {
 }
 #messages > section td.body {
     word-wrap: break-word;
-}
-#messages > section td.createdAt {
-    color: #999;
-    font-size: 80%;
-    padding-top: 4px;
-    padding-right: 10px;
-    width: 40px;
 }
 #postMessageForm {
     margin: 0;
@@ -247,10 +247,10 @@ li .toolIcon {
 /* font-family */
 
 * {
-    font-family: sans-serif;
-}
-h1, h2, h3, h4, h5, h6, h {
     font-family: Helvetica, Arial, sans-serif;
+}
+td.body {
+    font-family: sans-serif;
 }
 
 /* box */
