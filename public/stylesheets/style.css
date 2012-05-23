@@ -19,10 +19,12 @@ html * {
 a {
     color: #000;
 }
-
 em {
     font-style: normal;
     font-weight: bold;
+}
+textarea {
+    font-size: 100%;
 }
 
 header {
@@ -192,6 +194,10 @@ h1 {
 #postMessageForm p {
     margin: 0;
     padding: 0;
+}
+#postMessageForm textarea {
+    height: 2em;
+    padding: 0.5em 0.5em 0 0.5em;
 }
 
 .toolIcon {
