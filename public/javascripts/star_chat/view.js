@@ -303,7 +303,7 @@ starChat.View = (function () {
             if (self.channelName in self.oldMessages_ &&
                 key in self.oldMessages_[self.channelName]) {
                 // TODO: Refactoring
-                section.find('section.message').remove();
+                table.empty();
                 var msgs = self.oldMessages_[self.channelName][key];
                 msgs.forEach(function (message) {
                     table.append(messageToElement(message, []));
