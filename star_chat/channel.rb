@@ -22,8 +22,31 @@ module StarChat
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     end
 
-    def messages(idx, len)
-      Message.find_by_list(['channels', name, 'messages'], idx, len)
+    class ChannelMessages
+      include Enumerable
+      def initialize(channel_name)
+        @key = ['channels', channel_name, 'messages']
+      end
+      def each
+        idx = 0
+        loop do
+          # TODO: Lock!
+          messages = Message.find_by_list(@key, idx, 100)
+          break if messages.size == 0
+          messages.each do |message|
+            yield message
+          end
+          idx += 100
+        end
+      end
+    end
+
+    def messages(idx = nil, len = nil)
+      if idx and len
+        Message.find_by_list(['channels', name, 'messages'], idx, len)
+      else
+        ChannelMessages.new(name)
+      end
     end
 
     def messages_by_time_span(start_time, end_time)

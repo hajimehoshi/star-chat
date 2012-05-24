@@ -6,8 +6,20 @@ module StarChat
       RedisDB.exec(:incr, ['messages', 'id_num']).to_i
     end
 
+    # TODO: Cache?
+    def self.find(id)
+      key = ['messages', id]
+      # TODO: lock?
+      nil unless RedisDB.exec(:exists, key)
+      values = RedisDB.exec(:hmget, key, 'user_name', 'body', 'created_at', 'channel_name')
+      Message.new(values[0], values[1],
+                  id:           id,
+                  created_at:   values[2],
+                  channel_name: values[3])
+    end
+
     def self.find_by_list(redis_key, idx, len)
-      # TODO: Cache
+      # TODO: Cache?
       # TODO: Lock
       return [] if len <= 0
       idx += RedisDB.exec(:llen, redis_key) if idx < 0
@@ -31,7 +43,14 @@ module StarChat
       end
     end
 
-    attr_reader :id
+    def id
+      @id
+    end
+
+    def id=(id)
+      @id = id.to_i
+    end
+
     attr_reader :user_name
     attr_reader :channel_name
     attr_reader :body
