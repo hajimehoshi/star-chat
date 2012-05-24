@@ -39,16 +39,16 @@ module StarChat
       end
       Channel.all.each do |channel|
         channel.messages.each do |message|
-          add_message(channel.name, message)
+          add_message(message)
         end
       end
     end
 
-    def add_message(channel_name, message)
+    def add_message(message)
       entries = Groonga['Messages']
       raise 'Invalid state' unless entries
       entries.add(message.id,
-                  channel_name: channel_name,
+                  channel_name: message.channel_name,
                   body:         message.body)
     end
 

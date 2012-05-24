@@ -180,6 +180,8 @@ end
 post '/channels/:channel_name/messages', provides: :json do
   body = params[:body].to_s
   message = @channel.post_message(current_user, body)
+  # TODO: In fact, the real-time search is not needed.
+  StarChat::GroongaDB.add_message(message)
   broadcast(type: 'message',
             message: message) do |user_name|
     return false unless user = StarChat::User.find(user_name)
