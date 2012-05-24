@@ -68,6 +68,7 @@ module StarChat
         end
         include_keyword & in_channel
       end.map do |record|
+        # TODO: Scoring?
         Message.find(record._key),
       end
     end
