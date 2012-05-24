@@ -19,10 +19,12 @@ html * {
 a {
     color: #000;
 }
-
 em {
     font-style: normal;
     font-weight: bold;
+}
+textarea {
+    font-size: 100%;
 }
 
 header {
@@ -150,7 +152,7 @@ h1 {
 #messages > section {
     margin: 0;
     overflow-y: auto;
-    padding: 10px 20px;
+    padding: 10px 20px 0 20px; /* Firefox 12 can't use the padding-bottom */
 }
 #messages > section[data-channel-name=""] {
     background-color: #ccc;
@@ -161,6 +163,7 @@ h1 {
 #messages > section table.messages {
     border-collapse: separate;
     border-spacing: 0 5px;
+    margin-bottom: 10px;
     table-layout: fixed;
     width: 100%;
 }
@@ -191,6 +194,10 @@ h1 {
 #postMessageForm p {
     margin: 0;
     padding: 0;
+}
+#postMessageForm textarea {
+    height: 2em;
+    padding: 0.5em 0.5em 0 0.5em;
 }
 
 .toolIcon {

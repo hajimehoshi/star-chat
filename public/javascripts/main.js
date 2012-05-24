@@ -154,6 +154,8 @@ $(function() {
                     var view = getView();
                     view.channelName = channelName;
                     view.update();
+                    var url = '/channels/' + encodeURIComponent(channelName) + '/users';
+                    starChat.ajaxRequest(view.session(), url, 'GET', null, receiveResponse);
                 });
             }
         }
@@ -386,7 +388,7 @@ $(function () {
     if (!$.browser.mozilla) {
         return;
     }
-    $('#postMessageForm textarea').css('height', '1.2em');
+    /*$('#postMessageForm textarea').css('height', '1.2em');*/
     function relayout() {
         $('#messages > section').height($('#messages').height() -
                                         $('#messages > h2').outerHeight() -
