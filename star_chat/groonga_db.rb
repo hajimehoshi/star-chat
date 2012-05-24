@@ -68,11 +68,7 @@ module StarChat
         end
         include_keyword & in_channel
       end.map do |record|
-        id = record.key
-        {
-          channel_name: record.channel_name._key,
-          message: Message.find(record._key),
-        }
+        Message.find(record._key),
       end
     end
 
