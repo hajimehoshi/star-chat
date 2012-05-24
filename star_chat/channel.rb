@@ -39,8 +39,13 @@ module StarChat
     end
 
     def post_message(user, body, created_at = Time.now.to_i)
-      message = Message.new(user.name, body, created_at: created_at).save
-      RedisDB.exec(:rpush, ['channels', name, 'messages'], message.id)
+      message = Message.new(user.name,
+                            body,
+                            created_at:   created_at,
+                            channel_name: name).save
+      RedisDB.exec(:rpush,
+                   ['channels', name, 'messages'],
+                   message.id)
       message
     end
 
