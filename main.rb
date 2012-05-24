@@ -121,7 +121,7 @@ get '/users/:user_name/stream', provides: :json do
         msgs.concat(channel.messages_by_time_span(start_time, end_time).map do |msg|
                       {
                         type: 'message',
-                        channel_name: channel.name,
+                        channel_name: channel.name, # TODO: remove it?
                         message: msg,
                       }
                     end.to_a)
@@ -182,7 +182,7 @@ post '/channels/:channel_name/messages', provides: :json do
   body = params[:body].to_s
   message = @channel.post_message(current_user, body)
   broadcast(type: 'message',
-            channel_name: @channel.name,
+            channel_name: @channel.name, # TODO: remove it?
             message: message) do |user_name|
     return false unless user = StarChat::User.find(user_name)
     user.channels.any?{|channel| channel.name == @channel.name}
@@ -216,7 +216,7 @@ put '/subscribings', provides: :json do
   packets = @channel.messages(-100, 100).map do |message|
     {
       type: 'message',
-      channel_name: @channel.name,
+      channel_name: @channel.name, # TODO: remove it?
       message: message,
     }.to_json
   end.to_a

@@ -18,26 +18,30 @@ module StarChat
                             get: ['#',
                                   'messages:*->user_name',
                                   'messages:*->body',
-                                  'messages:*->created_at'],
+                                  'messages:*->created_at',
+                                  'messages:*->channel_name'],
                             limit: limit)
-      (values.size / 4).times.map do |i|
-        idx = i * 4
+      (values.size / 5).times.map do |i|
+        idx = i * 5
         Message.new(values[idx+1],
                     values[idx+2],
-                    id: values[idx],
-                    created_at: values[idx+3])
+                    id:           values[idx],
+                    created_at:   values[idx+3],
+                    channel_name: values[idx+4])
       end
     end
 
     attr_reader :id
     attr_reader :user_name
+    attr_reader :channel_name
     attr_reader :body
     attr_reader :created_at
 
     def initialize(user_name, body, options = {})
       options = {
-        created_at: Time.now.to_i,
-        id: nil
+        created_at:   Time.now.to_i,
+        id:           nil,
+        channel_name: '',
       }.merge(options)
       @user_name  = user_name
       @body       = body.gsub(/[[:cntrl:]]/) do |str|
@@ -48,16 +52,18 @@ module StarChat
           ''
         end
       end
-      @created_at = options[:created_at].to_i
-      @id         = options[:id]
+      @created_at   = options[:created_at].to_i
+      @id           = (options[:id] ? options[:id].to_i : nil)
+      @channel_name = options[:channel_name].to_s
     end
 
     def to_json(*args)
       {
-        id:         id,
-        user_name:  user_name,
-        body:       body,
-        created_at: created_at,
+        id:           id,
+        user_name:    user_name,
+        body:         body,
+        created_at:   created_at,
+        channel_name: channel_name,
       }.to_json(*args)
     end
 
@@ -66,9 +72,10 @@ module StarChat
       @id = Message.generate_id unless @id
       RedisDB.exec(:hmset,
                    ['messages', id],
-                   'created_at', created_at,
-                   'user_name',  user_name,
-                   'body',       body)
+                   'created_at',   created_at,
+                   'user_name',    user_name,
+                   'body',         body,
+                   'channel_name', channel_name)
       self
     end
 
