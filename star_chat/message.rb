@@ -11,10 +11,11 @@ module StarChat
       key = ['messages', id]
       # TODO: lock?
       nil unless RedisDB.exec(:exists, key)
-      values = RedisDB.exec(:hmget, key, 'user_name', 'body', 'created_at')
+      values = RedisDB.exec(:hmget, key, 'user_name', 'body', 'created_at', 'channel_name')
       Message.new(values[0], values[1],
-                  id:         id,
-                  created_at: values[2])
+                  id:           id,
+                  created_at:   values[2],
+                  channel_name: values[3])
     end
 
     def self.find_by_list(redis_key, idx, len)
