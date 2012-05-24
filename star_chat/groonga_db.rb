@@ -72,7 +72,9 @@ module StarChat
                   order: 'descending',
                 }],
                limit: 50).map do |record| # TODO: 暫定
-        Message.find(record._key)
+        {
+          message: Message.find(record._key),
+        }
       end
     end
 

@@ -125,7 +125,9 @@ starChat.View = (function () {
     function updateViewSearch(self) {
         var ul = $('#searchResultList');
         ul.empty();
-        self.searchResult_.forEach(function (message) {
+        self.searchResult_.forEach(function (result) {
+            var message = result.message;
+
             var li = $('<li></li>');
             var createdAt = new Date(message.created_at * 1000);
             var createdAtStr = starChat.toISO8601(createdAt, 'date') + ' ' +
