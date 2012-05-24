@@ -180,11 +180,7 @@ end
 
 post '/channels/:channel_name/messages', provides: :json do
   body = params[:body].to_s
-  begin
-    message = @channel.post_message(current_user, body)
-  rescue Exception => e
-    halt 400, {error: e.to_s}.to_json
-  end
+  message = @channel.post_message(current_user, body)
   broadcast(type: 'message',
             channel_name: @channel.name,
             message: message) do |user_name|
@@ -207,12 +203,7 @@ end
 
 put '/subscribings', provides: :json do
   unless @channel
-    @channel = StarChat::Channel.new(@channel_name)
-    begin
-      @channel.save
-    rescue Exception => e
-      halt 400, {error: e.to_s}.to_json
-    end
+    @channel = StarChat::Channel.new(@channel_name).save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
   StarChat::Subscribing.save(@channel, current_user)
