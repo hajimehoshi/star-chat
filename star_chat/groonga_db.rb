@@ -57,13 +57,13 @@ module StarChat
       entries = Groonga['Messages']
       raise 'Invalid state' unless entries
       entries.select do |record|
-        channels.map do |channel|
+        include_keyword = (record.body =~ keyword)
+        in_channel = channels.map do |channel|
           record.channel_name == channel.name
         end.inject do |result, query|
           result | query
         end
-      end.select do |record|
-        record.body =~ keyword
+        include_keyword & in_channel
       end.map do |record|
         id = record.key
         {
