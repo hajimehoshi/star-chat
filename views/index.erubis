@@ -23,16 +23,17 @@
       <section id="channels" class="sidebar">
         <h2>Channels</h2>
         <menu><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackCog" data-tool-id="edit" class="toolIcon" /></menu>
-        <ul>
+        <ul id="channelsList">
         </ul>
         <form id="addChannelForm">
           <p><input type="text" name="name" value="" /><input type="submit" value="Add" /></p>
         </form>
         <hr />
-        <h2>Search</h2>
         <form id="searchForm">
           <p><input type="text" name="query" value="" /><input type="submit" value="Search" /></p>
         </form>
+        <ul id="searchResultList">
+        </ul>
       </section>
       <section id="messages">
         <h2>&#xa0;</h2>

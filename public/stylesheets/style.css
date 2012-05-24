@@ -333,6 +333,7 @@ body > #main {
 #addChannelForm p > input:nth-child(2) {
     display: block;
 }
+
 #searchForm p {
     display: box;
     display: -webkit-box;
@@ -351,6 +352,17 @@ body > #main {
 }
 #searchForm p > input:nth-child(2) {
     display: block;
+}
+
+#searchResultList time {
+    color: #666;
+    font-size: 80%;
+}
+#searchResultList .userName {
+    color: #118;
+}
+#searchResultList li {
+    margin-bottom: 10px;
 }
 
 #messages {

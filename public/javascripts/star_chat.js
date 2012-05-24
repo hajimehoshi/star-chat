@@ -152,6 +152,9 @@ starChat.toISO8601 = function (date, type) {
         return date.getFullYear() + '-' +
             fillZero(date.getMonth() + 1) + '-' +
             fillZero(date.getDate());
+    } else if (type === 'hourMinute') {
+        return fillZero(date.getHours()) + ':' +
+            fillZero(date.getMinutes());
     }
 };
 
