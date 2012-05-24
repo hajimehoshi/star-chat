@@ -9,9 +9,12 @@ module StarChat
 
     def load_or_create(path)
       if File.exist?(path)
-        Groonga::Database.create(path: path)
-        return
+        raise 'Sorry, resuming is not implemented!'
+        # Groonga::Database.create(path: path)
+        # return
       end
+      # TODO: 毎度作り直すのは明らかに重いと考えられるので、なんとかする。
+      # 検索を別サーバー建てにするのを視野に入れる。
       Groonga::Database.create(path: path)
       Groonga::Schema.define do |schema|
         schema.create_table('ChannelNames',
