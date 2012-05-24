@@ -27,6 +27,8 @@ starChat.View = (function () {
         self.oldMessages_ = {};
         self.isBlinkingTitle_ = false;
         self.isEdittingUser_ = false;
+        self.searchQuery_ = null;
+        self.searchResult_ = [];
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -76,7 +78,7 @@ starChat.View = (function () {
                 self.dirtyFlags_[self.channelName] = false;
             }
             (function () {
-                var ul = $('#channels ul');
+                var ul = $('#channelsList');
                 ul.find('li').filter(function (i) {
                     var channelName = $(this).attr('data-channel-name');
                     return channels.every(function (channel) {
@@ -98,6 +100,7 @@ starChat.View = (function () {
                     var href = '#channels/' + encodeURIComponent(channel.name);
                     a.attr('href', href);
                     a.text(name);
+                    // TODO: Use attr
                     var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackRoundMinus" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
                     });
@@ -119,6 +122,48 @@ starChat.View = (function () {
             }
         }
     })();
+    function updateViewSearch(self) {
+        var ul = $('#searchResultList');
+        ul.empty();
+        self.searchResult_.forEach(function (result) {
+            var message = result.message;
+
+            var li = $('<li></li>');
+            var createdAt = new Date(message.created_at * 1000);
+            var createdAtStr = starChat.toISO8601(createdAt, 'date') + ' ' +
+                starChat.toISO8601(createdAt, 'hourMinute');
+            var createdAtE = $('<time></time>').append(createdAtStr);
+            createdAtE.attr('datetime', starChat.toISO8601(createdAt));
+
+            var userName = message.user_name;
+            var userNameE = $('<span></span>').text(userName).addClass('userName');
+
+            var bodyE = $(document.createTextNode(message.body));
+
+            var time = new Date(message.created_at * 1000);
+            time.setHours(0);
+            time.setMinutes(0);
+            time.setSeconds(0);
+            time.setMilliseconds(0);
+            var startTime = parseInt(time.getTime() / 1000);
+            var endTime   = startTime + 60 * 60 * 24;
+            var channelNameLink = $('<a></a>').text(message.channel_name);
+            var channelUrl = '#channels/' + encodeURIComponent(message.channel_name) +
+                '/old_logs/by_time_span/' + startTime + ',' + endTime;
+            channelNameLink.attr('href', channelUrl);
+            // TODO: highlight
+
+            li.append(createdAtE);
+            li.append($('<br />'));
+            li.append(userNameE);
+            li.append($('<br />'));
+            li.append(bodyE);
+            li.append(document.createTextNode(' ('));
+            li.append(channelNameLink);
+            li.append(document.createTextNode(')'));
+            ul.append(li);
+        });
+    }
     function getSectionElement(self) {
         if (!self.channelName) {
             return $('#messages > section[data-channel-name=""]');
@@ -376,6 +421,7 @@ starChat.View = (function () {
             $('#main').find('input, textarea').attr('disabled', 'disabled');
         }
         updateViewChannels(this);
+        updateViewSearch(this);
         updateViewMessages(this);
         updateViewUsers(this);
         $('img[data-image-icon-name]').each(function () {
@@ -449,6 +495,14 @@ starChat.View = (function () {
     };
     View.prototype.closeDialogs = function() {
         this.isEdittingUser_ = false;
+    };
+    View.prototype.setSearch = function (query, result) {
+        this.searchQuery_  = query;
+        this.searchResult_ = result;
+    };
+    View.prototype.clearSearch = function () {
+        this.searchQuery_  = null;
+        this.searchResult_ = [];
     }
     return View;
 })();

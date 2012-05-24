@@ -196,6 +196,9 @@ $(function() {
                     var startTime   = decodeURIComponent(RegExp.$2);
                     var endTime     = decodeURIComponent(RegExp.$3);
                     view.setOldMessages(channelName, startTime, endTime, data);
+                } else if (uri.match(/^\/messages\/search\/([^\/]+)$/)) {
+                    var query = decodeURIComponent(RegExp.$1);
+                    view.setSearch(query, data);
                 }
             } else if (method === 'PUT') {
                 if (uri.match(/^\/subscribings\?/)) {
@@ -272,6 +275,22 @@ $(function() {
                 receiveResponse(sessionId, uri, method, data);
                 location.hash = 'channels/' + encodeURIComponent(channelName);
             });
+            return false;
+        });
+    })();
+    (function () {
+        var form = $('#searchForm');
+        form.find('input[type="submit"]').click(function () {
+            var session = getView().session();
+            var query = form.find('input[name="query"]').val();
+            if (!query) {
+                var view = getView();
+                view.clearSearch();
+                view.update();
+                return false;
+            }
+            var url = '/messages/search/' + encodeURIComponent(query);
+            starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
             return false;
         });
     })();

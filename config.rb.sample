@@ -5,12 +5,15 @@ end
 
 configure :development do
   StarChat::RedisDB.setup('127.0.0.1', 6379)
+  StarChat::GroongaDB.load_or_create('./tmp/groonga-development.db')
 end
 
 configure :production do
   StarChat::RedisDB.setup('127.0.0.1', 6380)
+  StarChat::GroongaDB.load_or_create('./tmp/groonga-production.db')
 end
 
 configure :test do
   StarChat::RedisDB.setup('127.0.0.1', 6381)
+  StarChat::GroongaDB.load_or_create('./tmp/groonga-test.db')
 end

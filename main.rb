@@ -180,6 +180,8 @@ end
 post '/channels/:channel_name/messages', provides: :json do
   body = params[:body].to_s
   message = @channel.post_message(current_user, body)
+  # TODO: In fact, the real-time search is not needed.
+  StarChat::GroongaDB.add_message(message)
   broadcast(type: 'message',
             message: message) do |user_name|
     return false unless user = StarChat::User.find(user_name)
@@ -240,3 +242,12 @@ delete '/subscribings', provides: :json do
   200
 end
 
+before '/messages' do
+  protect!
+end
+
+get '/messages/search/:query', provides: :json do
+  channels = current_user.channels
+  query = params[:query]
+  StarChat::GroongaDB.search_messages(channels, query).to_a.to_json
+end

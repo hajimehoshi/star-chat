@@ -100,7 +100,14 @@ h1 {
 .sidebar h2 {
     font-size: 100%;
     font-weight: bold;
-    margin: 0 0 5px 0;
+    margin: 0 0 10px 0;
+    padding: 0;
+}
+.sidebar hr {
+    border-color: #999 #000 #ccc #000;
+    border-style: solid;
+    border-width: 1px 0 1px 0;
+    margin: 20px 0;
     padding: 0;
 }
 .sidebar menu {
@@ -325,6 +332,37 @@ body > #main {
 }
 #addChannelForm p > input:nth-child(2) {
     display: block;
+}
+
+#searchForm p {
+    display: box;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -o-box;
+    display: -ms-box;
+    width: 100%;
+}
+#searchForm p > input:nth-child(1) {
+    box-flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    -o-box-flex: 1;
+    -ms-box-flex: 1;
+    display: block;
+}
+#searchForm p > input:nth-child(2) {
+    display: block;
+}
+
+#searchResultList time {
+    color: #666;
+    font-size: 80%;
+}
+#searchResultList .userName {
+    color: #118;
+}
+#searchResultList li {
+    margin-bottom: 10px;
 }
 
 #messages {
