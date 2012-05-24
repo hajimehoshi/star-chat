@@ -67,8 +67,11 @@ module StarChat
           result | query
         end
         include_keyword & in_channel
-      end.map do |record|
-        # TODO: Scoring?
+      end.sort([{
+                  key:   '_key',
+                  order: 'descending',
+                }],
+               limit: 50).map do |record| # TODO: 暫定
         Message.find(record._key)
       end
     end
