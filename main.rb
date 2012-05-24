@@ -240,3 +240,12 @@ delete '/subscribings', provides: :json do
   200
 end
 
+before '/messages' do
+  protect!
+end
+
+get '/messages/search/:query', provides: :json do
+  channels = current_user.channels
+  query = params[:query]
+  StarChat::GroongaDB.search_messages(channels, query).to_a.to_json
+end
