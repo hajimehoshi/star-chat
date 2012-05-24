@@ -276,6 +276,20 @@ $(function() {
         });
     })();
     (function () {
+        var form = $('#searchForm');
+        form.find('input[type="submit"]').click(function () {
+            var session = getView().session();
+            var query = form.find('input[name="query"]').val();
+            console.log(query);
+            if (!query) {
+                return false;
+            }
+            var url = '/messages/search/' + encodeURIComponent(query);
+            starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+            return false;
+        });
+    })();
+    (function () {
         var form = $('#postMessageForm');
         var isPostingMessage = false;
         form.find('textarea[name="body"]').keypress(function (e) {

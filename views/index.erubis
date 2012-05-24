@@ -28,6 +28,11 @@
         <form id="addChannelForm">
           <p><input type="text" name="name" value="" /><input type="submit" value="Add" /></p>
         </form>
+        <hr />
+        <h2>Search</h2>
+        <form id="searchForm">
+          <p><input type="text" name="query" value="" /><input type="submit" value="Search" /></p>
+        </form>
       </section>
       <section id="messages">
         <h2>&#xa0;</h2>
