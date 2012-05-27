@@ -194,6 +194,9 @@ h1 {
 #messages > section td.body {
     word-wrap: break-word;
 }
+#messages > section td.body a:visited {
+    color: #666;
+}
 #postMessageForm {
     margin: 0;
     padding: 0;
