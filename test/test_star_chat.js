@@ -1,3 +1,5 @@
+'use strict';
+
 test('isSomeArray', function () {
     strictEqual(starChat.isSameArray([], []), true);
     strictEqual(starChat.isSameArray(['foo', 'bar'], ['foo', 'bar']), true);
