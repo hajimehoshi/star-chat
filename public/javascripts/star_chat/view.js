@@ -248,6 +248,8 @@ starChat.View = (function () {
         messageTR.append(userNameTD);
 
         var bodyTD = $('<td></td>').addClass('body').text(message.body);
+        starChat.replaceURLWithLinks(bodyTD);
+
         var emphasizedNum = 0;
         keywords.forEach(function (keyword) {
             emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
