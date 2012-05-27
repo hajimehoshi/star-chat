@@ -103,3 +103,16 @@ test('replaceBreakLines', function () {
         strictEqual(div.html(), '&amp;&lt;<br>&gt;"');
     }
 });
+
+test('replaceURLWithLinks', function () {
+    {
+        var div = $('<div></div>');
+        strictEqual(starChat.replaceURLWithLinks(div), 0);
+        strictEqual(div.html(), '');
+    }
+    {
+        var div = $('<div></div>').text('foo http://example.com/ baz');
+        strictEqual(starChat.replaceURLWithLinks(div), 1);
+        strictEqual(div.html(), 'foo <a href="http://example.com/">http://example.com/</a> baz');
+    }
+});
