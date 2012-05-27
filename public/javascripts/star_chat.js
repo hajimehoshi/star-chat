@@ -225,7 +225,7 @@ starChat.replaceURLWithLinks = function (element) {
             var text = this.nodeValue;
             // escapeText should not inlucde '&#x20;' or somthing escaped unexpectedly.
             var escapedText = starChat.escapeHTML(text);
-            html += text.replace(/(https?:\/\/[\x21-\x7e]+)/mg, function (escapedURL) {
+            html += escapedText.replace(/(https?:\/\/[\x21-\x7e]+)/mg, function (escapedURL) {
                 num += 1;
                 return '<a href="' + escapedURL + '">' + escapedURL + '</a>';
             });
