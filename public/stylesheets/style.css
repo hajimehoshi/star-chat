@@ -314,8 +314,6 @@ body > #main {
     -ms-box-flex: 1;
     overflow: hidden;
 }
-#main > #users {
-}
 
 #addChannelForm p {
     display: box;

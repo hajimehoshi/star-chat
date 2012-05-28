@@ -384,7 +384,7 @@ starChat.View = (function () {
             userNamesObj = {};
         }
         var userNames = Object.keys(userNamesObj).sort();
-        var ul = $('#users ul');
+        var ul = $('#users');
         ul.empty();
         userNames.forEach(function (userName) {
             var li = $('<li></li>');
