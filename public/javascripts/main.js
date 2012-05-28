@@ -354,6 +354,12 @@ $(function() {
             view.update();
             return false;
         });
+        $('img[data-tool-id="editTopic"]').click(function () {
+            var view = getView();
+            view.isEdittingTopic(!view.isEdittingTopic());
+            view.update();
+            return false;
+        });
         $('#logOutLink img[data-tool-id="edit"]').click(function () {
             var view = getView();
             view.isEdittingUser(!view.isEdittingUser());
@@ -397,6 +403,22 @@ $(function() {
                 }
                 view.closeDialogs();
                 view.update();
+            });
+            return false;
+        });
+    })();
+    (function () {
+        $('#updateTopicForm input[type="submit"]').click(function () {
+            var topicBody = $('#updateTopicForm *[name="body"]').val();
+            var view = getView();
+            var uri = '/channels/' + encodeURIComponent(view.channelName);
+            starChat.ajaxRequest(view.session(), uri, 'PUT', {
+                topic_body: topicBody,
+            }, function (sessionId, uri, method, data) {
+                receiveResponse(sessionId, uri, method, data);
+                var view = getView();
+                view.isEdittingTopic(false);
+                starChat.ajaxRequest(view.session(), uri, 'GET', null, receiveResponse);
             });
             return false;
         });

@@ -165,8 +165,8 @@ put '/channels/:channel_name', provides: :json do
     @channel = StarChat::Channel.save(params[:channel_name]).save
     result = 201
   end
-  if params[:topic]
-    @channel.update_topic(current_user, params[:topic])
+  if params[:topic_body]
+    @channel.update_topic(current_user, params[:topic_body])
   end
   @channel.save
   result

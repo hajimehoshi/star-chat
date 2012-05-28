@@ -30,6 +30,7 @@ starChat.View = (function () {
         self.searchQuery_ = null;
         self.searchResult_ = [];
         self.topics_ = {};
+        self.isEdittingTopic_ = false;
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -380,12 +381,26 @@ starChat.View = (function () {
         }
     }
     function updateViewTopic(self) {
-        if (self.channelName &&
-            (self.channelName in self.topics_)) {
-            var topic = self.topics_[self.channelName];
-            $('#topics span').text(topic.body);
+        if (self.channelName) {
+            if (self.isEdittingTopic()) {
+                $('#topic').hide();
+                $('#updateTopicForm').show();
+            } else {
+                $('#topic').show();
+                $('#updateTopicForm').hide();
+            }
+            if (self.channelName in self.topics_) {
+                var topic = self.topics_[self.channelName];
+                var topicE = $('#topic').text(topic.body);
+                starChat.replaceURLWithLinks(topicE);
+                starChat.replaceBreakLines(topicE);
+            } else {
+                $('#topic').text('(No Topic)');
+            }
         } else {
-            $('#topics span').text('');
+            $('#topic').hide();
+            $('#updateTopicForm').hide();
+            $('#topic').text('');
         }
     }
     function updateViewUsers(self) {
@@ -523,6 +538,14 @@ starChat.View = (function () {
             body:      body,
             createdAt: createdAt,
         };
+    };
+    View.prototype.isEdittingTopic = function(value) {
+        if (value !== void(0)) {
+            this.isEdittingTopic_ = value;
+            return this;
+        } else {
+            return this.isEdittingTopic_;
+        }
     };
     return View;
 })();
