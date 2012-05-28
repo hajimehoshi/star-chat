@@ -19,6 +19,9 @@ html * {
 a {
     color: #000;
 }
+a:visited {
+    color: #666;
+}
 em {
     font-style: normal;
     font-weight: bold;
@@ -100,8 +103,11 @@ h1 {
 .sidebar h2 {
     font-size: 100%;
     font-weight: bold;
-    margin: 0 0 10px 0;
+    margin: 20px 0 10px 0;
     padding: 0;
+}
+.sidebar h2:first-of-type {
+    margin-top: 0;
 }
 .sidebar hr {
     border-color: #999 #000 #ccc #000;
@@ -129,9 +135,15 @@ h1 {
 .sidebar li {
     margin-bottom: 5px;
 }
+.sidebar a:visited {
+    color: #555;
+}
 
 #channelsList a.dirty {
     color: #900;
+}
+#channelsList a:visited {
+    color: #000;
 }
 
 #messages {
@@ -194,9 +206,6 @@ h1 {
 #messages > section td.body {
     word-wrap: break-word;
 }
-#messages > section td.body a:visited {
-    color: #666;
-}
 #postMessageForm {
     margin: 0;
     padding: 0;
@@ -216,6 +225,9 @@ h1 {
 }
 #updateTopicForm textarea {
     width: 100%;
+}
+#topic {
+    margin: 0;
 }
 
 .toolIcon {
