@@ -29,6 +29,7 @@ module StarChat
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     end
 
+    # TODO: Rename 'current_topic_id'
     def last_topic_id
       topic_id = RedisDB.exec(:lindex, ['channels', name, 'topics'], -1)
       topic_id ? topic_id.to_i : nil
