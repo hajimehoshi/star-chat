@@ -59,8 +59,7 @@ module StarChat
     end
 
     def body=(body)
-      body = body.gsub(/(?!\n|\r|\t)[[:cntrl:]]/, '')
-      raise 'The body should not be empty' if body.empty?
+      body = body.strip.gsub(/(?!\n|\r|\t)[[:cntrl:]]/, '')
       @body = body
     end
     private(:body=)

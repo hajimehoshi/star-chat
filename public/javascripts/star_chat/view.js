@@ -389,7 +389,8 @@ starChat.View = (function () {
                 $('#topic').show();
                 $('#updateTopicForm').hide();
             }
-            if (self.channelName in self.topics_) {
+            if (self.channelName in self.topics_ &&
+                self.topics_[self.channelName].body) {
                 var topic = self.topics_[self.channelName];
                 var topicE = $('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
@@ -541,6 +542,9 @@ starChat.View = (function () {
             createdAt: createdAt,
         };
     };
+    View.prototype.clearTopic = function (channelName) {
+        delete this.topics_[channelName];
+    }
     View.prototype.isEdittingTopic = function(value) {
         if (value !== void(0)) {
             this.isEdittingTopic_ = value;

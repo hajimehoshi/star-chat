@@ -26,6 +26,15 @@ starChat.PacketProcessor = (function () {
         var userNames = view.userNames[channelName];
         delete userNames[packet.user_name];
     }
+    function processPacketTopic(packet, view) {
+        var topic = packet.topic;
+        if (topic) {
+            view.setTopic(topic.created_at,
+                          topic.channel_name,
+                          topic.user_name,
+                          topic.body);
+        }
+    }
     PacketProcessor.prototype.process = function (packet, view) {
         if (packet.type === 'message') {
             processPacketMessage(packet, view);
@@ -33,6 +42,8 @@ starChat.PacketProcessor = (function () {
             processPacketSubscribing(packet, view);
         } else if (packet.type === 'delete_subscribing') {
             processPacketDeleteSubscribing(packet, view);
+        } else if (packet.type === 'topic') {
+            processPacketTopic(packet, view);
         }
     };
     return PacketProcessor;
