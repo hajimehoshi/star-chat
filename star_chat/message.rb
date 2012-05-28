@@ -62,15 +62,8 @@ module StarChat
         id:           nil,
         channel_name: '',
       }.merge(options)
-      @user_name  = user_name
-      @body       = body.gsub(/[[:cntrl:]]/) do |str|
-        case str
-        when "\n", "\t"
-          str
-        else
-          ''
-        end
-      end
+      @user_name    = user_name
+      @body         = body.gsub(/(?!\n|\r|\t)[[:cntrl:]]/, '')
       @created_at   = options[:created_at].to_i
       @id           = (options[:id] ? options[:id].to_i : nil)
       @channel_name = options[:channel_name].to_s
