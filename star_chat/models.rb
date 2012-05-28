@@ -8,6 +8,7 @@ module StarChat
   autoload :Channel,      './star_chat/channel'
   autoload :User,         './star_chat/user'
   autoload :Subscribing,  './star_chat/subscribing'
+  autoload :Topic,        './star_chat/topic'
   autoload :RedisDB,      './star_chat/redis_db'
   autoload :GroongaDB,    './star_chat/groonga_db'
   autoload :BinarySearch, './star_chat/binary_search'

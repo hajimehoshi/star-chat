@@ -42,9 +42,15 @@
           <p><textarea name="body" rows="1"></textarea><input type="submit" name="send" value="Send" /></p>
         </form>
       </section>
-      <section id="users" class="sidebar">
+      <section class="sidebar">
+        <h2>Topic</h2>
+        <menu><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackPencil" data-tool-id="editTopic" class="toolIcon" /></menu>
+        <p id="topic"></p>
+        <form action="." id="updateTopicForm" method="post">
+          <p><textarea name="body" rows="10"></textarea><input type="submit" name="send" value="Update" /></p>
+        </form>
         <h2>Users</h2>
-        <ul>
+        <ul id="users">
         </ul>
       </section>
     </section>

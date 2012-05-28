@@ -93,6 +93,12 @@ module StarChat
       end
     end
 
+    def subscribing?(channel)
+      channels.any? do |c|
+        c.name == channel.name
+      end
+    end
+
     def to_h
       {
         name: name,
