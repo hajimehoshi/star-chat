@@ -43,6 +43,8 @@
         </form>
       </section>
       <section class="sidebar">
+        <h2>Topic</h2>
+        <p id="topic"><span></span><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackPencil" data-tool-id="edit" class="toolIcon" /></p>
         <h2>Users</h2>
         <ul id="users">
         </ul>

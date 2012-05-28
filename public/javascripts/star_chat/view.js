@@ -29,6 +29,7 @@ starChat.View = (function () {
         self.isEdittingUser_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
+        self.topics_ = {};
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -378,6 +379,15 @@ starChat.View = (function () {
             self.lastChannelName_ = self.channelName;
         }
     }
+    function updateViewTopic(self) {
+        if (self.channelName &&
+            (self.channelName in self.topics_)) {
+            var topic = self.topics_[self.channelName];
+            $('#topics span').text(topic.body);
+        } else {
+            $('#topics span').text('');
+        }
+    }
     function updateViewUsers(self) {
         var userNamesObj = self.userNames[self.channelName];
         if (!userNamesObj) {
@@ -425,6 +435,7 @@ starChat.View = (function () {
         updateViewChannels(this);
         updateViewSearch(this);
         updateViewMessages(this);
+        updateViewTopic(this);
         updateViewUsers(this);
         $('img[data-image-icon-name]').each(function () {
             var e = $(this);
@@ -505,6 +516,13 @@ starChat.View = (function () {
     View.prototype.clearSearch = function () {
         this.searchQuery_  = null;
         this.searchResult_ = [];
-    }
+    };
+    View.prototype.setTopic = function (createdAt, channelName, userName, body) {
+        this.topics_[channelName] = {
+            userName:  userName,
+            body:      body,
+            createdAt: createdAt,
+        };
+    };
     return View;
 })();
