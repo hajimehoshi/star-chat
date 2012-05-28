@@ -8,12 +8,12 @@ starChat.User = (function () {
     User.prototype.name = function () {
         return this.name_;
     };
-    User.prototype.keywords = function (value) {
-        if (value !== void(0)) {
-            if (!$.isArray(value)) {
-                throw 'Invalid assignment: value is not an array';
+    User.prototype.keywords = function (keywords) {
+        if (keywords !== void(0)) {
+            if (!$.isArray(keywords)) {
+                throw 'Invalid assignment: keywords is not an array';
             }
-            this.keywords_ = value;
+            this.keywords_ = keywords;
             return this;
         } else {
             return this.keywords_;
