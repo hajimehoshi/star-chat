@@ -186,10 +186,14 @@ $(function() {
                 } else if (uri.match(/^\/channels\/([^\/]+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var topic       = data['topic'];
-                    view.setTopic(topic.created_at,
-                                  channelName,
-                                  topic.user_name,
-                                  topic.body);
+                    if (topic) {
+                        view.setTopic(topic.created_at,
+                                      channelName,
+                                      topic.user_name,
+                                      topic.body);
+                    } else {
+                        view.clearTopic(channelName);
+                    }
                 } else if (uri.match(/^\/channels\/([^\/]+)\/users$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var userNames = {};
