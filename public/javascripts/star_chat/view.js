@@ -397,6 +397,7 @@ starChat.View = (function () {
                 $('#updateTopicForm *[name="body"]').val(topic.body);
             } else {
                 $('#topic').text('(No Topic)');
+                $('#updateTopicForm *[name="body"]').val('');
             }
         } else {
             $('#topic').hide();
