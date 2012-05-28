@@ -50,6 +50,7 @@ module StarChat
     def id=(id)
       @id = id.to_i
     end
+    private(:id=)
 
     attr_reader :user_name
     attr_reader :channel_name
