@@ -145,11 +145,31 @@ before %r{^/channels/([^/]+)} do
   channel_name = params[:captures][0]
   # TODO: only for members?
   @channel = StarChat::Channel.find(channel_name)
-  halt 404 unless @channel
+  if @channel
+    if (request.put? or request.delete? or request.post?) and
+        !current_user.subscribing?(@channel)
+      halt 401
+    end
+  else
+    halt 404 unless request.put?
+  end
 end
 
 get '/channels/:channel_name', provides: :json do
   @channel.to_json
+end
+
+put '/channels/:channel_name', provides: :json do
+  result = 200
+  unless @channel
+    @channel = StarChat::Channel.save(params[:channel_name]).save
+    result = 201
+  end
+  if params[:topic_body]
+    @channel.update_topic(current_user, params[:topic_body])
+  end
+  @channel.save
+  result
 end
 
 get '/channels/:channel_name/users', provides: :json do
