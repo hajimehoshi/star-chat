@@ -394,6 +394,7 @@ starChat.View = (function () {
                 var topicE = $('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
+                $('#updateTopicForm *[name="body"]').val(topic.body);
             } else {
                 $('#topic').text('(No Topic)');
             }
