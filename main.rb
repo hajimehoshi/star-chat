@@ -159,6 +159,19 @@ get '/channels/:channel_name', provides: :json do
   @channel.to_json
 end
 
+put '/channels/:channel_name', provides: :json do
+  result = 200
+  unless @channel
+    @channel = StarChat::Channel.save(params[:channel_name]).save
+    result = 201
+  end
+  if params[:topic]
+    @channel.update_topic(current_user, params[:topic])
+  end
+  @channel.save
+  result
+end
+
 get '/channels/:channel_name/users', provides: :json do
   # TODO: This is a temporal hack.
   @channel.users.map do |user|
