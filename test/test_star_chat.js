@@ -1,3 +1,5 @@
+'use strict';
+
 test('isSomeArray', function () {
     strictEqual(starChat.isSameArray([], []), true);
     strictEqual(starChat.isSameArray(['foo', 'bar'], ['foo', 'bar']), true);
@@ -101,5 +103,38 @@ test('replaceBreakLines', function () {
         var div = $('<div></div>').text('&<\n>"');
         strictEqual(starChat.replaceBreakLines(div), 1);
         strictEqual(div.html(), '&amp;&lt;<br>&gt;"');
+    }
+});
+
+test('replaceURLWithLinks', function () {
+    {
+        var div = $('<div></div>');
+        strictEqual(starChat.replaceURLWithLinks(div), 0);
+        strictEqual(div.html(), '');
+    }
+    {
+        var div = $('<div></div>').text('foo http://example.com/ baz');
+        strictEqual(starChat.replaceURLWithLinks(div), 1);
+        strictEqual(div.html(), 'foo <a href="http://example.com/">http://example.com/</a> baz');
+    }
+    {
+        var div = $('<div></div>').text('foo http://example.com/ baz http://bar.net/');
+        strictEqual(starChat.replaceURLWithLinks(div), 2);
+        strictEqual(div.html(), 'foo <a href="http://example.com/">http://example.com/</a> baz <a href="http://bar.net/">http://bar.net/</a>');
+    }
+    {
+        var div = $('<div></div>').text('https://example.com:1234/path?query=1 baz');
+        strictEqual(starChat.replaceURLWithLinks(div), 1);
+        strictEqual(div.html(), '<a href="https://example.com:1234/path?query=1">https://example.com:1234/path?query=1</a> baz');
+    }
+    {
+        var div = $('<div></div>').text('https://example.com:1234/path?query=1日本語');
+        strictEqual(starChat.replaceURLWithLinks(div), 1);
+        strictEqual(div.html(), '<a href="https://example.com:1234/path?query=1">https://example.com:1234/path?query=1</a>日本語');
+    }
+    {
+        var div = $('<div></div>').text('https://example.com/<>&"');
+        strictEqual(starChat.replaceURLWithLinks(div), 1);
+        strictEqual(div.html(), '<a href="https://example.com/&lt;&gt;&amp;&quot;">https://example.com/&lt;&gt;&amp;"</a>');
     }
 });

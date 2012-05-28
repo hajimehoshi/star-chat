@@ -217,6 +217,27 @@ starChat.replaceBreakLines = function (element) {
     return num;
 };
 
+starChat.replaceURLWithLinks = function (element) {
+    var num = 0;
+    var html = '';
+    element.contents().each(function () {
+        if (this.nodeType === Node.TEXT_NODE) {
+            var text = this.nodeValue;
+            // escapeText should not inlucde '&#x20;' or somthing escaped unexpectedly.
+            var escapedText = starChat.escapeHTML(text);
+            html += escapedText.replace(/(https?:\/\/[\x21-\x7e]+)/mg, function (escapedURL) {
+                num += 1;
+                return '<a href="' + escapedURL + '">' + escapedURL + '</a>';
+            });
+        } else {
+            num += starChat.replaceURLWithLinks($(this));
+            html += $(this).outerHTML();
+        }
+    });
+    element.html(html);
+    return num;
+};
+
 starChat.isFocused = (function () {
     var isFocused_ = true;
     $(window).focus(function () {
