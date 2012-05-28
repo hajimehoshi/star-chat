@@ -50,6 +50,8 @@ $(function() {
                 if (!channel.name) {
                     return;
                 }
+                var url = '/channels/' + encodeURIComponent(channel.name);
+                starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                 var url = '/channels/' + encodeURIComponent(channel.name) + '/messages/recent';
                 starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
             });
@@ -136,8 +138,6 @@ $(function() {
                             encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
                         starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     }
-                    var url = '/channels/' + encodeURIComponent(channelName);
-                    starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     var url = '/channels/' + encodeURIComponent(channelName) + '/users';
                     starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     return;
@@ -156,8 +156,6 @@ $(function() {
                     var view = getView();
                     view.channelName = channelName;
                     view.update();
-                    var url = '/channels/' + encodeURIComponent(channelName);
-                    starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     var url = '/channels/' + encodeURIComponent(channelName) + '/users';
                     starChat.ajaxRequest(view.session(), url, 'GET', null, receiveResponse);
                 });

@@ -166,7 +166,12 @@ put '/channels/:channel_name', provides: :json do
     result = 201
   end
   if params[:topic_body]
-    @channel.update_topic(current_user, params[:topic_body])
+    topic = @channel.update_topic(current_user, params[:topic_body])
+    broadcast(type: 'topic',
+              topic: topic) do |user_name|
+      return false unless user = StarChat::User.find(user_name)
+      user.subscribing?(@channel)
+    end
   end
   @channel.save
   result
@@ -205,6 +210,7 @@ post '/channels/:channel_name/messages', provides: :json do
   broadcast(type: 'message',
             message: message) do |user_name|
     return false unless user = StarChat::User.find(user_name)
+    # TODO: Use User#subscribing?
     user.channels.any?{|channel| channel.name == @channel.name}
   end
   201
@@ -231,6 +237,7 @@ put '/subscribings', provides: :json do
             channel_name: @channel.name,
             user_name: current_user.name) do |user_name|
     return false unless user = StarChat::User.find(user_name)
+    # TODO: Use User#subscribing?
     @channel.users.any?{|u| u.name == user.name}
   end
   packets = @channel.messages(-100, 100).map do |message|
@@ -257,6 +264,7 @@ delete '/subscribings', provides: :json do
             channel_name: @channel.name,
             user_name: current_user.name) do |user_name|
     return false unless user = StarChat::User.find(user_name)
+    # TODO: Use User#subscribing?
     @channel.users.any?{|u| u.name == user.name}
   end
   200
