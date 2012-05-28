@@ -11,7 +11,7 @@ module StarChat
       # TODO: lock?
       nil unless RedisDB.exec(:exists, key)
       values = RedisDB.exec(:hmget, key, 'created_at', 'user_name', 'channel_name', 'body')
-      Topic.new(values[1], values[2], values[3]
+      Topic.new(values[1], values[2], values[3],
                 id:         id,
                 created_at: values[0])
     end
@@ -73,25 +73,29 @@ module StarChat
       self.id           = options[:id]
       self.created_at   = options[:created_at]
       self.user_name    = user_name
-      self.channel_name = channle_name
+      self.channel_name = channel_name
       self.body         = body
     end
 
-    def to_json(*args)
+    def to_h
       {
         id:           id,
         created_at:   created_at,
         user_name:    user_name,
         channel_name: channel_name,
         body:         body,
-      }.to_json(*args)
+      }
+    end
+
+    def to_json(*args)
+      to_h.to_json(*args)
     end
 
     def save
       self.id = Topic.generate_id unless @id
       RedisDB.exec(:hmset,
                    ['topics', id],
-                   'created_at',   created_at
+                   'created_at',   created_at,
                    'user_name',    user_name,
                    'channel_name', channel_name,
                    'body',         body)

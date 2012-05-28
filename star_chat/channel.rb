@@ -117,7 +117,7 @@ module StarChat
       }
       if last_topic_id
         topic = Topic.find(last_topic_id)
-        hash[:topic] = topic.to_json(*args)
+        hash[:topic] = topic.to_h
       end
       hash.to_json(*args)
     end
