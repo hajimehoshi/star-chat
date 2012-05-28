@@ -130,7 +130,7 @@ h1 {
     margin-bottom: 5px;
 }
 
-#channels a.dirty {
+#channelsList a.dirty {
     color: #900;
 }
 
@@ -303,8 +303,6 @@ body > #main {
     display: -o-box;
     display: -ms-box;
     width: 100%;
-}
-#main > #channels {
 }
 #main > #messages {
     box-flex: 1;
