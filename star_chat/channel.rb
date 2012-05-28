@@ -4,7 +4,10 @@ module StarChat
   class Channel
 
     def self.find(name)
-      if RedisDB.exec(:exists, ['channels', name])
+      key = ['channels', name]
+      if RedisDB.exec(:exists, key)
+        # values = RedisDB.exec(:hmget)
+        # params = {}
         return new(name)
       end
       nil
@@ -17,9 +20,24 @@ module StarChat
     end
 
     attr_reader :name
-    
-    def initialize(name)
+
+    def name
+      @name
+    end
+
+    def name=(name)
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+    end
+
+    def last_topic_id
+      topic_id = RedisDB.exec(:lindex, ['channels', name, 'topics'], -1)
+      topic_id ? topic_id.to_i : nil
+    end
+
+    def initialize(name, options = {})
+      options = {
+      }.merge(options)
+      self.name = name
     end
 
     class ChannelMessages
@@ -62,6 +80,8 @@ module StarChat
     end
 
     def post_message(user, body, created_at = Time.now.to_i)
+      message = nil
+      # TODO: lock?
       message = Message.new(user.name,
                             body,
                             created_at:   created_at,
@@ -72,6 +92,19 @@ module StarChat
       message
     end
 
+    def update_topic(user, body, created_at = Time.now.to_i)
+      topic = nil
+      # TODO: lock?
+      topic = Topic.new(user.name,
+                        self.name,
+                        body,
+                        created_at: created_at).save
+      RedisDB.exec(:rpush,
+                   ['channels', name, 'topics'],
+                   topic.id)
+      topic
+    end
+
     def users
       RedisDB.exec(:smembers, ['channels', name, 'users']).map do |name|
         User.find(name)
@@ -79,9 +112,14 @@ module StarChat
     end
 
     def to_json(*args)
-      {
+      hash = {
         name: name
-      }.to_json(*args)
+      }
+      if last_topic_id
+        topic = Topic.find(last_topic_id)
+        hash[:topic] = topic.to_json(*args)
+      end
+      hash.to_json(*args)
     end
 
     def save
