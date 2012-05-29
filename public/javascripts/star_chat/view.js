@@ -471,7 +471,21 @@ starChat.View = (function () {
 
         $('a').filter(function () {
             var href = $(this).attr('href');
-            return href.match(/^[a-zA-Z1-9+.-]+:/);
+            if (!href.match(/^([a-zA-Z1-9+.-]+):/)) {
+                return false;
+            }
+            var schema = RegExp.$1;
+            if (!schema.match(/^https?$/)) {
+                return true;
+            }
+            href.match(/^([a-zA-Z1-9+.-]+):\/\/([^\/]+)\//);
+            // This may include a user and a pass, but they are ignored.
+            var login = RegExp.$2;
+            if (schema + ':' === location.protocol &&
+                login === location.host) {
+                return false;
+            }
+            return true;
         }).attr('target', '_blank').attr('rel', 'noreferrer');
 
         $(window).resize();
