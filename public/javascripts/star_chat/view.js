@@ -469,6 +469,11 @@ starChat.View = (function () {
 
         updateViewDialogs(this);
 
+        $('a').filter(function () {
+            var href = $(this).attr('href');
+            return href.match(/^[a-zA-Z1-9+.-]+:/);
+        }).attr('target', '_blank').attr('rel', 'noreferrer');
+
         $(window).resize();
     };
     View.prototype.logIn = function (userName, password) {
