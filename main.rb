@@ -106,7 +106,9 @@ put '/users/:user_name', provides: :json do
 end
 
 get '/users/:user_name/ping', provides: :json do
-  'pong'.to_json
+  {
+    result: 'pong',
+  }.to_json
 end
 
 get '/users/:user_name/channels', provides: :json do
