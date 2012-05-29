@@ -49,7 +49,7 @@ starChat.User = (function () {
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.keywords_ = data.keywords;
             if (callback !== void(0)) {
-                callback(sessionId, url, method, data);
+                callback(sessionId);
             }
         });
     };
@@ -59,7 +59,7 @@ starChat.User = (function () {
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.channels_ = data;
             if (callback !== void(0)) {
-                callback(sessionId, url, method, data);
+                callback(sessionId);
             }
         });
     };
@@ -69,7 +69,7 @@ starChat.User = (function () {
             keywords: this.keywords_,
         }, function (sessionId, url, method, data) {
             if (callback !== void(0)) {
-                callback(sessionId, url, method, data);
+                callback(sessionId);
             }
         });
     };

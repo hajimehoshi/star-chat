@@ -38,14 +38,14 @@ $(function() {
         var view = getView();
         view.logIn(userName, password);
         view.session().user().load(view.session());
-        view.session().user().loadChannels(view.session(), function (sessionId, url, method, data) {
+        view.session().user().loadChannels(view.session(), function (sessionId) {
             var view = getView();
             var session = view.session();
             if (session.id() !== sessionId) {
                 return
             }
-            receiveResponse(sessionId, url, method, data);
-            data.forEach(function (channel) {
+            var user = session.user();
+            user.channels().forEach(function (channel) {
                 if (!channel.name) {
                     return;
                 }
@@ -348,11 +348,12 @@ $(function() {
             if (view.isEdittingUser()) {
                 var session = view.session();
                 var user = session.user();
-                user.load(session, function (sessionId, url, method, data) {
+                user.load(session, function (sessionId) {
                     var view = getView();
                     if (view.session().id() !== sessionId) {
                         return;
                     }
+                    var user = view.session().user();
                     var val = user.keywords().join('\n');
                     $('#userEdit [name="keywords"]').val(val);
                     view.update();
@@ -378,7 +379,7 @@ $(function() {
             var view = getView();
             var user = view.session().user();
             user.keywords(keywords);
-            user.save(view.session(), function (sessionId, url, method, data) {
+            user.save(view.session(), function (sessionId) {
                 var view = getView();
                 if (view.session().id() !== sessionId) {
                     return;
