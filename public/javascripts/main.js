@@ -83,7 +83,6 @@ $(function() {
         if (!password.match(allAscii)) {
             return;
         }
-        // TODO: Don't use /users/:user_name
         var callbacks = {
             success: function (data, textStatus, jqXHR) {
                 logIn(userName, password);
