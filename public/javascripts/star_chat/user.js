@@ -36,7 +36,7 @@ starChat.User = (function () {
     User.prototype.loadChannels = function (session, callback) {
         var url = '/users/' + encodeURIComponent(this.name_) + '/channels';
         var self = this;
-        starChat.ajaxRequest(session, url, 'GET', null, function () {
+        starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.channels_ = data;
             if (callback !== void(0)) {
                 callback(sessionId, url, method, data);

@@ -38,8 +38,7 @@ $(function() {
         var view = getView();
         view.logIn(userName, password);
         view.session().user().load(view.session());
-        var url = '/users/' + encodeURIComponent(userName) + '/channels';
-        starChat.ajaxRequest(view.session(), url, 'GET', null, function (sessionId, url, method, data) {
+        view.session().user().loadChannels(view.session(), function (sessionId, url, method, data) {
             var view = getView();
             var session = view.session();
             if (session.id() !== sessionId) {
