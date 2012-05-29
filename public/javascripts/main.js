@@ -255,9 +255,9 @@ $(function() {
         } else {
             logOut();
         }
-        form.find('input[type="submit"]').click(function (e) {
-            var userName = form.find('input[name="userName"]').val();
-            var password = form.find('input[name="password"]').val();
+        form.find('[type="submit"]').click(function (e) {
+            var userName = form.find('[name="userName"]').val();
+            var password = form.find('[name="password"]').val();
             if (!userName) {
                 return false;
             }
@@ -274,9 +274,9 @@ $(function() {
     })();
     (function () {
         var form = $('#addChannelForm');
-        form.find('input[type="submit"]').click(function () {
+        form.find('[type="submit"]').click(function () {
             var session = getView().session();
-            var channelName = form.find('input[name="name"]').val();
+            var channelName = form.find('[name="name"]').val();
             if (!channelName) {
                 return false;
             }
@@ -284,7 +284,7 @@ $(function() {
                 'channel_name=' + encodeURIComponent(channelName) + ';' +
                 'user_name=' + encodeURIComponent(session.userName());
             starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
-                form.find('input[name="name"]').val('');
+                form.find('[name="name"]').val('');
                 receiveResponse(sessionId, uri, method, data);
                 location.hash = 'channels/' + encodeURIComponent(channelName);
             });
@@ -293,9 +293,9 @@ $(function() {
     })();
     (function () {
         var form = $('#searchForm');
-        form.find('input[type="submit"]').click(function () {
+        form.find('[type="submit"]').click(function () {
             var session = getView().session();
-            var query = form.find('input[name="query"]').val();
+            var query = form.find('[name="query"]').val();
             if (!query) {
                 var view = getView();
                 view.clearSearch();
@@ -374,7 +374,7 @@ $(function() {
                         return;
                     }
                     var val = user.keywords().join('\n');
-                    $('#userEdit *[name="keywords"]').val(val);
+                    $('#userEdit [name="keywords"]').val(val);
                     view.update();
                 });
             } else {
@@ -393,8 +393,8 @@ $(function() {
             view.update();
             return false;
         });
-        $('#userEdit input[type="submit"]').click(function () {
-            var keywords = $('#userEdit *[name="keywords"]').val().split('\n');
+        $('#userEdit [type="submit"]').click(function () {
+            var keywords = $('#userEdit [name="keywords"]').val().split('\n');
             var view = getView();
             var user = view.session().user();
             user.keywords(keywords);

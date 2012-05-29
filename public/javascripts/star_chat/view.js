@@ -181,9 +181,9 @@ starChat.View = (function () {
         });
         if (sections.length === 1) {
             var section = sections;
-            section.find('input[name="year"]').val('');
-            section.find('input[name="month"]').val('');
-            section.find('input[name="day"]').val('');
+            section.find('[name="year"]').val('');
+            section.find('[name="month"]').val('');
+            section.find('[name="day"]').val('');
             return section;
         }
         if (2 <= sections.length) {
@@ -427,7 +427,8 @@ starChat.View = (function () {
         var dialogIsShown = false;
         if (self.isEdittingUser_) {
             $('#userEdit').show();
-            $('#userEdit *[data-column="name"]').text(self.session().userName());
+            // TODO: this attribute's name is strange
+            $('#userEdit [data-column="name"]').text(self.session().userName());
             dialogIsShown = true;
         }
         if (dialogIsShown) {
