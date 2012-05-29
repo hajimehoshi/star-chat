@@ -22,7 +22,7 @@ starChat.Channel = (function () {
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.topic_ = data.topic;
             if (callback !== void(0)) {
-                callback(sessionId, url, method, data);
+                callback(sessionId);
             }
         });
     };
@@ -37,7 +37,7 @@ starChat.Channel = (function () {
             }
             starChat.ajaxRequest(session, url, 'PUT', params, function (sesionId, url, method, data) {
                 if (callback !== void(0)) {
-                    callback(sessionId, url, method, data);
+                    callback(sessionId);
                 }
             });
         };
