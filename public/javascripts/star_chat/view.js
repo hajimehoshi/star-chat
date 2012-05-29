@@ -404,6 +404,7 @@ starChat.View = (function () {
             $('#topic').hide();
             $('#updateTopicForm').hide();
             $('#topic').text('');
+            $('#updateTopicForm *[name="body"]').val('');
         }
     }
     function updateViewUsers(self) {
