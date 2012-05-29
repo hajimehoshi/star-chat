@@ -140,7 +140,7 @@ h1 {
 }
 
 #channelsList a.dirty {
-    color: #900;
+    color: #900 !important;
 }
 #channelsList a:visited {
     color: #000;
