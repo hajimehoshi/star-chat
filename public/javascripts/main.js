@@ -310,14 +310,14 @@ $(function() {
     (function () {
         var form = $('#postMessageForm');
         var isPostingMessage = false;
-        form.find('textarea[name="body"]').keypress(function (e) {
+        form.find('[name="body"]').keypress(function (e) {
             if (e.which === 13) {
-                form.find('input[type="submit"]').click();
+                form.find('[type="submit"]').click();
                 return false;
             }
             return true;
         });
-        form.find('input[type="submit"]').click(function () {
+        form.find('[type="submit"]').click(function () {
             var session = getView().session();
             if (!session.isLoggedIn()) {
                 // TODO: show alert or do something
@@ -330,7 +330,7 @@ $(function() {
             if (!view.channelName) {
                 return false;
             }
-            var body = form.find('*[name="body"]').val();
+            var body = form.find('[name="body"]').val();
             if (!body) {
                 return false;
             }
@@ -340,7 +340,7 @@ $(function() {
                 body: body,
             }, function (sessionId, uri, method, data) {
                 receiveResponse(sessionId, uri, method, data);
-                form.find('*[name="body"]').val('');
+                form.find('[name="body"]').val('');
             });
             isPostingMessage = true;
             setTimeout(function () {
@@ -410,8 +410,8 @@ $(function() {
         });
     })();
     (function () {
-        $('#updateTopicForm input[type="submit"]').click(function () {
-            var topicBody = $('#updateTopicForm *[name="body"]').val();
+        $('#updateTopicForm [type="submit"]').click(function () {
+            var topicBody = $('#updateTopicForm [name="body"]').val();
             var view = getView();
             var uri = '/channels/' + encodeURIComponent(view.channelName);
             starChat.ajaxRequest(view.session(), uri, 'PUT', {
