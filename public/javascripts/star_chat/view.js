@@ -181,9 +181,9 @@ starChat.View = (function () {
         });
         if (sections.length === 1) {
             var section = sections;
-            section.find('input[name="year"]').val('');
-            section.find('input[name="month"]').val('');
-            section.find('input[name="day"]').val('');
+            section.find('[name="year"]').val('');
+            section.find('[name="month"]').val('');
+            section.find('[name="day"]').val('');
             return section;
         }
         if (2 <= sections.length) {
@@ -381,13 +381,14 @@ starChat.View = (function () {
         }
     }
     function updateViewTopic(self) {
+        var form = $('#updateTopicForm');
         if (self.channelName) {
             if (self.isEdittingTopic()) {
                 $('#topic').hide();
-                $('#updateTopicForm').show();
+                form.show();
             } else {
                 $('#topic').show();
-                $('#updateTopicForm').hide();
+                form.hide();
             }
             if (self.channelName in self.topics_ &&
                 self.topics_[self.channelName].body) {
@@ -395,15 +396,16 @@ starChat.View = (function () {
                 var topicE = $('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
-                $('#updateTopicForm *[name="body"]').val(topic.body);
+                form.find('[name="body"]').val(topic.body);
             } else {
                 $('#topic').text('(No Topic)');
-                $('#updateTopicForm *[name="body"]').val('');
+                form.find('[name="body"]').val('');
             }
         } else {
             $('#topic').hide();
-            $('#updateTopicForm').hide();
+            form.hide();
             $('#topic').text('');
+            form.find('[name="body"]').val('');
         }
     }
     function updateViewUsers(self) {
@@ -425,7 +427,8 @@ starChat.View = (function () {
         var dialogIsShown = false;
         if (self.isEdittingUser_) {
             $('#userEdit').show();
-            $('#userEdit *[data-column="name"]').text(self.session().userName());
+            // TODO: this attribute's name is strange
+            $('#userEdit [data-column="name"]').text(self.session().userName());
             dialogIsShown = true;
         }
         if (dialogIsShown) {
@@ -441,9 +444,9 @@ starChat.View = (function () {
             $('#logOutLink').show();
             $('#main').find('input, textarea').removeAttr('disabled');
             if (this.channelName && !this.isShowingOldLogs()) {
-                $('#postMessageForm').find('input, textarea').removeAttr('disabled');
+                $('#postMessageForm, #updateTopicForm').find('input, textarea').removeAttr('disabled');
             } else {
-                $('#postMessageForm').find('input, textarea').attr('disabled', 'disabled');
+                $('#postMessageForm, #updateTopicForm').find('input, textarea').attr('disabled', 'disabled');
             }
         } else {
             $('#logInForm').show();
@@ -465,6 +468,25 @@ starChat.View = (function () {
         });
 
         updateViewDialogs(this);
+
+        $('a').filter(function () {
+            var href = $(this).attr('href');
+            if (!href.match(/^([a-zA-Z1-9+.-]+):/)) {
+                return false;
+            }
+            var schema = RegExp.$1;
+            if (!schema.match(/^https?$/)) {
+                return true;
+            }
+            href.match(/^([a-zA-Z1-9+.-]+):\/\/([^\/]+)\//);
+            // This may include a user and a pass, but they are ignored.
+            var login = RegExp.$2;
+            if (schema + ':' === location.protocol &&
+                login === location.host) {
+                return false;
+            }
+            return true;
+        }).attr('target', '_blank').attr('rel', 'noreferrer');
 
         $(window).resize();
     };

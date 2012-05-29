@@ -80,6 +80,7 @@
     <script src="/javascripts/star_chat/session.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/stream.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/user.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/channel.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/view.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/main.js?_=<%= launched_time %>"></script>
   </body>

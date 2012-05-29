@@ -105,6 +105,12 @@ put '/users/:user_name', provides: :json do
   200
 end
 
+get '/users/:user_name/ping', provides: :json do
+  {
+    result: 'pong',
+  }.to_json
+end
+
 get '/users/:user_name/channels', provides: :json do
   current_user.channels.to_json
 end
