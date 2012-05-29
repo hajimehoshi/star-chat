@@ -442,9 +442,9 @@ starChat.View = (function () {
             $('#logOutLink').show();
             $('#main').find('input, textarea').removeAttr('disabled');
             if (this.channelName && !this.isShowingOldLogs()) {
-                $('#postMessageForm').find('input, textarea').removeAttr('disabled');
+                $('#postMessageForm, #updateTopicForm').find('input, textarea').removeAttr('disabled');
             } else {
-                $('#postMessageForm').find('input, textarea').attr('disabled', 'disabled');
+                $('#postMessageForm, #updateTopicForm').find('input, textarea').attr('disabled', 'disabled');
             }
         } else {
             $('#logInForm').show();
