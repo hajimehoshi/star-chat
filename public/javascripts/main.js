@@ -83,6 +83,7 @@ $(function() {
         if (!password.match(allAscii)) {
             return;
         }
+        // TODO: Don't use /users/:user_name
         var callbacks = {
             success: function (data, textStatus, jqXHR) {
                 logIn(userName, password);
@@ -90,7 +91,7 @@ $(function() {
             logOut: logOut,
         };
         starChat.ajax(userName, password,
-                      '/users/' + encodeURIComponent(userName),
+                      '/users/' + encodeURIComponent(userName) + '/ping',
                       'GET',
                       callbacks);
     }
