@@ -3,10 +3,14 @@
 starChat.User = (function () {
     var User = function (name) {
         this.name_ = name;
+        this.channels_ = [];
         this.keywords_ = [];
     };
     User.prototype.name = function () {
         return this.name_;
+    };
+    User.prototype.channels = function () {
+        return this.channels_;
     };
     User.prototype.keywords = function (keywords) {
         if (keywords !== void(0)) {
@@ -24,6 +28,16 @@ starChat.User = (function () {
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.keywords_ = data.keywords;
+            if (callback !== void(0)) {
+                callback(sessionId, url, method, data);
+            }
+        });
+    };
+    User.prototype.loadChannels = function (session, callback) {
+        var url = '/users/' + encodeURIComponent(this.name_) + '/channels';
+        var self = this;
+        starChat.ajaxRequest(session, url, 'GET', null, function () {
+            self.channels_ = data;
             if (callback !== void(0)) {
                 callback(sessionId, url, method, data);
             }
