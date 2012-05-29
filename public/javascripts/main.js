@@ -123,7 +123,7 @@ $(function() {
                     return;
                 }
                 var isAlreadyJoined = false;
-                view.channels.forEach(function (channel) {
+                view.session().user().channels().forEach(function (channel) {
                     if (channel.name === channelName) {
                         isAlreadyJoined = true;
                         return false;
@@ -175,12 +175,7 @@ $(function() {
         }
         try {
             if (method === 'GET') {
-                if (uri.match(/^\/users\/([^\/]+)\/channels$/)) {
-                    var userName = decodeURIComponent(RegExp.$1);
-                    if (userName === session.userName()) {
-                        view.channels = data;
-                    }
-                } else if (uri.match(/^\/channels\/([^\/]+)$/)) {
+                if (uri.match(/^\/channels\/([^\/]+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var topic       = data['topic'];
                     if (topic) {
@@ -216,27 +211,13 @@ $(function() {
                 if (uri.match(/^\/subscribings\?/)) {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
-                    var r = $.grep(view.channels, function (channel) {
-                        return channel.name === channelName;
-                    });
-                    if (r.length === 0) {
-                        view.channels.push({name: channelName});
-                    }
+                    view.session().user().addChannel(channelName);
                 }
             } else if (method === 'DELETE') {
                 if (uri.match(/^\/subscribings\?/)) {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
-                    var idx = -1;
-                    for (var i = 0; i < view.channels.length; i++) {
-                        if (view.channels[i].name === channelName) {
-                            idx = i;
-                            break;
-                        }
-                    }
-                    if (idx !== -1) {
-                        view.channels.splice(i, 1);
-                    }
+                    view.session().user().removeChannel(channelName);
                 }
             }
         } finally {

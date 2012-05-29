@@ -11,7 +11,6 @@ starChat.View = (function () {
 
         // TODO: Model に相当するクラスを作る?
         // TODO: いずれこれらの変数も private (_ 終わり) にする
-        self.channels = [];
         self.channelName = '';
         self.messageScrollTops = {};
         self.userNames = {};
@@ -67,7 +66,7 @@ starChat.View = (function () {
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         return function (self) {
-            var channels = self.channels.sort(function (a, b) {
+            var channels = self.session().user().channels().sort(function (a, b) {
                 if (a.name > b.name) {
                     return 1;
                 }
