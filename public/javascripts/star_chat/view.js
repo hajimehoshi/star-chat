@@ -381,13 +381,14 @@ starChat.View = (function () {
         }
     }
     function updateViewTopic(self) {
+        var form = $('#updateTopicForm');
         if (self.channelName) {
             if (self.isEdittingTopic()) {
                 $('#topic').hide();
-                $('#updateTopicForm').show();
+                form.show();
             } else {
                 $('#topic').show();
-                $('#updateTopicForm').hide();
+                form.hide();
             }
             if (self.channelName in self.topics_ &&
                 self.topics_[self.channelName].body) {
@@ -395,16 +396,16 @@ starChat.View = (function () {
                 var topicE = $('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
-                $('#updateTopicForm *[name="body"]').val(topic.body);
+                form.find('[name="body"]').val(topic.body);
             } else {
                 $('#topic').text('(No Topic)');
-                $('#updateTopicForm *[name="body"]').val('');
+                form.find('[name="body"]').val('');
             }
         } else {
             $('#topic').hide();
-            $('#updateTopicForm').hide();
+            form.hide();
             $('#topic').text('');
-            $('#updateTopicForm *[name="body"]').val('');
+            form.find('[name="body"]').val('');
         }
     }
     function updateViewUsers(self) {
