@@ -9,11 +9,17 @@ starChat.User = (function () {
     User.prototype.name = function () {
         return this.name_;
     };
-    User.prototype.channels = function () {
-        return this.channelObjects_.map(function (obj) {
-            return new starChat.Channel(obj);
-        });
-    };
+    User.prototype.channels = (function () {
+        var cache = {};
+        return function () {
+            return this.channelObjects_.map(function (obj) {
+                if (obj.name in cache) {
+                    return cache[obj.name];
+                }
+                return cache[obj.name] = new starChat.Channel(obj);
+            });
+        };
+    })();
     User.prototype.addChannel = function(name) {
         var r = $.grep(this.channelObjects_, function (channel) {
             return channel.name === name;
