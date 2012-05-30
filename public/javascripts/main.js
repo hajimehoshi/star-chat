@@ -289,7 +289,6 @@ $(function() {
     })();
     (function () {
         var form = $('#postMessageForm');
-        var isPostingMessage = false;
         form.find('[name="body"]').keypress(function (e) {
             if (e.which === 13) {
                 form.find('[type="submit"]').click();
@@ -304,7 +303,7 @@ $(function() {
                 return false;
             }
             var view = getView();
-            if (isPostingMessage) {
+            if (view.isPostingMessage()) {
                 return false;
             }
             if (!view.channelName) {
@@ -314,6 +313,7 @@ $(function() {
             if (!body) {
                 return false;
             }
+            view.isPostingMessage(true);
             var url = '/channels/' + encodeURIComponent(view.channelName) +
                 '/messages';
             starChat.ajaxRequest(session, url, 'POST', {
@@ -321,11 +321,10 @@ $(function() {
             }, function (sessionId, uri, method, data) {
                 receiveResponse(sessionId, uri, method, data);
                 form.find('[name="body"]').val('');
+            }, function () {
+                var view = getView();
+                view.isPostingMessage(false);
             });
-            isPostingMessage = true;
-            setTimeout(function () {
-                isPostingMessage = false;
-            }, 500);
             return false;
         });
     })();

@@ -209,6 +209,7 @@ get '/channels/:channel_name/messages/by_time_span/:start_time,:end_time', provi
 end
 
 post '/channels/:channel_name/messages', provides: :json do
+  sleep(1)
   body = params[:body].to_s
   message = @channel.post_message(current_user, body)
   # TODO: In fact, the real-time search is not needed.

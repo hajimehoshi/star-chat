@@ -63,7 +63,7 @@ starChat.ajax = function (userName, password, url, method, callbacks, data, sess
     return jq;
 };
 
-starChat.ajaxRequest = function (session, url, method, data, callback) {
+starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, callbackComplete) {
     var sessionId = session.id();
     var userName  = session.userName();
     var password  = session.password();
@@ -74,9 +74,16 @@ starChat.ajaxRequest = function (session, url, method, data, callback) {
         beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
         dataType: 'json',
         statusCode: {},
-        success: function (data, textStatus, jqXHR) {
-            callback(sessionId, url, method, data);
-        },
+    }
+    if (callbackSuccess !== void(0)) {
+        args.success = function (data, textStatus, jqXHR) {
+            callbackSuccess(sessionId, url, method, data);
+        };
+    }
+    if (callbackComplete !== void(0)) {
+        args.complete = function (jqXHR, textStatus) {
+            callbackComplete();
+        }
     }
     if (data) {
         args.data = data;

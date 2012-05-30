@@ -16,6 +16,7 @@ starChat.View = (function () {
         self.userNames = {};
         self.isEdittingChannels = false;
 
+        self.isPostingMessage_ = false;
         self.lastChannelName_ = '';
         self.newMessages_ = {};
         self.messageElements_ = {};
@@ -498,6 +499,14 @@ starChat.View = (function () {
     };
     View.prototype.session = function () {
         return this.session_;
+    };
+    View.prototype.isPostingMessage = function (value) {
+        if (value !== void(0)) {
+            this.isPostingMessage_ = value;
+            return this;
+        } else {
+            return this.isPostingMessage_;
+        }
     };
     View.prototype.addNewMessage = function (channelName, message, setDirtyFlag) {
         if (!this.newMessages_[channelName]) {
