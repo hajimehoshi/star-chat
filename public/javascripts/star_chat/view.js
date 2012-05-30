@@ -29,7 +29,7 @@ starChat.View = (function () {
         self.isEdittingUser_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
-        self.topics_ = {};
+        self.topics_ = {}; // TODO: Use Channel#topic instead.
         self.isEdittingTopic_ = false;
 
         self.title_ = 'StarChat (β)';
