@@ -19,7 +19,6 @@ starChat.View = (function () {
         self.lastChannelName_ = '';
         self.newMessages_ = {};
         self.pseudoMessages_ = {};
-        self.pseudoMessageIdsToRemove_ = [];
         self.messageElements_ = {};
         self.messageIdsAlreadyInSection_ = {};
         self.dirtyFlags_ = {};
@@ -372,10 +371,7 @@ starChat.View = (function () {
             }
         }
 
-        self.pseudoMessageIdsToRemove_.forEach(function (id) {
-            $('[data-pseudo-message-id=' + parseInt(id) + ']').remove();
-        });
-        self.pseudoMessageIdsToRemove_ = [];
+        $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
 
         if (!self.isShowingOldLogs() && !section.is(':animated')) {
             if (self.lastChannelName_ === self.channelName) {
@@ -530,6 +526,15 @@ starChat.View = (function () {
         if (setDirtyFlag && channelName !== this.channelName) {
             this.setDirtyFlag(channelName, true);
         }
+        if (message.user_name === this.session().user().name()) {
+            var body = message.body;
+            var id = $('[data-pseudo-message-id]').filter(function () {
+                var e = $(this);
+                return e.find('.body').text() === body &&
+                    e.attr('data-removed') !== 'true';
+            }).first().attr('data-pseudo-message-id');
+            this.removePseudoMessage(id);
+        }
     };
     View.prototype.addPseudoMessage = function (message) {
         if (!(message.channel_name in this.pseudoMessages_)) {
@@ -538,7 +543,7 @@ starChat.View = (function () {
         this.pseudoMessages_[message.channel_name].push(message);
     };
     View.prototype.removePseudoMessage = function (id) {
-        this.pseudoMessageIdsToRemove_.push(id);
+        $('[data-pseudo-message-id=' + parseInt(id) + ']').attr('data-removed', 'true');
     };
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;

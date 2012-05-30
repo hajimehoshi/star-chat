@@ -318,10 +318,6 @@ $(function() {
             }, function (sessionId, uri, method, data) {
                 var view = getView();
                 receiveResponse(sessionId, uri, method, data);
-            }, function () {
-                // This function should be executed before accepting packets.
-                var view = getView();
-                view.removePseudoMessage(id);
             });
             var message = {
                 body: body,
