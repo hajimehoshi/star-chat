@@ -6,9 +6,15 @@ module StarChat
     def self.find(name)
       key = ['channels', name]
       if RedisDB.exec(:exists, key)
-        # values = RedisDB.exec(:hmget)
-        # params = {}
-        return new(name)
+        values = RedisDB.exec(:hmget, key, 'secret', 'password_digest')
+        params = {
+          secret:          values[0] == 'true',
+          password_digest: values[1] ? values[1] : '',
+        }
+        if values[1] and !values[1].empty?
+          params[:password_digest] = values[1]
+        end
+        return new(name, params)
       end
       nil
     end
@@ -19,8 +25,6 @@ module StarChat
       end
     end
 
-    attr_reader :name
-
     def name
       @name
     end
@@ -28,6 +32,24 @@ module StarChat
     def name=(name)
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     end
+
+    def secret?
+      @secret
+    end
+
+    def secret=(secret)
+      @secret = !!secret
+    end
+
+    def password_digest
+      @password_digest
+    end
+    private :password_digest
+
+    def password_digest=(password_digest)
+      @password_digest = password_digest ? password_digest : password_digest.to_s
+    end
+    private :password_digest=
 
     # TODO: Rename 'current_topic_id'
     def last_topic_id
@@ -37,8 +59,12 @@ module StarChat
 
     def initialize(name, options = {})
       options = {
+        secret:          false,
+        password_digest: nil,
       }.merge(options)
-      self.name = name
+      self.name            = name
+      self.secret          = options[:secret]
+      self.password_digest = options[:password_digest]
     end
 
     class ChannelMessages
@@ -81,6 +107,7 @@ module StarChat
     end
 
     def post_message(user, body, created_at = Time.now.to_i)
+      # TODO: Check subscribing?
       message = nil
       # TODO: lock?
       message = Message.new(user.name,
@@ -127,7 +154,9 @@ module StarChat
       raise 'The name should not be empty' if name.empty?
       RedisDB.multi do
         RedisDB.exec(:sadd, ['channels'], name)
-        RedisDB.exec(:hmset, ['channels', name], 'dummy', 'dummy')
+        RedisDB.exec(:hmset, ['channels', name],
+                     'secret',          secret? ? 'true' : 'false',
+                     'password_digest', password_digest ? password_digest : '')
       end
       self
     end
