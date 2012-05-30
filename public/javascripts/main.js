@@ -303,9 +303,6 @@ $(function() {
                 return false;
             }
             var view = getView();
-            if (view.isPostingMessage()) {
-                return false;
-            }
             if (!view.channelName) {
                 return false;
             }
@@ -313,18 +310,29 @@ $(function() {
             if (!body) {
                 return false;
             }
-            view.isPostingMessage(true);
             var url = '/channels/' + encodeURIComponent(view.channelName) +
                 '/messages';
+            var id = $.now();
             starChat.ajaxRequest(session, url, 'POST', {
                 body: body,
             }, function (sessionId, uri, method, data) {
+                var view = getView();
                 receiveResponse(sessionId, uri, method, data);
-                form.find('[name="body"]').val('');
             }, function () {
                 var view = getView();
-                view.isPostingMessage(false);
+                view.removePseudoMessage(id);
             });
+            var message = {
+                body: body,
+                channel_name: view.channelName,
+                user_name: session.user().name(),
+                pseudo_message_id: id,
+                id: 0,
+                created_at: parseInt($.now() / 1000),
+            };
+            view.addPseudoMessage(message);
+            view.update();
+            form.find('[name="body"]').val('');
             return false;
         });
     })();
