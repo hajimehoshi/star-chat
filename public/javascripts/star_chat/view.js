@@ -67,15 +67,18 @@ starChat.View = (function () {
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         return function (self) {
-            var channels = self.session().user().channels().sort(function (a, b) {
-                if (a.name > b.name) {
-                    return 1;
-                }
-                if (a.name < b.name) {
-                    return -1;
-                }
-                return 0;
-            });
+            var channels = [];
+            if (self.session().isLoggedIn()) {
+                channels = self.session().user().channels().sort(function (a, b) {
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    return 0;
+                });
+            }
             if (self.channelName) {
                 self.dirtyFlags_[self.channelName] = false;
             }
