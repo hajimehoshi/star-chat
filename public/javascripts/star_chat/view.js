@@ -11,7 +11,6 @@ starChat.View = (function () {
 
         // TODO: Model に相当するクラスを作る?
         // TODO: いずれこれらの変数も private (_ 終わり) にする
-        self.channels = [];
         self.channelName = '';
         self.messageScrollTops = {};
         self.userNames = {};
@@ -19,6 +18,7 @@ starChat.View = (function () {
 
         self.lastChannelName_ = '';
         self.newMessages_ = {};
+        self.pseudoMessages_ = {};
         self.messageElements_ = {};
         self.messageIdsAlreadyInSection_ = {};
         self.dirtyFlags_ = {};
@@ -67,7 +67,7 @@ starChat.View = (function () {
     var updateViewChannels = (function () {
         var lastSessionId = 0;
         return function (self) {
-            var channels = self.channels.sort(function (a, b) {
+            var channels = self.session().user().channels().sort(function (a, b) {
                 if (a.name > b.name) {
                     return 1;
                 }
@@ -253,9 +253,11 @@ starChat.View = (function () {
         starChat.replaceURLWithLinks(bodyTD);
 
         var emphasizedNum = 0;
-        keywords.forEach(function (keyword) {
-            emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
-        });
+        if (keywords !== void(0)) {
+            keywords.forEach(function (keyword) {
+                emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
+            });
+        }
         starChat.replaceBreakLines(bodyTD);
         messageTR.append(bodyTD);
 
@@ -334,7 +336,7 @@ starChat.View = (function () {
         if (table.length === 0) {
             table = $('<table></table>').addClass('messages');
             section.append(table);
-        }
+        }        
         if (!self.isShowingOldLogs()) {
             if (self.channelName in self.newMessages_) {
                 var msgs = self.newMessages_[self.channelName];
@@ -346,6 +348,15 @@ starChat.View = (function () {
                     table.append(self.messageElements_[message.id]);
                 });
                 self.newMessages_[self.channelName] = [];
+            }
+            if (self.channelName in self.pseudoMessages_) {
+                var messages = self.pseudoMessages_[self.channelName];
+                messages.forEach(function (message) {
+                    var e = messageToElement(message);
+                    e.attr('data-pseudo-message-id', message.pseudo_message_id)
+                    table.append(e);
+                });
+                self.pseudoMessages_[self.channelName] = [];
             }
         } else {
             var key = self.startTime_ + '_' + self.endTime_;
@@ -359,6 +370,9 @@ starChat.View = (function () {
                 });
             }
         }
+
+        $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
+
         if (!self.isShowingOldLogs() && !section.is(':animated')) {
             if (self.lastChannelName_ === self.channelName) {
                 if (isBottom) {
@@ -500,6 +514,7 @@ starChat.View = (function () {
     View.prototype.session = function () {
         return this.session_;
     };
+    // TODO: Is channelName needed?
     View.prototype.addNewMessage = function (channelName, message, setDirtyFlag) {
         if (!this.newMessages_[channelName]) {
             this.newMessages_[channelName] = [];
@@ -511,6 +526,24 @@ starChat.View = (function () {
         if (setDirtyFlag && channelName !== this.channelName) {
             this.setDirtyFlag(channelName, true);
         }
+        if (message.user_name === this.session().user().name()) {
+            var body = message.body;
+            var id = $('[data-pseudo-message-id]').filter(function () {
+                var e = $(this);
+                return e.find('.body').text() === body &&
+                    e.attr('data-removed') !== 'true';
+            }).first().attr('data-pseudo-message-id');
+            this.removePseudoMessage(id);
+        }
+    };
+    View.prototype.addPseudoMessage = function (message) {
+        if (!(message.channel_name in this.pseudoMessages_)) {
+            this.pseudoMessages_[message.channel_name] = [];
+        }
+        this.pseudoMessages_[message.channel_name].push(message);
+    };
+    View.prototype.removePseudoMessage = function (id) {
+        $('[data-pseudo-message-id=' + parseInt(id) + ']').attr('data-removed', 'true');
     };
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;

@@ -38,15 +38,14 @@ $(function() {
         var view = getView();
         view.logIn(userName, password);
         view.session().user().load(view.session());
-        var url = '/users/' + encodeURIComponent(userName) + '/channels';
-        starChat.ajaxRequest(view.session(), url, 'GET', null, function (sessionId, url, method, data) {
+        view.session().user().loadChannels(view.session(), function (sessionId) {
             var view = getView();
             var session = view.session();
             if (session.id() !== sessionId) {
                 return
             }
-            receiveResponse(sessionId, url, method, data);
-            data.forEach(function (channel) {
+            var user = session.user();
+            user.channels().forEach(function (channel) {
                 if (!channel.name) {
                     return;
                 }
@@ -124,7 +123,7 @@ $(function() {
                     return;
                 }
                 var isAlreadyJoined = false;
-                view.channels.forEach(function (channel) {
+                view.session().user().channels().forEach(function (channel) {
                     if (channel.name === channelName) {
                         isAlreadyJoined = true;
                         return false;
@@ -176,12 +175,7 @@ $(function() {
         }
         try {
             if (method === 'GET') {
-                if (uri.match(/^\/users\/([^\/]+)\/channels$/)) {
-                    var userName = decodeURIComponent(RegExp.$1);
-                    if (userName === session.userName()) {
-                        view.channels = data;
-                    }
-                } else if (uri.match(/^\/channels\/([^\/]+)$/)) {
+                if (uri.match(/^\/channels\/([^\/]+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var topic       = data['topic'];
                     if (topic) {
@@ -217,27 +211,13 @@ $(function() {
                 if (uri.match(/^\/subscribings\?/)) {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
-                    var r = $.grep(view.channels, function (channel) {
-                        return channel.name === channelName;
-                    });
-                    if (r.length === 0) {
-                        view.channels.push({name: channelName});
-                    }
+                    view.session().user().addChannel(channelName);
                 }
             } else if (method === 'DELETE') {
                 if (uri.match(/^\/subscribings\?/)) {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
-                    var idx = -1;
-                    for (var i = 0; i < view.channels.length; i++) {
-                        if (view.channels[i].name === channelName) {
-                            idx = i;
-                            break;
-                        }
-                    }
-                    if (idx !== -1) {
-                        view.channels.splice(i, 1);
-                    }
+                    view.session().user().removeChannel(channelName);
                 }
             }
         } finally {
@@ -309,7 +289,6 @@ $(function() {
     })();
     (function () {
         var form = $('#postMessageForm');
-        var isPostingMessage = false;
         form.find('[name="body"]').keypress(function (e) {
             if (e.which === 13) {
                 form.find('[type="submit"]').click();
@@ -324,9 +303,6 @@ $(function() {
                 return false;
             }
             var view = getView();
-            if (isPostingMessage) {
-                return false;
-            }
             if (!view.channelName) {
                 return false;
             }
@@ -336,16 +312,24 @@ $(function() {
             }
             var url = '/channels/' + encodeURIComponent(view.channelName) +
                 '/messages';
+            var id = $.now();
             starChat.ajaxRequest(session, url, 'POST', {
                 body: body,
             }, function (sessionId, uri, method, data) {
+                var view = getView();
                 receiveResponse(sessionId, uri, method, data);
-                form.find('[name="body"]').val('');
             });
-            isPostingMessage = true;
-            setTimeout(function () {
-                isPostingMessage = false;
-            }, 500);
+            var message = {
+                body: body,
+                channel_name: view.channelName,
+                user_name: session.user().name(),
+                pseudo_message_id: id,
+                id: 0,
+                created_at: parseInt($.now() / 1000),
+            };
+            view.addPseudoMessage(message);
+            view.update();
+            form.find('[name="body"]').val('');
             return false;
         });
     })();
@@ -368,11 +352,12 @@ $(function() {
             if (view.isEdittingUser()) {
                 var session = view.session();
                 var user = session.user();
-                user.load(session, function (sessionId, url, method, data) {
+                user.load(session, function (sessionId) {
                     var view = getView();
                     if (view.session().id() !== sessionId) {
                         return;
                     }
+                    var user = view.session().user();
                     var val = user.keywords().join('\n');
                     $('#userEdit [name="keywords"]').val(val);
                     view.update();
@@ -398,7 +383,7 @@ $(function() {
             var view = getView();
             var user = view.session().user();
             user.keywords(keywords);
-            user.save(view.session(), function (sessionId, url, method, data) {
+            user.save(view.session(), function (sessionId) {
                 var view = getView();
                 if (view.session().id() !== sessionId) {
                     return;
