@@ -69,11 +69,11 @@ starChat.View = (function () {
         return function (self) {
             var channels = [];
             if (self.session().isLoggedIn()) {
-                channels = self.session().user().channelObjects().sort(function (a, b) {
-                    if (a.name > b.name) {
+                channels = self.session().user().channels().sort(function (a, b) {
+                    if (a.name() > b.name()) {
                         return 1;
                     }
-                    if (a.name < b.name) {
+                    if (a.name() < b.name()) {
                         return -1;
                     }
                     return 0;
@@ -87,7 +87,7 @@ starChat.View = (function () {
                 ul.find('li').filter(function (i) {
                     var channelName = $(this).attr('data-channel-name');
                     return channels.every(function (channel) {
-                        return channel.name !== channelName;
+                        return channel.name() !== channelName;
                     });
                 }).remove();
                 var existChannelNames = $.map(ul.find('li'), function (e) {
@@ -95,21 +95,21 @@ starChat.View = (function () {
                 });
                 var newChannels = channels.filter(function (channel) {
                     return existChannelNames.every(function (name) {
-                        return name !== channel.name;
+                        return name !== channel.name();
                     });
                 });
                 // TODO: sort
                 newChannels.forEach(function (channel) {
                     var a = $('<a></a>');
-                    var name = channel.name;
-                    var href = '#channels/' + encodeURIComponent(channel.name);
+                    var name = channel.name();
+                    var href = '#channels/' + encodeURIComponent(channel.name());
                     a.attr('href', href);
                     a.text(name);
                     // TODO: Use attr
                     var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackRoundMinus" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
                     });
-                    var li = $('<li></li>').attr('data-channel-name', channel.name);
+                    var li = $('<li></li>').attr('data-channel-name', channel.name());
                     li.append(a).append(icon);
                     ul.append(li);
                 });

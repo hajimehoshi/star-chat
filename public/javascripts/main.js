@@ -3,7 +3,7 @@
 $(function() {
     var clickChannelDel = function (view) {
         return function (channel) {
-            var channelName = channel.name;
+            var channelName = channel.name();
             var msg = "Are you sure you want to delete subscribing '" +
                 channelName + "'?"
             if (!confirm(msg)) {
@@ -45,13 +45,13 @@ $(function() {
                 return
             }
             var user = session.user();
-            user.channelObjects().forEach(function (channel) {
-                if (!channel.name) {
+            user.channels().forEach(function (channel) {
+                if (!channel.name()) {
                     return;
                 }
-                var url = '/channels/' + encodeURIComponent(channel.name);
+                var url = '/channels/' + encodeURIComponent(channel.name());
                 starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-                var url = '/channels/' + encodeURIComponent(channel.name) + '/messages/recent';
+                var url = '/channels/' + encodeURIComponent(channel.name()) + '/messages/recent';
                 starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
             });
         });
@@ -123,8 +123,8 @@ $(function() {
                     return;
                 }
                 var isAlreadyJoined = false;
-                view.session().user().channelObjects().forEach(function (channel) {
-                    if (channel.name === channelName) {
+                view.session().user().channels().forEach(function (channel) {
+                    if (channel.name() === channelName) {
                         isAlreadyJoined = true;
                         return false;
                     }

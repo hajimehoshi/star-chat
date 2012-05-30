@@ -9,8 +9,10 @@ starChat.User = (function () {
     User.prototype.name = function () {
         return this.name_;
     };
-    User.prototype.channelObjects = function () {
-        return this.channelObjects_;
+    User.prototype.channels = function () {
+        return this.channelObjects_.map(function (obj) {
+            return new starChat.Channel(obj);
+        });
     };
     User.prototype.addChannel = function(name) {
         var r = $.grep(this.channelObjects_, function (channel) {

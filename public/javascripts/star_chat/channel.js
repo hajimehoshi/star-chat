@@ -1,9 +1,9 @@
 'use strict';
 
 starChat.Channel = (function () {
-    var Channel = function (name) {
-        this.name_ = name;
-        this.topic_ = {};
+    var Channel = function (object) {
+        this.name_  = object.name;
+        this.topic_ = object.topic;
     };
     Channel.prototype.name = function () {
         return this.name_;
@@ -42,4 +42,5 @@ starChat.Channel = (function () {
             });
         };
     })();
+    return Channel;
 })();
