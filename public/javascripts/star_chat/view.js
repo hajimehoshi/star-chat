@@ -69,7 +69,7 @@ starChat.View = (function () {
         return function (self) {
             var channels = [];
             if (self.session().isLoggedIn()) {
-                channels = self.session().user().channels().sort(function (a, b) {
+                channels = self.session().user().channelObjects().sort(function (a, b) {
                     if (a.name > b.name) {
                         return 1;
                     }

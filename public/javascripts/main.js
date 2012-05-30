@@ -45,7 +45,7 @@ $(function() {
                 return
             }
             var user = session.user();
-            user.channels().forEach(function (channel) {
+            user.channelObjects().forEach(function (channel) {
                 if (!channel.name) {
                     return;
                 }
@@ -123,7 +123,7 @@ $(function() {
                     return;
                 }
                 var isAlreadyJoined = false;
-                view.session().user().channels().forEach(function (channel) {
+                view.session().user().channelObjects().forEach(function (channel) {
                     if (channel.name === channelName) {
                         isAlreadyJoined = true;
                         return false;

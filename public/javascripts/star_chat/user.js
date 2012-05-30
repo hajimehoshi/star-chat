@@ -3,33 +3,33 @@
 starChat.User = (function () {
     var User = function (name) {
         this.name_ = name;
-        this.channels_ = [];
+        this.channelObjects_ = [];
         this.keywords_ = [];
     };
     User.prototype.name = function () {
         return this.name_;
     };
-    User.prototype.channels = function () {
-        return this.channels_;
+    User.prototype.channelObjects = function () {
+        return this.channelObjects_;
     };
     User.prototype.addChannel = function(name) {
-        var r = $.grep(this.channels_, function (channel) {
+        var r = $.grep(this.channelObjects_, function (channel) {
             return channel.name === name;
         });
         if (r.length === 0) {
-            this.channels_.push({name: name});                        
+            this.channelObjects_.push({name: name});                        
         }
     };
     User.prototype.removeChannel = function(name) {
         var idx = -1;
-        for (var i = 0; i < this.channels_.length; i++) {
-            if (this.channels_[i].name === name) {
+        for (var i = 0; i < this.channelObjects_.length; i++) {
+            if (this.channelObjects_[i].name === name) {
                 idx = i;
                 break;
             }
         }
         if (idx !== -1) {
-            this.channels_.splice(idx, 1);
+            this.channelObjects_.splice(idx, 1);
         }
     };
     User.prototype.keywords = function (keywords) {
@@ -57,7 +57,7 @@ starChat.User = (function () {
         var url = '/users/' + encodeURIComponent(this.name_) + '/channels';
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
-            self.channels_ = data;
+            self.channelObjects_ = data;
             if (callback !== void(0)) {
                 callback(sessionId);
             }
