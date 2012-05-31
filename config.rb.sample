@@ -3,6 +3,9 @@ StarChat::User.auth_system do |name, password|
   false
 end
 
+# Please edit it
+StarChat::Channel.salt = 'c5abd916f3bec67cbd9cba4b8ce0add0'
+
 configure :development do
   StarChat::RedisDB.setup('127.0.0.1', 6379)
   StarChat::GroongaDB.load_or_create('./tmp/groonga-development.db')

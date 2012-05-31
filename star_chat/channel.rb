@@ -1,19 +1,27 @@
-# -*- coding: utf-8 -*-
+require 'digest/sha2'
+
 module StarChat
 
   class Channel
 
+    # This should be rewritten in the configuration.
+    @@salt = 'starchat.channel.'
+
+    def self.salt
+      @@salt
+    end
+    
+    def self.salt=(salt)
+      @@salt=salt
+    end
+
     def self.find(name)
       key = ['channels', name]
       if RedisDB.exec(:exists, key)
-        values = RedisDB.exec(:hmget, key, 'secret', 'password_digest')
+        values = RedisDB.exec(:hmget, key, 'password_digest')
         params = {
-          secret:          values[0] == 'true',
-          password_digest: values[1] ? values[1] : '',
+          password_digest: values[0] ? values[0] : '',
         }
-        if values[1] and !values[1].empty?
-          params[:password_digest] = values[1]
-        end
         return new(name, params)
       end
       nil
@@ -33,23 +41,28 @@ module StarChat
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     end
 
-    def secret?
-      @secret
-    end
-
-    def secret=(secret)
-      @secret = !!secret
+    def password_locked?
+      !password_digest.empty?
     end
 
     def password_digest
-      @password_digest
+      @password_digest ||= ''
     end
-    private :password_digest
+    private(:password_digest)
 
     def password_digest=(password_digest)
-      @password_digest = password_digest ? password_digest : password_digest.to_s
+      @password_digest = password_digest.to_s
     end
-    private :password_digest=
+    private(:password_digest=)
+
+    def password=(password)
+      self.password_digest = Digest::SHA256.hexdigest(Channel.salt + password)
+    end
+
+    def auth?(password)
+      return true unless password_locked?
+      Digest::SHA256.hexdigest(Channel.salt + password) == password_digest
+    end
 
     # TODO: Rename 'current_topic_id'
     def last_topic_id
@@ -59,11 +72,9 @@ module StarChat
 
     def initialize(name, options = {})
       options = {
-        secret:          false,
-        password_digest: nil,
+        password_digest: '',
       }.merge(options)
       self.name            = name
-      self.secret          = options[:secret]
       self.password_digest = options[:password_digest]
     end
 
@@ -155,7 +166,6 @@ module StarChat
       RedisDB.multi do
         RedisDB.exec(:sadd, ['channels'], name)
         RedisDB.exec(:hmset, ['channels', name],
-                     'secret',          secret? ? 'true' : 'false',
                      'password_digest', password_digest ? password_digest : '')
       end
       self
