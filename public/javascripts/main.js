@@ -1,7 +1,7 @@
 'use strict';
 
 $(function() {
-    var clickChannelDel = function (view) {
+    /*var clickChannelDel = function (view) {
         return function (channel) {
             var channelName = channel.name();
             var msg = "Are you sure you want to delete subscribing '" +
@@ -19,13 +19,12 @@ $(function() {
             });
             return false;
         };
-    }
+    }*/
     var getView = (function () {
         var view = null;
         return function () {
             if (view === null) {
                 view = new starChat.View(starChat.Session);
-                view.clickChannelDel(clickChannelDel(view));
             }
             return view;
         };
@@ -328,7 +327,21 @@ $(function() {
         $('#channels menu img[data-tool-id="edit"]').click(function () {
             var view = getView();
             view.isEdittingChannels(!view.isEdittingChannels());
-            view.update();
+            if (view.isEdittingChannels()) {
+                var session = view.session();
+                var channels = session.user().channels();
+                channels.forEach(function (channel) {
+                    channel.load(session, function (sessionId) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
+                        view.update();
+                    });
+                });
+            } else {
+                view.update();
+            }
             return false;
         });
         $('img[data-tool-id="editTopic"]').click(function () {
@@ -350,7 +363,7 @@ $(function() {
                     }
                     var user = view.session().user();
                     var val = user.keywords().join('\n');
-                    $('#editUserDialog [name="keywords"]').val(val);
+                    $('#editUserDialog [name="keywords"]').val(val); // Move to the view?
                     view.update();
                 });
             } else {

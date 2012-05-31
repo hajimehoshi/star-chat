@@ -103,12 +103,8 @@ starChat.View = (function () {
                     var href = '#channels/' + encodeURIComponent(channel.name());
                     a.attr('href', href);
                     a.text(name);
-                    // TODO: Use attr
-                    var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackRoundMinus" data-tool-id="delete" />').click(function () {
-                        return self.clickChannelDel_(channel);
-                    });
                     var li = $('<li></li>').attr('data-channel-name', channel.name());
-                    li.append(a).append(icon);
+                    li.append(a);
                     ul.append(li);
                 });
                 ul.find('li').each(function () {
@@ -118,12 +114,6 @@ starChat.View = (function () {
                 });
                 lastSessionId = self.session_.id();
             })();
-            // TODO: Show a dialog
-            if (self.isEdittingChannels()) {
-                $('#channels li img[data-tool-id="delete"]').show().css('display', 'inline');
-            } else {
-                $('#channels li img[data-tool-id="delete"]').hide();
-            }
         }
     })();
     function updateViewSearch(self) {
@@ -441,9 +431,13 @@ starChat.View = (function () {
     function updateViewDialogs(self) {
         $('.dialog').hide();
         var dialogIsShown = false;
-        if (self.isEdittingUser_) {
+        if (self.isEdittingUser()) {
             $('#editUserDialog').show();
             $('#editUserDialog [title="name"]').text(self.session().userName());
+            dialogIsShown = true;
+        }
+        if (self.isEdittingChannels()) {
+            $('#editChannelsDialog').show();
             dialogIsShown = true;
         }
         if (dialogIsShown) {
@@ -549,11 +543,6 @@ starChat.View = (function () {
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
     };
-    // TODO: 関数名直すべき?
-    View.prototype.clickChannelDel = function (func) {
-        this.clickChannelDel_ = func;
-        return this;
-    };
     View.prototype.resetTimeSpan = function () {
         this.startTime_ = null;
         this.endTime_   = null;
@@ -589,7 +578,8 @@ starChat.View = (function () {
         }
     };
     View.prototype.closeDialogs = function() {
-        this.isEdittingUser_ = false;
+        this.isEdittingUser(false);
+        this.isEdittingChannels(false);
     };
     View.prototype.setSearch = function (query, result) {
         this.searchQuery_  = query;
