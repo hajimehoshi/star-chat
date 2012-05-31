@@ -457,6 +457,8 @@ starChat.View = (function () {
                 var tr = $('<tr></tr>');
                 var td = $('<td></td>').append(channel.name());
                 tr.append(td);
+                var td = $('<td>...</td>');
+                tr.append(td);
                 var deleteLink = $('<img />');
                 deleteLink.attr('alt', 'delete');
                 deleteLink.attr('width', '16').attr('height', '16');
