@@ -13,7 +13,6 @@ starChat.View = (function () {
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channelName = '';
         self.messageScrollTops = {};
-        self.userNames = {};
         self.isEdittingChannels = false;
 
         self.lastChannelName_ = '';
@@ -425,11 +424,11 @@ starChat.View = (function () {
         }
     }
     function updateViewUsers(self) {
-        var userNamesObj = self.userNames[self.channelName];
-        if (!userNamesObj) {
-            userNamesObj = {};
-        }
-        var userNames = Object.keys(userNamesObj).sort();
+        var channel = starChat.Channel.find(self.channelName);
+        var users = channel.users();
+        var userNames = users.map(function (user) {
+            return user.name();
+        }).sort();
         var ul = $('#users');
         ul.empty();
         userNames.forEach(function (userName) {

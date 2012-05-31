@@ -6,8 +6,26 @@ starChat.User = (function () {
         this.channels_ = [];
         this.keywords_ = [];
     };
+    var cache = {};
+    User.find = function (name) {
+        if (name in cache) {
+            return cache[name];
+        }
+        return cache[name] = new User(name);
+    };
+    User.prototype.update = function (obj) {
+        if ('nick' in obj) {
+            this.nick_ = obj.nick;
+        }
+        if ('keywords' in obj) {
+            this.keywords_ = obj.keywords;
+        }
+    };
     User.prototype.name = function () {
         return this.name_;
+    };
+    User.prototype.nick = function () {
+        return this.nick_;
     };
     User.prototype.channels = function () {
         return this.channels_;

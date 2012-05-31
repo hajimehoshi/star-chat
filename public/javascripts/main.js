@@ -135,8 +135,9 @@ $(function() {
                             encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
                         starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     }
-                    var url = '/channels/' + encodeURIComponent(channelName) + '/users';
-                    starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+                    starChat.Channel.find(channelName).loadUsers(view.session(), function () {
+                        view.update();
+                    });
                     return;
                 }
                 // Confirming joining the new channel
@@ -153,8 +154,9 @@ $(function() {
                     var view = getView();
                     view.channelName = channelName;
                     view.update();
-                    var url = '/channels/' + encodeURIComponent(channelName) + '/users';
-                    starChat.ajaxRequest(view.session(), url, 'GET', null, receiveResponse);
+                    starChat.Channel.find(channelName).loadUsers(view.session(), function () {
+                        view.update();
+                    });
                 });
             }
         }
@@ -173,14 +175,7 @@ $(function() {
         }
         try {
             if (method === 'GET') {
-                if (uri.match(/^\/channels\/([^\/]+)\/users$/)) {
-                    var channelName = decodeURIComponent(RegExp.$1);
-                    var userNames = {};
-                    data.forEach(function (user) {
-                        userNames[user.name] = true;
-                    });
-                    view.userNames[channelName] = userNames;
-                } else if (uri.match(/^\/channels\/([^\/]+)\/messages\/recent/)) {
+                if (uri.match(/^\/channels\/([^\/]+)\/messages\/recent/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     data.forEach(function (message) {
                         view.addNewMessage(channelName, message, false);
