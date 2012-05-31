@@ -71,6 +71,14 @@
           <p class="buttons"><input type="submit" value="OK"></p>
         </form>
       </div>
+      <div id="editChannelsDialog" class="dialog">
+        <form>
+          <h2>Channels</h2>
+          <table>
+          </table>
+          <p class="buttons"><input type="submit" value="OK"></p>
+        </form>
+      </div>
     </div>
     <!-- TODO: write footer -->
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
