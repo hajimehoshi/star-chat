@@ -203,12 +203,6 @@ $(function() {
                     view.session().user().addChannel(channelName);
                     starChat.Channel.find(channelName).load(view.session());
                 }
-            } else if (method === 'DELETE') {
-                if (uri.match(/^\/subscribings\?/)) {
-                    var params = starChat.parseQuery(uri);
-                    var channelName = params['channel_name'];
-                    view.session().user().removeChannel(channelName);
-                }
             }
         } finally {
             view.update();

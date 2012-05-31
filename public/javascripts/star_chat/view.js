@@ -457,6 +457,29 @@ starChat.View = (function () {
                 var tr = $('<tr></tr>');
                 var td = $('<td></td>').append(channel.name());
                 tr.append(td);
+                var deleteLink = $('<img />');
+                deleteLink.attr('alt', 'delete');
+                deleteLink.attr('width', '16').attr('height', '16');
+                deleteLink.attr('data-image-icon-name', 'blackRoundMinus');
+                deleteLink.attr('data-tool-id', 'deleteChannel');
+                deleteLink.addClass('toolIcon');
+                deleteLink.click(function () {
+                    var channelName = channel.name();
+                    var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
+                    if (!confirm(msg)) {
+                        return false;
+                    }
+                    var url = '/subscribings?' +
+                        'channel_name=' + encodeURIComponent(channelName) + ';' +
+                        'user_name=' + encodeURIComponent(self.session().user().name());
+                    starChat.ajaxRequest(self.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
+                        self.session().user().removeChannel(channelName);
+                        self.update();
+                    });
+                    return false;
+                });
+                var td = $('<td></td>').append(deleteLink);
+                tr.append(td);
                 table.append(tr);
             });
             dialogIsShown = true;
@@ -488,6 +511,7 @@ starChat.View = (function () {
         updateViewMessages(this);
         updateViewTopic(this);
         updateViewUsers(this);
+        updateViewDialogs(this);
         $('img[data-image-icon-name]').each(function () {
             var e = $(this);
             if (e.attr('src')) {
@@ -496,8 +520,6 @@ starChat.View = (function () {
             var iconName = e.attr('data-image-icon-name');
             e.attr('src', starChat.Icons[iconName]);
         });
-
-        updateViewDialogs(this);
 
         $('a').filter(function () {
             var href = $(this).attr('href');

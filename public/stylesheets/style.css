@@ -255,12 +255,11 @@ li .toolIcon {
 }
 .dialog table {
     border-collapse: separate;
-    border-spacing: 0 5px;
-    margin: 10px 0;
+    border-spacing: 5px 5px;
+    margin: 10px 0px;
 }
 .dialog th {
     font-weight: normal;
-    padding-right: 5px;
     text-align: right;
     vertical-align: top;
 }
