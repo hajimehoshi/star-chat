@@ -29,7 +29,6 @@ starChat.View = (function () {
         self.isEdittingUser_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
-        self.topics_ = {}; // TODO: Use Channel#topic instead.
         self.isEdittingTopic_ = false;
 
         self.title_ = 'StarChat (β)';
@@ -407,9 +406,9 @@ starChat.View = (function () {
                 $('#topic').show();
                 form.hide();
             }
-            if (self.channelName in self.topics_ &&
-                self.topics_[self.channelName].body) {
-                var topic = self.topics_[self.channelName];
+            var channel = self.session().user().channel(self.channelName);
+            var topic   = channel.topic();
+            if (topic && topic.body) {
                 var topicE = $('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
@@ -593,16 +592,6 @@ starChat.View = (function () {
         this.searchQuery_  = null;
         this.searchResult_ = [];
     };
-    View.prototype.setTopic = function (createdAt, channelName, userName, body) {
-        this.topics_[channelName] = {
-            userName:  userName,
-            body:      body,
-            createdAt: createdAt,
-        };
-    };
-    View.prototype.clearTopic = function (channelName) {
-        delete this.topics_[channelName];
-    }
     View.prototype.isEdittingTopic = function(value) {
         if (value !== void(0)) {
             this.isEdittingTopic_ = value;

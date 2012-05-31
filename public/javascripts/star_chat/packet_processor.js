@@ -29,10 +29,8 @@ starChat.PacketProcessor = (function () {
     function processPacketTopic(packet, view) {
         var topic = packet.topic;
         if (topic) {
-            view.setTopic(topic.created_at,
-                          topic.channel_name,
-                          topic.user_name,
-                          topic.body);
+            var channel = view.session().user().channel(topic.channel_name);
+            channel.topic(topic);
         }
     }
     PacketProcessor.prototype.process = function (packet, view) {

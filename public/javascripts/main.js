@@ -49,8 +49,6 @@ $(function() {
                 if (!channel.name()) {
                     return;
                 }
-                var url = '/channels/' + encodeURIComponent(channel.name());
-                starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                 var url = '/channels/' + encodeURIComponent(channel.name()) + '/messages/recent';
                 starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
             });
@@ -175,18 +173,7 @@ $(function() {
         }
         try {
             if (method === 'GET') {
-                if (uri.match(/^\/channels\/([^\/]+)$/)) {
-                    var channelName = decodeURIComponent(RegExp.$1);
-                    var topic       = data['topic'];
-                    if (topic) {
-                        view.setTopic(topic.created_at,
-                                      channelName,
-                                      topic.user_name,
-                                      topic.body);
-                    } else {
-                        view.clearTopic(channelName);
-                    }
-                } else if (uri.match(/^\/channels\/([^\/]+)\/users$/)) {
+                if (uri.match(/^\/channels\/([^\/]+)\/users$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var userNames = {};
                     data.forEach(function (user) {
@@ -212,6 +199,7 @@ $(function() {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
                     view.session().user().addChannel(channelName);
+                    view.session().user().channel(channelName).load(view.session());
                 }
             } else if (method === 'DELETE') {
                 if (uri.match(/^\/subscribings\?/)) {
