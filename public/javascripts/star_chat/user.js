@@ -6,24 +6,42 @@ starChat.User = (function () {
         this.channels_ = [];
         this.keywords_ = [];
     };
+    var cache = {};
+    User.find = function (name) {
+        if (name in cache) {
+            return cache[name];
+        }
+        return cache[name] = new User(name);
+    };
+    User.prototype.update = function (obj) {
+        if ('nick' in obj) {
+            this.nick_ = obj.nick;
+        }
+        if ('keywords' in obj) {
+            this.keywords_ = obj.keywords;
+        }
+    };
     User.prototype.name = function () {
         return this.name_;
+    };
+    User.prototype.nick = function () {
+        return this.nick_;
     };
     User.prototype.channels = function () {
         return this.channels_;
     };
     User.prototype.addChannel = function(name) {
         var r = $.grep(this.channels_, function (channel) {
-            return channel.name === name;
+            return channel.name() === name;
         });
         if (r.length === 0) {
-            this.channels_.push({name: name});                        
+            this.channels_.push(starChat.Channel.find(name));
         }
     };
     User.prototype.removeChannel = function(name) {
         var idx = -1;
         for (var i = 0; i < this.channels_.length; i++) {
-            if (this.channels_[i].name === name) {
+            if (this.channels_[i].name() === name) {
                 idx = i;
                 break;
             }
@@ -57,7 +75,11 @@ starChat.User = (function () {
         var url = '/users/' + encodeURIComponent(this.name_) + '/channels';
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
-            self.channels_ = data;
+            self.channels_ = data.map(function (obj) {
+                var channel = starChat.Channel.find(obj.name);
+                channel.update(obj);
+                return channel;
+            });
             if (callback !== void(0)) {
                 callback(sessionId);
             }
