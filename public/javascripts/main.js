@@ -1,25 +1,6 @@
 'use strict';
 
 $(function() {
-    /*var clickChannelDel = function (view) {
-        return function (channel) {
-            var channelName = channel.name();
-            var msg = "Are you sure you want to delete subscribing '" +
-                channelName + "'?"
-            if (!confirm(msg)) {
-                return false;
-            }
-            var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(view.session().userName());
-            starChat.ajaxRequest(view.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
-                starChat.clearFragment();
-                getView().channelName = '';
-                receiveResponse(sessionId, uri, method, data);
-            });
-            return false;
-        };
-    }*/
     var getView = (function () {
         var view = null;
         return function () {

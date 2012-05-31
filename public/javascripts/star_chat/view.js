@@ -474,6 +474,10 @@ starChat.View = (function () {
                         'user_name=' + encodeURIComponent(self.session().user().name());
                     starChat.ajaxRequest(self.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
                         self.session().user().removeChannel(channelName);
+                        if (self.channelName === channelName) {
+                            starChat.clearFragment();
+                            self.channelName = null;
+                        }
                         self.update();
                     });
                     return false;
