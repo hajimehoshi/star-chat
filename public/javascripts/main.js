@@ -135,7 +135,11 @@ $(function() {
                             encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
                         starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     }
-                    starChat.Channel.find(channelName).loadUsers(view.session(), function () {
+                    starChat.Channel.find(channelName).loadUsers(view.session(), function (sessionId) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
                         view.update();
                     });
                     return;
@@ -155,6 +159,10 @@ $(function() {
                     view.channelName = channelName;
                     view.update();
                     starChat.Channel.find(channelName).loadUsers(view.session(), function () {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
                         view.update();
                     });
                 });
