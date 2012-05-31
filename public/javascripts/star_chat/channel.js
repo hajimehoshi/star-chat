@@ -1,9 +1,13 @@
 'use strict';
 
 starChat.Channel = (function () {
-    var Channel = function (object) {
-        this.name_  = object.name;
-        this.topic_ = object.topic;
+    var Channel = function (obj) {
+        this.name_             = obj.name;
+        this.topic_            = obj.topic;
+        this.isPasswordLocked_ = false;
+        if ('password_locked' in obj) {
+            this.isPasswordLocked_ = obj.password_locked;
+        }
         this.users_ = [];
     };
     var cache = {};
@@ -18,6 +22,9 @@ starChat.Channel = (function () {
     Channel.prototype.update = function (obj) {
         if ('topic' in obj) {
             this.topic_ = obj.topic;
+        }
+        if ('password_locked' in obj) {
+            this.isPasswordLocked_ = obj.password_locked;
         }
     };
     Channel.prototype.name = function () {
@@ -53,7 +60,10 @@ starChat.Channel = (function () {
         if (idx !== -1) {
             this.users_.splice(idx, 1);
         }
-    }
+    };
+    Channel.prototype.isPasswordLocked = function () {
+        return this.isPasswordLocked_;
+    };
     Channel.prototype.load = function (session, callback) {
         var url = '/channels/' + encodeURIComponent(this.name_);
         var self = this;

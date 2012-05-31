@@ -158,7 +158,8 @@ module StarChat
 
     def to_json(*args)
       hash = {
-        name: name
+        name: name,
+        password_locked: password_locked?,
       }
       if last_topic_id
         topic = Topic.find(last_topic_id)
