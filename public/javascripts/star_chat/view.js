@@ -13,7 +13,6 @@ starChat.View = (function () {
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channelName = '';
         self.messageScrollTops = {};
-        self.isEdittingChannels = false;
 
         self.lastChannelName_ = '';
         self.newMessages_ = {};
@@ -26,6 +25,7 @@ starChat.View = (function () {
         self.oldMessages_ = {};
         self.isBlinkingTitle_ = false;
         self.isEdittingUser_ = false;
+        self.isEdittingChannels_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
         self.isEdittingTopic_ = false;
@@ -118,7 +118,8 @@ starChat.View = (function () {
                 });
                 lastSessionId = self.session_.id();
             })();
-            if (self.isEdittingChannels) {
+            // TODO: Show a dialog
+            if (self.isEdittingChannels()) {
                 $('#channels li img[data-tool-id="delete"]').show().css('display', 'inline');
             } else {
                 $('#channels li img[data-tool-id="delete"]').hide();
@@ -572,12 +573,20 @@ starChat.View = (function () {
         var key = startTime + '_' + endTime;
         this.oldMessages_[channelName][key] = messages;
     };
-    View.prototype.isEdittingUser = function(value) {
+    View.prototype.isEdittingUser = function (value) {
         if (value !== void(0)) {
             this.isEdittingUser_ = value;
             return this;
         } else {
             return this.isEdittingUser_;
+        }
+    };
+    View.prototype.isEdittingChannels = function (value) {
+        if (value !== void(0)) {
+            this.isEdittingChannels_ = value;
+            return this;
+        } else {
+            return this.isEdittingChannels_;
         }
     };
     View.prototype.closeDialogs = function() {
