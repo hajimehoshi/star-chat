@@ -240,6 +240,11 @@ put '/subscribings', provides: :json do
     @channel = StarChat::Channel.new(@channel_name).save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
+  if @channel.password_locked?
+    password = request['X-StarChat-Channel-Password']
+    halt 401 if password.nil? or password.empty?
+    halt 401 unless @channel.auth?(password)
+  end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
             channel_name: @channel.name,

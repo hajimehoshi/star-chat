@@ -59,6 +59,8 @@ module StarChat
       if password.nil? or password.empty?
         self.password_digest = ''
       else
+        raise 'password should not be empty' if password.empty?
+        raise 'password can\'t include control characters' if password =~ /[[:cntrl:]]/
         self.password_digest = Digest::SHA256.hexdigest(Channel.salt + password)
       end
     end
