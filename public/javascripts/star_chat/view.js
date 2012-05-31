@@ -434,6 +434,9 @@ starChat.View = (function () {
         if (self.isEdittingUser()) {
             $('#editUserDialog').show();
             $('#editUserDialog [title="name"]').text(self.session().userName());
+            var user = self.session().user();
+            var val = user.keywords().join('\n');
+            $('#editUserDialog [name="keywords"]').val(val); // Move to the view?
             dialogIsShown = true;
         }
         if (self.isEdittingChannels()) {

@@ -361,9 +361,6 @@ $(function() {
                     if (view.session().id() !== sessionId) {
                         return;
                     }
-                    var user = view.session().user();
-                    var val = user.keywords().join('\n');
-                    $('#editUserDialog [name="keywords"]').val(val); // Move to the view?
                     view.update();
                 });
             } else {
