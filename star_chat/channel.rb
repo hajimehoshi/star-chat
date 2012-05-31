@@ -56,7 +56,11 @@ module StarChat
     private(:password_digest=)
 
     def password=(password)
-      self.password_digest = Digest::SHA256.hexdigest(Channel.salt + password)
+      if password.nil? or password.empty?
+        self.password_digest = ''
+      else
+        self.password_digest = Digest::SHA256.hexdigest(Channel.salt + password)
+      end
     end
 
     def auth?(password)
