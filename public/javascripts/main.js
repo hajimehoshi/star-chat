@@ -152,6 +152,7 @@ $(function() {
 
     $(window).bind('hashchange', onHashchange);
 
+    // TODO: Remove it!!
     function receiveResponse(sessionId, uri, method, data) {
         var view = getView();
         var session = view.session();
