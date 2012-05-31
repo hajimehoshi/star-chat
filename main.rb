@@ -246,7 +246,11 @@ end
 
 put '/subscribings', provides: :json do
   unless @channel
-    @channel = StarChat::Channel.new(@channel_name).save
+    @channel = StarChat::Channel.new(@channel_name)
+    if channel_password and !channel_password.empty?
+      @channel.password = channel_password
+    end
+    @channel.save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
   if @channel.password_locked?
