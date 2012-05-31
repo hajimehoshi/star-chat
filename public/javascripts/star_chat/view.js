@@ -441,9 +441,9 @@ starChat.View = (function () {
         $('.dialog').hide();
         var dialogIsShown = false;
         if (self.isEdittingUser_) {
-            $('#userEditDialog').show();
+            $('#editUserDialog').show();
             // TODO: this attribute's name is strange
-            $('#userEditDialog [data-column="name"]').text(self.session().userName());
+            $('#editUserDialog [data-column="name"]').text(self.session().userName());
             dialogIsShown = true;
         }
         if (dialogIsShown) {

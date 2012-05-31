@@ -55,7 +55,7 @@
       </section>
     </section>
     <div id="dialogBackground">
-      <div id="userEditDialog" class="dialog">
+      <div id="editUserDialog" class="dialog">
         <form>
           <h2>Edit User</h2>
           <table>

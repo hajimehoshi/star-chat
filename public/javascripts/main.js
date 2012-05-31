@@ -342,7 +342,7 @@ $(function() {
                     }
                     var user = view.session().user();
                     var val = user.keywords().join('\n');
-                    $('#userEditDialog [name="keywords"]').val(val);
+                    $('#editUserDialog [name="keywords"]').val(val);
                     view.update();
                 });
             } else {
@@ -361,8 +361,8 @@ $(function() {
             view.update();
             return false;
         });
-        $('#userEditDialog [type="submit"]').click(function () {
-            var keywords = $('#userEditDialog [name="keywords"]').val().split('\n');
+        $('#editUserDialog [type="submit"]').click(function () {
+            var keywords = $('#editUserDialog [name="keywords"]').val().split('\n');
             var view = getView();
             var user = view.session().user();
             user.keywords(keywords);
