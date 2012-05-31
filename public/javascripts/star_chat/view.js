@@ -441,6 +441,24 @@ starChat.View = (function () {
         }
         if (self.isEdittingChannels()) {
             $('#editChannelsDialog').show();
+            var channels = self.session().user().channels();
+            channels = channels.sort(function (a, b) {
+                if (a.name() > b.name()) {
+                    return 1;
+                }
+                if (a.name() < b.name()) {
+                    return -1;
+                }
+                return 0;
+            });
+            var table = $('#editChannelsDialog table');
+            table.empty();
+            channels.forEach(function (channel) {
+                var tr = $('<tr></tr>');
+                var td = $('<td></td>').append(channel.name());
+                tr.append(td);
+                table.append(tr);
+            });
             dialogIsShown = true;
         }
         if (dialogIsShown) {
