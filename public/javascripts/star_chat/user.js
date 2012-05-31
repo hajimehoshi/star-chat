@@ -3,14 +3,14 @@
 starChat.User = (function () {
     var User = function (name) {
         this.name_ = name;
-        this.channelObjects_ = [];
+        this.channels_ = [];
         this.keywords_ = [];
     };
     User.prototype.name = function () {
         return this.name_;
     };
     User.prototype.channel = function (name) {
-        var result = $.grep(this.channels(), function (channel) {
+        var result = $.grep(this.channels_, function (channel) {
             return channel.name() === name;
         });
         if (1 <= result.length) {
@@ -19,35 +19,27 @@ starChat.User = (function () {
             return null;
         }
     };
-    User.prototype.channels = (function () {
-        var cache = {};
-        return function () {
-            return this.channelObjects_.map(function (obj) {
-                if (obj.name in cache) {
-                    return cache[obj.name];
-                }
-                return cache[obj.name] = new starChat.Channel(obj);
-            });
-        };
-    })();
+    User.prototype.channels = function () {
+        return this.channels_;
+    };
     User.prototype.addChannel = function(name) {
-        var r = $.grep(this.channelObjects_, function (channel) {
-            return channel.name === name;
+        var r = $.grep(this.channels_, function (channel) {
+            return channel.name() === name;
         });
         if (r.length === 0) {
-            this.channelObjects_.push({name: name});                        
+            this.channels_.push(Channel.find(name));
         }
     };
     User.prototype.removeChannel = function(name) {
         var idx = -1;
-        for (var i = 0; i < this.channelObjects_.length; i++) {
-            if (this.channelObjects_[i].name === name) {
+        for (var i = 0; i < this.channels_.length; i++) {
+            if (this.channels_[i].name() === name) {
                 idx = i;
                 break;
             }
         }
         if (idx !== -1) {
-            this.channelObjects_.splice(idx, 1);
+            this.channels_.splice(idx, 1);
         }
     };
     User.prototype.keywords = function (keywords) {
@@ -75,7 +67,11 @@ starChat.User = (function () {
         var url = '/users/' + encodeURIComponent(this.name_) + '/channels';
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
-            self.channelObjects_ = data;
+            self.channels_ = data.map(function (obj) {
+                var channel = starChat.Channel.find(obj.name);
+                channel.update(obj);
+                return channel;
+            });
             if (callback !== void(0)) {
                 callback(sessionId);
             }

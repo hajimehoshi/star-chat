@@ -5,6 +5,20 @@ starChat.Channel = (function () {
         this.name_  = object.name;
         this.topic_ = object.topic;
     };
+    var cache = {};
+    Channel.find = function (name) {
+        if (name in cache) {
+            return cache[name];
+        }
+        return cache[name] = new Channel({
+            name: name,
+        });
+    };
+    Channel.prototype.update = function (obj) {
+        if ('topic' in obj) {
+            this.topic_ = obj.topic;
+        }
+    };
     Channel.prototype.name = function () {
         return this.name_;
     };
