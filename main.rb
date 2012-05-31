@@ -69,6 +69,10 @@ helpers do
     end
   end
 
+  def channel_password
+    request['X-StarChat-Channel-Password']
+  end
+
   def uri_encode(str)
     # Rack::Utils.escape is not for URI but for application/x-www-form-urlencoded
     Rack::Utils.escape(str).gsub('+', '%20')
@@ -174,11 +178,16 @@ put '/channels/:channel_name', provides: :json do
   # TODO: params[:topic][:body]?
   if params[:topic_body]
     topic = @channel.update_topic(current_user, params[:topic_body])
+    # TODO: move after saving?
     broadcast(type: 'topic',
               topic: topic) do |user_name|
       return false unless user = StarChat::User.find(user_name)
       user.subscribing?(@channel)
     end
+  end
+  if params[:password]
+    # Do we need to check an existed password?
+    @channel.passowrd = params[:password]
   end
   @channel.save
   result
@@ -241,9 +250,8 @@ put '/subscribings', provides: :json do
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
   if @channel.password_locked?
-    password = request['X-StarChat-Channel-Password']
-    halt 401 if password.nil? or password.empty?
-    halt 401 unless @channel.auth?(password)
+    halt 401 if channel_password.nil? or channel_password.empty?
+    halt 401 unless @channel.auth?(channel_password)
   end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
