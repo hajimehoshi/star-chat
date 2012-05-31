@@ -29,7 +29,7 @@ starChat.PacketProcessor = (function () {
     function processPacketTopic(packet, view) {
         var topic = packet.topic;
         if (topic) {
-            var channel = view.session().user().channel(topic.channel_name);
+            var channel = starChat.Channel.find(topic.channel_name);
             channel.topic(topic);
         }
     }

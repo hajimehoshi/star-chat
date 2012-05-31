@@ -199,7 +199,7 @@ $(function() {
                     var params = starChat.parseQuery(uri);
                     var channelName = params['channel_name'];
                     view.session().user().addChannel(channelName);
-                    view.session().user().channel(channelName).load(view.session());
+                    starChat.Channel.find(channelName).load(view.session());
                 }
             } else if (method === 'DELETE') {
                 if (uri.match(/^\/subscribings\?/)) {

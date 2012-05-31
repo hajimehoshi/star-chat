@@ -406,7 +406,7 @@ starChat.View = (function () {
                 $('#topic').show();
                 form.hide();
             }
-            var channel = self.session().user().channel(self.channelName);
+            var channel = starChat.Channel.find(self.channelName);
             var topic   = channel.topic();
             if (topic && topic.body) {
                 var topicE = $('#topic').text(topic.body);

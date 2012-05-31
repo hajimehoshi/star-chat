@@ -9,16 +9,6 @@ starChat.User = (function () {
     User.prototype.name = function () {
         return this.name_;
     };
-    User.prototype.channel = function (name) {
-        var result = $.grep(this.channels_, function (channel) {
-            return channel.name() === name;
-        });
-        if (1 <= result.length) {
-            return result[0];
-        } else {
-            return null;
-        }
-    };
     User.prototype.channels = function () {
         return this.channels_;
     };
