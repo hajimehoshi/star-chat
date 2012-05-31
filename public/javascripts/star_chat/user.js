@@ -17,7 +17,7 @@ starChat.User = (function () {
             return channel.name() === name;
         });
         if (r.length === 0) {
-            this.channels_.push(Channel.find(name));
+            this.channels_.push(starChat.Channel.find(name));
         }
     };
     User.prototype.removeChannel = function(name) {
