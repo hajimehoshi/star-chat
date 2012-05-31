@@ -12,13 +12,13 @@ starChat.View = (function () {
         // TODO: Model に相当するクラスを作る?
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channelName = '';
-        self.messageScrollTops = {};
 
         self.lastChannelName_ = '';
         self.newMessages_ = {};
         self.pseudoMessages_ = {};
         self.messageElements_ = {};
         self.messageIdsAlreadyInSection_ = {};
+        self.messageScrollTops_ = {};
         self.dirtyFlags_ = {};
         self.startTime_ = null;
         self.endTime_ = null;
@@ -200,7 +200,7 @@ starChat.View = (function () {
         }
         if (!self.isShowingOldLogs()) {
             section.scroll(function () {
-                self.messageScrollTops[channelName] = section.scrollTop();
+                self.messageScrollTops_[channelName] = section.scrollTop();
             });
         }
         var inputYear   = $('<input type="number" name="year" min="0" max="9999" value="" />');
@@ -386,13 +386,13 @@ starChat.View = (function () {
                 }
             } else {
                 if (!self.lastChannelName_ ||
-                    !(self.channelName in self.messageScrollTops)) {
+                    !(self.channelName in self.messageScrollTops_)) {
                     section.scrollTop(section.get(0).scrollHeight);
                 } else {
-                    section.scrollTop(self.messageScrollTops[self.channelName]);
+                    section.scrollTop(self.messageScrollTops_[self.channelName]);
                 }
             }
-            self.messageScrollTops[self.channelName] = section.scrollTop();
+            self.messageScrollTops_[self.channelName] = section.scrollTop();
             self.lastChannelName_ = self.channelName;
         }
     }
