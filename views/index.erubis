@@ -61,7 +61,7 @@
           <table>
             <tr>
               <th>Name:</th>
-              <td data-column="name"></td>
+              <td title="name"></td>
             </tr>
             <tr>
               <th>Keywords:</th>
