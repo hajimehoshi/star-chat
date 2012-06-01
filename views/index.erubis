@@ -75,8 +75,28 @@
         <form>
           <h2>Channels</h2>
           <table>
+            <tr class="cloneMe">
+              <td class="channelName">...</td>
+              <td><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackCog" data-tool-id="editChannel" class="toolIcon" /></td>
+              <td><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackRoundMinus" data-tool-id="deleteChannel" class="toolIcon" /></td>
+            </tr>
           </table>
           <p class="buttons"><input type="submit" value="OK"></p>
+        </form>
+      </div>
+      <div id="editChannelDialog" class="dialog">
+        <form>
+          <h2>Channel '<span title="channelName"></span>'</h2>
+          <table>
+            <tr>
+              <th>Current State:</th>
+              <td title="currentState"></td>
+            </tr>
+            <tr>
+              <th>New Password:</th>
+              <td><input type="password" name="password" value="" width="200" /><input type="submit" value="Update" /></td>
+            </tr>
+          </table>
         </form>
       </div>
     </div>

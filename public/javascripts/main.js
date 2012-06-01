@@ -365,7 +365,7 @@ $(function() {
                 if (view.session().id() !== sessionId) {
                     return;
                 }
-                view.closeDialogs();
+                view.isEdittingUser(false);
                 view.update();
             });
             return false;
@@ -373,7 +373,7 @@ $(function() {
         $('#editChannelsDialog [type="submit"]').click(function () {
             var view = getView();
             // TODO: implement
-            view.closeDialogs();
+            view.isEdittingChannels(false);
             view.update();
             return false;
         });

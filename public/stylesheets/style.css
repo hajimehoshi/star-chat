@@ -279,6 +279,11 @@ li .toolIcon {
     width: 100%;
     z-index: 1;
 }
+#editChannelsDialog td.channelName {
+}
+#editChannelsDialog tr.editChannel {
+    display: none;
+}
 
 /* font-family */
 

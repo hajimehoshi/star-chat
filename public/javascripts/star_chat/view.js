@@ -451,19 +451,17 @@ starChat.View = (function () {
                 }
                 return 0;
             });
-            var table = $('#editChannelsDialog table');
-            table.empty();
+            var table = $('#editChannelsDialog h2 ~ table');
+            var origTR = table.find('tr.cloneMe').hide();
+            table.find('tr.cloned').not(origTR).remove();
             channels.forEach(function (channel) {
-                var tr = $('<tr></tr>');
-                var td = $('<td></td>').append(channel.name());
-                tr.append(td);
-                var deleteLink = $('<img />');
-                deleteLink.attr('alt', 'delete');
-                deleteLink.attr('width', '16').attr('height', '16');
-                deleteLink.attr('data-image-icon-name', 'blackRoundMinus');
-                deleteLink.attr('data-tool-id', 'deleteChannel');
-                deleteLink.addClass('toolIcon');
-                deleteLink.click(function () {
+                var tr = origTR.clone(false).removeClass('cloneMe').addClass('cloned').show();
+                tr.find('.channelName').text(channel.name());
+                tr.find('[data-tool-id="editChannel"]').click(function () {
+                    // TODO: implement
+                    return false;
+                });
+                tr.find('[data-tool-id="deleteChannel"]').click(function () {
                     var channelName = channel.name();
                     var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
                     if (!confirm(msg)) {
@@ -482,8 +480,6 @@ starChat.View = (function () {
                     });
                     return false;
                 });
-                var td = $('<td></td>').append(deleteLink);
-                tr.append(td);
                 table.append(tr);
             });
             dialogIsShown = true;
@@ -624,7 +620,7 @@ starChat.View = (function () {
             return this.isEdittingChannels_;
         }
     };
-    View.prototype.closeDialogs = function() {
+    View.prototype.closeDialogs = function () {
         this.isEdittingUser(false);
         this.isEdittingChannels(false);
     };
