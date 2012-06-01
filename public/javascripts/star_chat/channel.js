@@ -83,9 +83,14 @@ starChat.Channel = (function () {
         return function (session, callback) {
             var url = '/channels/' + encodeURIComponent(this.name_);
             var params = {};
-            if (this.topic_ && lastTopicBody !== this.topic_.body) {
-                params['topic_body'] = this.topic_.body;
-                lastTopicBody = this.topic_.body;
+            if (this.topic_) {
+                var topicBody = this.topic_.body;
+                topicBody = topicBody.replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
+                topicBody = topicBody.substring(0, 1024);
+                if (lastTopicBody !== topicBody) {
+                    params['topic_body'] = topicBody;
+                    lastTopicBody = topicBody
+                }
             }
             starChat.ajaxRequest(session, url, 'PUT', params, function (sesionId, url, method, data) {
                 if (callback !== void(0)) {
