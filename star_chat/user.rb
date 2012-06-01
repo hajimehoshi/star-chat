@@ -131,7 +131,7 @@ module StarChat
         end
       end
       if auth_with_system?(password)
-        salt = SecureRandom.hex(8)
+        salt = SecureRandom.hex(16)
         digest = Digest::SHA256.digest(salt + password)
         @@password_cache[name] = {
           salt:                  salt,
