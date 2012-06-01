@@ -273,9 +273,11 @@ $(function() {
                 return false;
             }
             var body = form.find('[name="body"]').val();
+            body = body.replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
             if (!body) {
                 return false;
             }
+            body = body.substring(0, 1024);
             var url = '/channels/' + encodeURIComponent(view.channelName) +
                 '/messages';
             var id = $.now();
