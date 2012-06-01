@@ -26,6 +26,8 @@ starChat.View = (function () {
         self.isBlinkingTitle_ = false;
         self.isEdittingUser_ = false;
         self.isEdittingChannels_ = false;
+        self.isEdittingChannel_ = false;
+        self.edittingChannelName_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
         self.isEdittingTopic_ = false;
@@ -458,7 +460,10 @@ starChat.View = (function () {
                 var tr = origTR.clone(false).removeClass('cloneMe').addClass('cloned').show();
                 tr.find('.channelName').text(channel.name());
                 tr.find('[data-tool-id="editChannel"]').click(function () {
-                    // TODO: implement
+                    self.isEdittingChannel(true);
+                    self.edittingChannelName(channel.name());
+                    $('#editChannelDialog [title="channelName"]').text(channel.name());
+                    self.update();
                     return false;
                 });
                 tr.find('[data-tool-id="deleteChannel"]').click(function () {
@@ -483,6 +488,11 @@ starChat.View = (function () {
                 table.append(tr);
             });
             dialogIsShown = true;
+        }
+        if (self.isEdittingChannel()) {
+            $('#editChannelDialog').show();
+        } else {
+            $('#editChannelDialog').hide();
         }
         if (dialogIsShown) {
             $('#dialogBackground').show();
@@ -620,9 +630,26 @@ starChat.View = (function () {
             return this.isEdittingChannels_;
         }
     };
+    View.prototype.isEdittingChannel = function (value) {
+        if (value !== void(0)) {
+            this.isEdittingChannel_ = value;
+            return this;
+        } else {
+            return this.isEdittingChannel_;
+        }
+    };
+    View.prototype.edittingChannelName = function (value) {
+        if (value !== void(0)) {
+            this.edittingChannelName_ = value;
+            return this;
+        } else {
+            return this.edittingChannelName_;
+        }
+    }
     View.prototype.closeDialogs = function () {
         this.isEdittingUser(false);
         this.isEdittingChannels(false);
+        this.isEdittingChannel(false);
     };
     View.prototype.setSearch = function (query, result) {
         this.searchQuery_  = query;

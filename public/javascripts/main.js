@@ -346,8 +346,8 @@ $(function() {
         });
     })();
     (function () {
-        $('.dialog').click(function () {
-            return false;
+        $('.dialog').click(function (e) {
+            e.stopPropagation();
         });
         $('#dialogBackground').click(function () {
             var view = getView();

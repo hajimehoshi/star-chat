@@ -86,17 +86,23 @@
       </div>
       <div id="editChannelDialog" class="dialog">
         <form>
-          <h2>Channel '<span title="channelName"></span>'</h2>
+          <h2>Channel</h2>
           <table>
             <tr>
-              <th>Current State:</th>
-              <td title="currentState"></td>
+              <th>Name:</th>
+              <td title="channelName"></td>
             </tr>
             <tr>
-              <th>New Password:</th>
-              <td><input type="password" name="password" value="" width="200" /><input type="submit" value="Update" /></td>
+              <th>Privacy:</th>
+              <td>
+                <form action="." method="post">
+                  <input type="radio" name="privacy" value="public" id="editChannelPrivacyPublic" checked="checked" /><label for="editChannelPrivacyPublic">Public</label><br />
+                  <input type="radio" name="privacy" value="private" id="editChannelPrivacyPrivate" /><label for="editChannelPrivacyPrivate">Private</label>
+                </form>
+              </td>
             </tr>
           </table>
+          <p class="buttons"><input type="submit" value="Update"></p>
         </form>
       </div>
     </div>
