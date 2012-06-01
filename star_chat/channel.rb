@@ -1,19 +1,9 @@
 require 'digest/sha2'
+require 'securerandom'
 
 module StarChat
 
   class Channel
-
-    # This should be rewritten in the configuration.
-    @@salt = 'starchat.channel.'
-
-    def self.salt
-      @@salt
-    end
-    
-    def self.salt=(salt)
-      @@salt=salt
-    end
 
     def self.find(name)
       key = ['channels', name]
@@ -61,13 +51,15 @@ module StarChat
       else
         raise 'password should not be empty' if password.empty?
         raise 'password can\'t include control characters' if password =~ /[[:cntrl:]]/
-        self.password_digest = Digest::SHA256.hexdigest(Channel.salt + password)
+        salt = SecureRandom.hex(16)
+        self.password_digest = "#{salt}.#{Digest::SHA256.hexdigest(salt + password)}"
       end
     end
 
     def auth?(password)
       return true unless password_locked?
-      Digest::SHA256.hexdigest(Channel.salt + password) == password_digest
+      salt, = password_digest.split('.')
+      password_digest == "#{salt}.#{Digest::SHA256.hexdigest(salt + password)}"
     end
 
     # TODO: Rename 'current_topic_id'
