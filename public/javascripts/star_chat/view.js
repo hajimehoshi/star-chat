@@ -13,7 +13,6 @@ starChat.View = (function () {
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channelName = '';
         self.messageScrollTops = {};
-        self.userNames = {};
         self.isEdittingChannels = false;
 
         self.lastChannelName_ = '';
@@ -29,7 +28,6 @@ starChat.View = (function () {
         self.isEdittingUser_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
-        self.topics_ = {};
         self.isEdittingTopic_ = false;
 
         self.title_ = 'StarChat (β)';
@@ -70,10 +68,10 @@ starChat.View = (function () {
             var channels = [];
             if (self.session().isLoggedIn()) {
                 channels = self.session().user().channels().sort(function (a, b) {
-                    if (a.name > b.name) {
+                    if (a.name() > b.name()) {
                         return 1;
                     }
-                    if (a.name < b.name) {
+                    if (a.name() < b.name()) {
                         return -1;
                     }
                     return 0;
@@ -87,7 +85,7 @@ starChat.View = (function () {
                 ul.find('li').filter(function (i) {
                     var channelName = $(this).attr('data-channel-name');
                     return channels.every(function (channel) {
-                        return channel.name !== channelName;
+                        return channel.name() !== channelName;
                     });
                 }).remove();
                 var existChannelNames = $.map(ul.find('li'), function (e) {
@@ -95,21 +93,21 @@ starChat.View = (function () {
                 });
                 var newChannels = channels.filter(function (channel) {
                     return existChannelNames.every(function (name) {
-                        return name !== channel.name;
+                        return name !== channel.name();
                     });
                 });
                 // TODO: sort
                 newChannels.forEach(function (channel) {
                     var a = $('<a></a>');
-                    var name = channel.name;
-                    var href = '#channels/' + encodeURIComponent(channel.name);
+                    var name = channel.name();
+                    var href = '#channels/' + encodeURIComponent(channel.name());
                     a.attr('href', href);
                     a.text(name);
                     // TODO: Use attr
                     var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackRoundMinus" data-tool-id="delete" />').click(function () {
                         return self.clickChannelDel_(channel);
                     });
-                    var li = $('<li></li>').attr('data-channel-name', channel.name);
+                    var li = $('<li></li>').attr('data-channel-name', channel.name());
                     li.append(a).append(icon);
                     ul.append(li);
                 });
@@ -407,9 +405,9 @@ starChat.View = (function () {
                 $('#topic').show();
                 form.hide();
             }
-            if (self.channelName in self.topics_ &&
-                self.topics_[self.channelName].body) {
-                var topic = self.topics_[self.channelName];
+            var channel = starChat.Channel.find(self.channelName);
+            var topic   = channel.topic();
+            if (topic && topic.body) {
                 var topicE = $('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
@@ -426,11 +424,11 @@ starChat.View = (function () {
         }
     }
     function updateViewUsers(self) {
-        var userNamesObj = self.userNames[self.channelName];
-        if (!userNamesObj) {
-            userNamesObj = {};
-        }
-        var userNames = Object.keys(userNamesObj).sort();
+        var channel = starChat.Channel.find(self.channelName);
+        var users = channel.users();
+        var userNames = users.map(function (user) {
+            return user.name();
+        }).sort();
         var ul = $('#users');
         ul.empty();
         userNames.forEach(function (userName) {
@@ -443,9 +441,9 @@ starChat.View = (function () {
         $('.dialog').hide();
         var dialogIsShown = false;
         if (self.isEdittingUser_) {
-            $('#userEdit').show();
+            $('#editUserDialog').show();
             // TODO: this attribute's name is strange
-            $('#userEdit [data-column="name"]').text(self.session().userName());
+            $('#editUserDialog [data-column="name"]').text(self.session().userName());
             dialogIsShown = true;
         }
         if (dialogIsShown) {
@@ -533,8 +531,15 @@ starChat.View = (function () {
             var body = message.body;
             var id = $('[data-pseudo-message-id]').filter(function () {
                 var e = $(this);
-                return e.find('.body').text() === body &&
-                    e.attr('data-removed') !== 'true';
+                if (e.attr('data-removed') === 'true') {
+                    return false;
+                }
+                var body1 = e.find('.body').text();
+                var e = $('<div></div>').text(body);
+                starChat.replaceURLWithLinks(e);
+                starChat.replaceBreakLines(e);
+                var body2 = e.text();
+                return body1 === body2;
             }).first().attr('data-pseudo-message-id');
             this.removePseudoMessage(id);
         }
@@ -593,16 +598,6 @@ starChat.View = (function () {
         this.searchQuery_  = null;
         this.searchResult_ = [];
     };
-    View.prototype.setTopic = function (createdAt, channelName, userName, body) {
-        this.topics_[channelName] = {
-            userName:  userName,
-            body:      body,
-            createdAt: createdAt,
-        };
-    };
-    View.prototype.clearTopic = function (channelName) {
-        delete this.topics_[channelName];
-    }
     View.prototype.isEdittingTopic = function(value) {
         if (value !== void(0)) {
             this.isEdittingTopic_ = value;

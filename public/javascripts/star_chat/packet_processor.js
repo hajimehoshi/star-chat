@@ -11,28 +11,19 @@ starChat.PacketProcessor = (function () {
     }
     function processPacketSubscribing(packet, view) {
         var channelName = packet.channel_name;
-        if (!(channelName in view.userNames)) {
-            view.userNames[channelName] = {};
-        }
-        var userNames = view.userNames[channelName];
-        userNames[packet.user_name] = true;
+        var userName    = packet.user_name;
+        starChat.Channel.find(channelName).addUser(userName);
     }
     function processPacketDeleteSubscribing(packet, view) {
         var channelName = packet.channel_name;
-        if (!(channelName in view.userNames)) {
-            view.userNames[channelName] = {};
-            return;
-        }
-        var userNames = view.userNames[channelName];
-        delete userNames[packet.user_name];
+        var userName    = packet.user_name;
+        starChat.Channel.find(channelName).removeUser(userName);
     }
     function processPacketTopic(packet, view) {
         var topic = packet.topic;
         if (topic) {
-            view.setTopic(topic.created_at,
-                          topic.channel_name,
-                          topic.user_name,
-                          topic.body);
+            var channel = starChat.Channel.find(topic.channel_name);
+            channel.topic(topic);
         }
     }
     PacketProcessor.prototype.process = function (packet, view) {
