@@ -69,8 +69,8 @@ helpers do
     end
   end
 
-  def channel_password
-    request['X-StarChat-Channel-Password']
+  def channel_key
+    request['X-StarChat-Channel-Key']
   end
 
   def uri_encode(str)
@@ -185,9 +185,8 @@ put '/channels/:channel_name', provides: :json do
       user.subscribing?(@channel)
     end
   end
-  if params[:password]
-    # Do we need to check an existed password?
-    @channel.passowrd = params[:password]
+  if params[:privacy]
+    @channel.privacy = params[:privacy]
   end
   @channel.save
   result
@@ -233,6 +232,12 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
+get '/channels/:channel_name/permit_key', provides: :json do
+  halt 400 unless @channel.private?
+  # implement
+  ''
+end
+
 before '/subscribings' do
   protect!
   channel_name = params[:channel_name].to_s
@@ -247,15 +252,13 @@ end
 put '/subscribings', provides: :json do
   unless @channel
     @channel = StarChat::Channel.new(@channel_name)
-    if channel_password and !channel_password.empty?
-      @channel.password = channel_password
-    end
     @channel.save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
-  if @channel.password_locked?
-    halt 401 if channel_password.nil? or channel_password.empty?
-    halt 401 unless @channel.auth?(channel_password)
+  if @channel.private?
+    # TODO: Use one-time password
+    # halt 401 if channel_password.nil? or channel_password.empty?
+    # halt 401 unless @channel.auth?(channel_password)
   end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',

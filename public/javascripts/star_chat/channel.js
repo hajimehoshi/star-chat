@@ -2,12 +2,9 @@
 
 starChat.Channel = (function () {
     var Channel = function (obj) {
-        this.name_             = obj.name;
-        this.topic_            = obj.topic;
-        this.isPasswordLocked_ = false;
-        if ('password_locked' in obj) {
-            this.isPasswordLocked_ = obj.password_locked;
-        }
+        this.name_    = obj.name;
+        this.topic_   = obj.topic;
+        this.privacy_ = obj.privacy;
         this.users_ = [];
     };
     var cache = {};
@@ -38,6 +35,14 @@ starChat.Channel = (function () {
             return this.topic_;
         }
     };
+    Channel.prototype.privacy = function (privacy) {
+        if (privacy !== void(0)) {
+            this.privacy_ = privacy;
+            return this;
+        } else {
+            return this.privacy_;
+        }
+    };
     Channel.prototype.users = function () {
         return this.users_;
     };
@@ -60,9 +65,6 @@ starChat.Channel = (function () {
         if (idx !== -1) {
             this.users_.splice(idx, 1);
         }
-    };
-    Channel.prototype.isPasswordLocked = function () {
-        return this.isPasswordLocked_;
     };
     Channel.prototype.load = function (session, callback) {
         var url = '/channels/' + encodeURIComponent(this.name_);

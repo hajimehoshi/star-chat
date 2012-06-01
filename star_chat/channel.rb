@@ -8,9 +8,9 @@ module StarChat
     def self.find(name)
       key = ['channels', name]
       if RedisDB.exec(:exists, key)
-        values = RedisDB.exec(:hmget, key, 'password_digest')
+        values = RedisDB.exec(:hmget, key, 'privacy')
         params = {
-          password_digest: values[0] ? values[0] : '',
+          privacy: values[0] ? values[0].to_sym : :public,
         }
         return new(name, params)
       end
@@ -31,35 +31,25 @@ module StarChat
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     end
 
-    def password_locked?
-      !password_digest.empty?
+    def privacy
+      @privacy
     end
 
-    def password_digest
-      @password_digest ||= ''
-    end
-    private(:password_digest)
-
-    def password_digest=(password_digest)
-      @password_digest = password_digest.to_s
-    end
-    private(:password_digest=)
-
-    def password=(password)
-      if password.nil? or password.empty?
-        self.password_digest = ''
+    def privacy=(privacy)
+      privacy = privacy.to_sym
+      if [:public, :private].include?(privacy)
+        @privacy = privacy
       else
-        raise 'password should not be empty' if password.empty?
-        raise 'password can\'t include control characters' if password =~ /[[:cntrl:]]/
-        salt = SecureRandom.hex(16)
-        self.password_digest = "#{salt}.#{Digest::SHA256.hexdigest(salt + password)}"
+        @privacy = :public
       end
     end
 
-    def auth?(password)
-      return true unless password_locked?
-      salt, = password_digest.split('.')
-      password_digest == "#{salt}.#{Digest::SHA256.hexdigest(salt + password)}"
+    def public?
+      privacy == :public
+    end
+
+    def private?
+      privacy == :private
     end
 
     # TODO: Rename 'current_topic_id'
@@ -70,10 +60,10 @@ module StarChat
 
     def initialize(name, options = {})
       options = {
-        password_digest: '',
+        privacy: :public,
       }.merge(options)
-      self.name            = name
-      self.password_digest = options[:password_digest]
+      self.name    = name
+      self.privacy = options[:privacy]
     end
 
     class ChannelMessages
@@ -150,8 +140,8 @@ module StarChat
 
     def to_json(*args)
       hash = {
-        name: name,
-        password_locked: password_locked?,
+        name:    name,
+        privacy: privacy,
       }
       if last_topic_id
         topic = Topic.find(last_topic_id)
@@ -165,7 +155,7 @@ module StarChat
       RedisDB.multi do
         RedisDB.exec(:sadd, ['channels'], name)
         RedisDB.exec(:hmset, ['channels', name],
-                     'password_digest', password_digest ? password_digest : '')
+                     'privacy', privacy.to_s)
       end
       self
     end
