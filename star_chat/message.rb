@@ -48,14 +48,22 @@ module StarChat
     end
 
     def id=(id)
-      @id = id.to_i
+      @id = id ? id.to_i : nil
     end
     private(:id=)
 
     attr_reader :user_name
     attr_reader :channel_name
-    attr_reader :body
     attr_reader :created_at
+
+    def body
+      @body
+    end
+
+    def body=(body)
+      @body = body.gsub(/(?![\n\r\t])[\x00-\x1f\x7f]/, '')[0, 1024]
+    end
+    private(:body=)
 
     def initialize(user_name, body, options = {})
       options = {
@@ -64,7 +72,7 @@ module StarChat
         channel_name: '',
       }.merge(options)
       @user_name    = user_name
-      @body         = body.gsub(/(?!\n|\r|\t)[[:cntrl:]]/, '')
+      self.body     = body
       @created_at   = options[:created_at].to_i
       @id           = (options[:id] ? options[:id].to_i : nil)
       @channel_name = options[:channel_name].to_s

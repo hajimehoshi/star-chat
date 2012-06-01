@@ -59,7 +59,7 @@ module StarChat
     end
 
     def body=(body)
-      body = body.strip.gsub(/(?!\n|\r|\t)[[:cntrl:]]/, '')
+      body = body.strip.gsub(/(?![\n\r\t])[\x00-\x1f\x7f]/, '')[0, 1024]
       @body = body
     end
     private(:body=)
