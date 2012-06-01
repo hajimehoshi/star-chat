@@ -6,7 +6,6 @@ module StarChat
   # TODO: def id
   class User
 
-    @@salt = SecureRandom.hex(64).freeze
     @@password_cache = {}
 
     def self.auth_system(&block)
@@ -126,13 +125,17 @@ module StarChat
       if cache = @@password_cache[name] and
           cache[:last_auth_with_system] <= now and
           now - cache[:last_auth_with_system] < 60 * 30 # 30 min
-        if cache[:digest] == Digest::SHA1.digest(@@salt + password)
+        salt = @@password_cache[name][:salt]
+        if cache[:digest] == Digest::SHA256.digest(salt + password)
           return true
         end
       end
       if auth_with_system?(password)
+        salt = SecureRandom.hex(8)
+        digest = Digest::SHA256.digest(salt + password)
         @@password_cache[name] = {
-          digest: Digest::SHA1.digest(@@salt + password),
+          salt:                  salt,
+          digest:                digest,
           last_auth_with_system: Time.now.to_i,
         }
         return true
