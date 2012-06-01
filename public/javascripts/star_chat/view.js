@@ -588,8 +588,15 @@ starChat.View = (function () {
             var body = message.body;
             var id = $('[data-pseudo-message-id]').filter(function () {
                 var e = $(this);
-                return e.find('.body').text() === body &&
-                    e.attr('data-removed') !== 'true';
+                if (e.attr('data-removed') === 'true') {
+                    return false;
+                }
+                var body1 = e.find('.body').text();
+                var e = $('<div></div>').text(body);
+                starChat.replaceURLWithLinks(e);
+                starChat.replaceBreakLines(e);
+                var body2 = e.text();
+                return body1 === body2;
             }).first().attr('data-pseudo-message-id');
             this.removePseudoMessage(id);
         }
