@@ -245,7 +245,7 @@ li .toolIcon {
     -moz-box-shadow:    0 0 8px #000;
     -webkit-box-shadow: 0 0 8px #000;
     display: none;
-    padding: 10px 20px;
+    padding: 20px;
     position: absolute;
     z-index: 2;
 }
@@ -266,6 +266,11 @@ li .toolIcon {
 .dialog p.buttons {
     margin: 0;
     text-align: right;
+}
+.dialog p.closeDialog {
+    right: 10px;
+    position: absolute;
+    top: 0;
 }
 #dialogBackground {
     background-color: rgba(0, 0, 0, 0.5);

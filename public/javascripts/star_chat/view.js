@@ -462,8 +462,9 @@ starChat.View = (function () {
                 tr.find('[data-tool-id="editChannel"]').click(function () {
                     self.isEdittingChannel(true);
                     self.edittingChannelName(channel.name());
-                    $('#editChannelDialog [title="channelName"]').text(channel.name());
-                    self.update();
+                    setTimeout(function () {
+                        self.update();
+                    }, 0);
                     return false;
                 });
                 tr.find('[data-tool-id="deleteChannel"]').click(function () {
@@ -490,7 +491,16 @@ starChat.View = (function () {
             dialogIsShown = true;
         }
         if (self.isEdittingChannel()) {
+            var channelName = self.edittingChannelName();
+            var channel = starChat.Channel.find(channelName);
+            $('#editChannelDialog [title="channelName"]').text(channel.name());
+            if (!channel.isPasswordLocked()) {
+                $('#editChannelDialog [name="privacy"]').val(['public']);
+            } else {
+                $('#editChannelDialog [name="privacy"]').val(['private']);
+            }
             $('#editChannelDialog').show();
+            dialogIsShown = true;
         } else {
             $('#editChannelDialog').hide();
         }

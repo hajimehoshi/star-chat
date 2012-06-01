@@ -349,6 +349,24 @@ $(function() {
         $('.dialog').click(function (e) {
             e.stopPropagation();
         });
+        $('#editUserDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isEdittingUser(false);
+            view.update();
+            return false;
+        });
+        $('#editChannelsDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isEdittingChannels(false);
+            view.update();
+            return false;
+        });
+        $('#editChannelDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isEdittingChannel(false);
+            view.update();
+            return false;
+        });
         $('#dialogBackground').click(function () {
             var view = getView();
             view.closeDialogs();
@@ -374,6 +392,14 @@ $(function() {
             var view = getView();
             // TODO: implement
             view.isEdittingChannels(false);
+            view.update();
+            return false;
+        });
+        $('#editChannelDialog [type="submit"]').click(function () {
+            var view = getView();
+            // TODO: implement
+            view.isEdittingChannel(false);
+            view.edittingChannelName(null);
             view.update();
             return false;
         });

@@ -56,6 +56,7 @@
     </section>
     <div id="dialogBackground">
       <div id="editUserDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
           <h2>Edit User</h2>
           <table>
@@ -72,6 +73,7 @@
         </form>
       </div>
       <div id="editChannelsDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
           <h2>Channels</h2>
           <table>
@@ -85,6 +87,7 @@
         </form>
       </div>
       <div id="editChannelDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
           <h2>Channel</h2>
           <table>
@@ -102,7 +105,7 @@
               </td>
             </tr>
           </table>
-          <p class="buttons"><input type="submit" value="Update"></p>
+          <p class="buttons"><input type="submit" value="Update" /></p>
         </form>
       </div>
     </div>
