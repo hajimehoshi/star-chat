@@ -397,6 +397,15 @@ $(function() {
             view.update();
             return false;
         });
+        $('#editChannelDialog [name="privacy"]').change(function () {
+            var e = $(this);
+            var privacy = e.val();
+            if (privacy === 'public') {
+                $('#editChannelDialog [name="password"]').attr('disabled', 'disabled');
+            } else {
+                $('#editChannelDialog [name="password"]').removeAttr('disabled');
+            }
+        });
         $('#editChannelDialog [type="submit"]').click(function () {
             var view = getView();
             // TODO: implement

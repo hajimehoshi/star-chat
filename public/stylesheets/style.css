@@ -289,6 +289,9 @@ li .toolIcon {
 #editChannelsDialog tr.editChannel {
     display: none;
 }
+#editChannelDialog input[name="password"] {
+    width: 200px;
+}
 
 /* font-family */
 

@@ -100,7 +100,8 @@
               <td>
                 <form action="." method="post">
                   <input type="radio" name="privacy" value="public" id="editChannelPrivacyPublic" checked="checked" /><label for="editChannelPrivacyPublic">Public</label><br />
-                  <input type="radio" name="privacy" value="private" id="editChannelPrivacyPrivate" /><label for="editChannelPrivacyPrivate">Private</label>
+                  <input type="radio" name="privacy" value="private" id="editChannelPrivacyPrivate" /><label for="editChannelPrivacyPrivate">Private</label><br />
+                  New Password: <input type="password" name="password" value="" disabled="disabled" />
                 </form>
               </td>
             </tr>
