@@ -94,6 +94,15 @@ starChat.Channel = (function () {
             }
         });
     };
+    Channel.prototype.loadLatestKey = function (session, callback) {
+        var url = '/channels/' + encodeURIComponent(this.name()) + '/latest_key';
+        var self = this;
+        starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
+            if (callback !== void(0)) {
+                callback(sessionId, data.key);
+            }
+        });
+    };
     Channel.prototype.save = (function () {
         var lastTopicBody = null;
         return function (session, callback) {

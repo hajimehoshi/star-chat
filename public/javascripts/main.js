@@ -386,6 +386,22 @@ $(function() {
             });
             return false;
         });
+        $('#invitationLink a').click(function () {
+            var view = getView();
+            var channelName = view.channelName;
+            if (!channelName) {
+                return false;
+            }
+            var channel = starChat.Channel.find(channelName);
+            channel.loadLatestKey(view.session(), function (sessionId, key) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                console.log(key);
+            });
+            return false;
+        });
     })();
     (function () {
         $('.dialog').click(function (e) {

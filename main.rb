@@ -232,13 +232,13 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
-get '/channels/:channel_name/key/:expire_time', provides: :json do
+get '/channels/:channel_name/latest_key', provides: :json do
   halt 400 unless @channel.private?
-  expire_time = params[:expire_time].to_i
-  now = Time.now.to_i
-  halt 400 if expire_time <= now
-  halt 400 if now + 60 < expire_time
-  @channel.generate_key(current_user, expire_time)
+  expire_time = Time.now.to_i + 60
+  {
+    channel_name: @channel.name,
+    key:          @channel.generate_key(current_user, expire_time),
+  }.to_json
 end
 
 before '/subscribings' do

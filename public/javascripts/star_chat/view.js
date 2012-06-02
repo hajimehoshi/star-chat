@@ -446,9 +446,9 @@ starChat.View = (function () {
                 ul.append(li);
             });
             if (channel.privacy() === 'private') {
-                $('#inviteLink').show();
+                $('#invitationLink').show();
             } else {
-                $('#inviteLink').hide();
+                $('#invitationLink').hide();
             }
         }
     }
