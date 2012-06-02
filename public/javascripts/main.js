@@ -439,10 +439,19 @@ $(function() {
         });
         $('#editChannelDialog [type="submit"]').click(function () {
             var view = getView();
-            // TODO: implement
-            view.isEdittingChannel(false);
-            view.edittingChannelName(null);
-            view.update();
+            var channelName = view.edittingChannelName();
+            var channel = starChat.Channel.find(channelName);
+            var privacy = $('#editChannelDialog [name="privacy"]:checked').val();
+            channel.privacy(privacy);
+            channel.save(view.session(), function (sessionId) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.isEdittingChannel(false);
+                view.edittingChannelName(null);
+                view.update();
+            });
             return false;
         });
     })();

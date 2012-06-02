@@ -110,7 +110,7 @@ starChat.Channel = (function () {
                 }
             }
             params.privacy = this.privacy();
-            starChat.ajaxRequest(session, url, 'PUT', params, function (sesionId, url, method, data) {
+            starChat.ajaxRequest(session, url, 'PUT', params, function (sessionId, url, method, data) {
                 if (callback !== void(0)) {
                     callback(sessionId);
                 }
