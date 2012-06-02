@@ -60,16 +60,23 @@ $(function() {
         if (!password.match(allAscii)) {
             return;
         }
-        var callbacks = {
+        var url = '/users/' + encodeURIComponent(userName) + '/ping';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            cache: false,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization',
+                                     'Basic ' + btoa(userName + ':' + password));
+            },
+            dataType: 'json',
             success: function (data, textStatus, jqXHR) {
                 logIn(userName, password);
             },
-            logOut: logOut,
-        };
-        starChat.ajax(userName, password,
-                      '/users/' + encodeURIComponent(userName) + '/ping',
-                      'GET',
-                      callbacks);
+            statusCode: {
+                401: logOut
+            },
+        });
     }
 
     var onHashchange = (function () {

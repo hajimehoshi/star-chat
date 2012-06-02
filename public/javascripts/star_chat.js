@@ -19,47 +19,6 @@ starChat.isSameArray = function (a, b, func) {
     return true;
 };
 
-// This function is deprecated
-starChat.ajax = function (userName, password, url, method, callbacks, data, sessionId) {
-    var args = {
-        url: url,
-        type: method,
-        cache: false,
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization',
-                                 'Basic ' + btoa(userName + ':' + password));            
-        },
-        dataType: 'json',
-        statusCode: {},
-    }
-    if (data) {
-        args.data = data;
-    }
-    if ('logOut' in callbacks) {
-        args.statusCode[401] = callbacks.logOut;
-    }
-    if ('onprogress' in callbacks) {
-        args.xhrFields = {
-            onprogress: callbacks.onprogress,
-        };
-    }
-    if ('success' in callbacks) {
-        args.success = callbacks.success;
-    }
-    if ('error' in callbacks) {
-        args.error = callbacks.error;
-    }
-    if ('complete' in callbacks) {
-        args.complete = callbacks.complete;
-    }
-    var jq = $.ajax(args)
-    jq.starChatRequestURI = url;
-    if ($.isNumeric(sessionId)) {
-        jq.starChatSessionId = sessionId;
-    }
-    return jq;
-};
-
 starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, options) {
     var sessionId = session.id();
     var userName  = session.userName();

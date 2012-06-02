@@ -25,32 +25,16 @@ starChat.Stream = (function () {
             }
             self.start(view, lastTime);
         };
-        var callbacks = {
-            onprogress: function () {
-                console.log('Reading stream...');
-                self.continuingErrorNum_ = 0;
-                // TODO: Reconnecting if overflow
-                var xhr = this;
-                var text = xhr.responseText;
-                var subText = text.substring(streamReadIndex);
-                while (true) {
-                    var tokenLength = subText.search("\n");
-                    if (tokenLength === -1) {
-                        break;
-                    }
-                    streamReadIndex += tokenLength + 1;
-                    var token = subText.substring(0, tokenLength);
-                    subText = subText.substring(tokenLength + 1);
-                    try {
-                        var packet = JSON.parse(token);
-                    } catch (e) {
-                        console.log(e);
-                        continue;
-                    }
-                    self.packetProcessor_.process(packet, view);
-                }
-                view.update();
+        console.log('Connecting stream...');
+        this.ajax_ = $.ajax({
+            url: url,
+            type: 'GET',
+            cache: false,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization',
+                                     'Basic ' + btoa(session.userName() + ':' + session.password()));
             },
+            dataType: 'json',
             success: function (data, textStatus, jqXHR) {
                 self.continuingErrorNum_ = 0;
                 setTimeout(function () {
@@ -70,12 +54,34 @@ starChat.Stream = (function () {
                     restartStream(parseInt($.now() / 1000) - 10);
                 }, 2000);
             },
-        };
-        console.log('Connecting stream...');
-        this.ajax_ = starChat.ajax(session.userName(), session.password(),
-                                   url,
-                                   'GET',
-                                   callbacks);
+            xhrFields: {
+                onprogress: function () {
+                    console.log('Reading stream...');
+                    self.continuingErrorNum_ = 0;
+                    // TODO: Reconnecting if overflow
+                    var xhr = this;
+                    var text = xhr.responseText;
+                    var subText = text.substring(streamReadIndex);
+                    while (true) {
+                        var tokenLength = subText.search("\n");
+                        if (tokenLength === -1) {
+                            break;
+                        }
+                        streamReadIndex += tokenLength + 1;
+                        var token = subText.substring(0, tokenLength);
+                        subText = subText.substring(tokenLength + 1);
+                        try {
+                            var packet = JSON.parse(token);
+                        } catch (e) {
+                            console.log(e);
+                            continue;
+                        }
+                        self.packetProcessor_.process(packet, view);
+                    }
+                    view.update();
+                },
+            },
+        });
     };
     Stream.prototype.stop = function () {
         if (!this.ajax_) {
