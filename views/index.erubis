@@ -27,7 +27,6 @@
         </ul>
         <form id="addChannelForm">
           <p><input type="text" name="name" value="" /><input type="submit" value="Add" /></p>
-          <p class="errorMessage">...</p>
         </form>
         <hr />
         <form id="searchForm">

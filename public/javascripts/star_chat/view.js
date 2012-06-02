@@ -120,11 +120,6 @@ starChat.View = (function () {
                 });
                 lastSessionId = self.session_.id();
             })();
-            if (self.errorMessages_['addingChannel']) {
-                $('#channels .errorMessage').text(self.errorMessages_['addingChannel']).show();
-            } else {
-                $('#channels .errorMessage').hide();
-            }
         }
     })();
     function updateViewSearch(self) {
