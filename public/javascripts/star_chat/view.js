@@ -117,11 +117,11 @@ starChat.View = (function () {
                 });
                 lastSessionId = self.session_.id();
             })();
-        }
-        if (this.errorMessages_['addingChannel']) {
-            $('#channelsList .errorMessage').text(this.errorMessages_['addingChannel']).show();
-        } else {
-            $('#channelsList .errorMessage').hide();
+            if (self.errorMessages_['addingChannel']) {
+                $('#channels .errorMessage').text(self.errorMessages_['addingChannel']).show();
+            } else {
+                $('#channels .errorMessage').hide();
+            }
         }
     })();
     function updateViewSearch(self) {
