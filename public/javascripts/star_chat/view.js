@@ -453,6 +453,8 @@ starChat.View = (function () {
             } else {
                 $('#invitationLink').hide();
             }
+        } else {
+            $('#invitationLink').hide();
         }
     }
     function updateViewDialogs(self) {
