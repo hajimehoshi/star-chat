@@ -137,7 +137,11 @@ module StarChat
       topic = Topic.new(user.name,
                         self.name,
                         body,
-                        created_at: created_at).save
+                        created_at: created_at)
+      if current_topic and current_topic.body == topic.body
+        return nil
+      end
+      topic.save
       RedisDB.exec(:rpush,
                    ['channels', name, 'topics'],
                    topic.id)

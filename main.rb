@@ -177,8 +177,8 @@ put '/channels/:channel_name', provides: :json do
   end
   # TODO: params[:topic][:body]?
   if params[:topic] and params[:topic][:body]
-    # TODO: 内容が同じだったら更新しない
     topic = @channel.update_topic(current_user, params[:topic][:body])
+    halt 409 if topic.nil?
     # TODO: move after saving?
     broadcast(type: 'topic',
               topic: topic) do |user_name|
