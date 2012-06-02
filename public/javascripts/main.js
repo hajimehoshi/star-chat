@@ -29,6 +29,13 @@ $(function() {
                 if (!channel.name()) {
                     return;
                 }
+                channel.loadUsers(view.session(), function (sessionId) {
+                    var view = getView();
+                    if (view.session().id() !== sessionId) {
+                        return;
+                    }
+                    view.update();
+                });
                 var url = '/channels/' + encodeURIComponent(channel.name()) + '/messages/recent';
                 starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
             });
@@ -121,18 +128,18 @@ $(function() {
                     }
                 });
                 if (isAlreadyJoined || view.isShowingOldLogs()) {
-                    view.channelName = channelName;
-                    if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
-                        var url = '/channels/' + encodeURIComponent(channelName) +
-                            '/messages/by_time_span/' +
-                            encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
-                        starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
-                    }
                     var channel = starChat.Channel.find(channelName);
                     channel.loadUsers(view.session(), function (sessionId) {
                         var view = getView();
                         if (view.session().id() !== sessionId) {
                             return;
+                        }
+                        view.channelName = channelName;
+                        if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
+                            var url = '/channels/' + encodeURIComponent(channelName) +
+                                '/messages/by_time_span/' +
+                                encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
+                            starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                         }
                         view.update();
                     });
