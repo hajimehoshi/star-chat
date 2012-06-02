@@ -292,7 +292,9 @@ starChat.View = (function () {
                 h2.find('img[alt="private"]').hide();
             }
         } else {
-            $('#messages h2 span').text("\u00a0");
+            var h2 = $('#messages h2');
+            h2.find('span').text("\u00a0");
+            h2.find('img[alt="private"]').hide();
         }
         if (!self.isShowingOldLogs()) {
             $('#messages > section').filter(function (i) {
