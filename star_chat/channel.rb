@@ -195,7 +195,7 @@ module StarChat
       return false if expire_time < now
       # too future
       return false if now + 60 * 5 < expire_time
-      channel_name = [channel_name_hex].pack('h*')
+      channel_name = [channel_name_hex].pack('h*').force_encoding('utf-8')
       return false if self.name != channel_name
       master_key = @@master_keys[self.name]
       hash == Digest::SHA256.hexdigest("#{expire_time}.#{salt}.#{channel_name_hex}.#{master_key}")
