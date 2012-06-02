@@ -107,6 +107,13 @@
           <p class="buttons"><input type="submit" value="Update" /></p>
         </form>
       </div>
+      <div id="invitationURLDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
+        <h2>Invitation URL</h2>
+        <p>Please tell the below URL to the user you want to invite. This URL will expire in 5 minutes.</p>
+        <p><input type="text" value="" name="invitationURL" /></p>
+        <p class="buttons"><button title="regenerate">Regenerate</button></p>
+      </div>
     </div>
     <!-- TODO: write footer -->
     <script src="/javascripts/jquery-1.7.2.min.js"></script>

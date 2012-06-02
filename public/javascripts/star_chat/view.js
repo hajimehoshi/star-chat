@@ -24,14 +24,17 @@ starChat.View = (function () {
         self.endTime_ = null;
         self.oldMessages_ = {};
         self.isBlinkingTitle_ = false;
-        self.isEdittingUser_ = false;
-        self.isEdittingChannels_ = false;
-        self.isEdittingChannel_ = false;
-        self.edittingChannelName_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
         self.isEdittingTopic_ = false;
         self.errorMessages_ = {};
+
+        // Dialogs
+        self.isEdittingUser_ = false;
+        self.isEdittingChannels_ = false;
+        self.isEdittingChannel_ = false;
+        self.edittingChannelName_ = false;
+        self.isShowingInvitationURLDialog_ = false;
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -499,6 +502,12 @@ starChat.View = (function () {
         } else {
             $('#editChannelDialog').hide();
         }
+        if (self.isShowingInvitationURLDialog()) {
+            dialogIsShown = true;
+            $('#invitationURLDialog').show();
+        } else {
+            $('#invitationURLDialog').hide();
+        }
         if (dialogIsShown) {
             $('#dialogBackground').show();
         } else {
@@ -658,10 +667,19 @@ starChat.View = (function () {
             return this.edittingChannelName_;
         }
     }
+    View.prototype.isShowingInvitationURLDialog = function (value) {
+        if (value !== void(0)) {
+            this.isShowingInvitationURLDialog_ = value;
+            return this;
+        } else {
+            return this.isShowingInvitationURLDialog_;
+        }
+    };
     View.prototype.closeDialogs = function () {
         this.isEdittingUser(false);
         this.isEdittingChannels(false);
         this.isEdittingChannel(false);
+        this.isShowingInvitationURLDialog(false);
     };
     View.prototype.setSearch = function (query, result) {
         this.searchQuery_  = query;

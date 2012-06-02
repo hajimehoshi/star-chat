@@ -94,7 +94,7 @@ starChat.Channel = (function () {
             }
         });
     };
-    Channel.prototype.loadLatestKey = function (session, callback) {
+    Channel.prototype.generateKey = function (session, callback) {
         var url = '/channels/' + encodeURIComponent(this.name()) + '/keys';
         var self = this;
         starChat.ajaxRequest(session, url, 'POST', null, function (sessionId, url, method, data) {

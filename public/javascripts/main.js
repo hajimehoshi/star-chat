@@ -392,15 +392,30 @@ $(function() {
             if (!channelName) {
                 return false;
             }
+            view.isShowingInvitationURLDialog(true);
+            view.update();
+            $('#invitationURLDialog button[title="regenerate"]').click();
+            return false;
+        });
+        $('#invitationURLDialog button[title="regenerate"]').click(function () {
+            var view = getView();
+            var channelName = view.channelName;
+            if (!channelName) {
+                return false;
+            }
             var channel = starChat.Channel.find(channelName);
-            channel.loadLatestKey(view.session(), function (sessionId, key) {
+            channel.generateKey(view.session(), function (sessionId, key) {
                 var view = getView();
                 if (view.session().id() !== sessionId) {
                     return;
                 }
-                console.log(key);
+                var url = location.href + '?key=' + encodeURIComponent(key);
+                $('#invitationURLDialog input[name="invitationURL"]').val(url);
             });
             return false;
+        });
+        $('#invitationURLDialog input[name="invitationURL"]').click(function () {
+            $(this).select();
         });
     })();
     (function () {
@@ -422,6 +437,12 @@ $(function() {
         $('#editChannelDialog [data-tool-id="closeDialog"]').click(function () {
             var view = getView();
             view.isEdittingChannel(false);
+            view.update();
+            return false;
+        });
+        $('#invitationURLDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isShowingInvitationURLDialog(false);
             view.update();
             return false;
         });

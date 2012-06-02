@@ -292,6 +292,10 @@ li .toolIcon {
 #editChannelDialog input[name="password"] {
     width: 200px;
 }
+#invitationURLDialog input[name="invitationURL"] {
+    font-size: 200%;
+    width: 600px;
+}
 
 /* font-family */
 
