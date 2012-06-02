@@ -177,8 +177,8 @@ module StarChat
 
     def auth?(key)
       segments = key.split('.')
-      return false if segments.length != 5
-      expire_time_str, salt, channel_name_hex, invited_user_name_hex, hash = *segments
+      return false if segments.length != 4
+      expire_time_str, salt, channel_name_hex, hash = *segments
       expire_time = expire_time_str.to_i
       now = Time.now.to_i
       # expired

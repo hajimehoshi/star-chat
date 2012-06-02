@@ -88,11 +88,15 @@ $(function() {
             view.channelName = '';
             view.resetTimeSpan();
             if (fragment.match(/^channels\//)) {
-                if (fragment.match(/^channels\/([^\/]+)$/)) {
+                var params = {};
+                if (fragment.match(/^channels\/([^\/\?]+)(\?(.*))?$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = null;
                     var endTime     = null;
-                } else if (fragment.match(/^channels\/([^\/]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
+                    if (RegExp.$3) {
+                        params = starChat.parseQuery(RegExp.$3);
+                    }
+                } else if (fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = parseInt(decodeURIComponent(RegExp.$2));
                     var endTime     = parseInt(decodeURIComponent(RegExp.$3));
@@ -134,6 +138,12 @@ $(function() {
                 var url = '/subscribings?' +
                     'channel_name=' + encodeURIComponent(channelName) + ';' +
                     'user_name=' + encodeURIComponent(session.userName());
+                var options = {};
+                if ('key' in params) {
+                    options['headers'] = {
+                        'X-StarChat-Channel-Key': params.key,
+                    };
+                }
                 starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
                     receiveResponse(sessionId, uri, method, data);
                     var view = getView();
@@ -147,7 +157,7 @@ $(function() {
                         }
                         view.update();
                     });
-                });
+                }, options);
             }
         }
     })();

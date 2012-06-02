@@ -19,19 +19,16 @@ starChat.isSameArray = function (a, b, func) {
     return true;
 };
 
-starChat.getAddAuthHeaderFunc = function (userName, password) {
-    return function (xhr) {
-        xhr.setRequestHeader('Authorization',
-                             'Basic ' + btoa(userName + ':' + password));
-    }
-};
-
+// This function is deprecated
 starChat.ajax = function (userName, password, url, method, callbacks, data, sessionId) {
     var args = {
         url: url,
         type: method,
         cache: false,
-        beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization',
+                                 'Basic ' + btoa(userName + ':' + password));            
+        },
         dataType: 'json',
         statusCode: {},
     }
@@ -67,12 +64,22 @@ starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, op
     var sessionId = session.id();
     var userName  = session.userName();
     var password  = session.password();
+    var beforeSend = function (xhr) {
+        xhr.setRequestHeader('Authorization',
+                             'Basic ' + btoa(userName + ':' + password));
+        if (options && 'headers' in options) {
+            var headers = options.headers;
+            Object.keys(headers).forEach(function (key) {
+                xhr.setRequestHeader(key, headers[key]);
+            });
+        };
+    }
     var args = {
-        url: url,
-        type: method,
-        cache: false,
-        beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
-        dataType: 'json',
+        url:        url,
+        type:       method,
+        cache:      false,
+        beforeSend: beforeSend,
+        dataType:   'json',
         statusCode: {},
     }
     if (callbackSuccess !== void(0) ||

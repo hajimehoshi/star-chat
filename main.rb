@@ -253,13 +253,13 @@ end
 
 put '/subscribings', provides: :json do
   unless @channel
-    channel_key = request['X-StarChat-Channel-Key']
     @channel = StarChat::Channel.new(@channel_name)
     @channel.save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
   if @channel.private?
     # TODO: Use one-time password
+    channel_key = request.env['HTTP_X_STARCHAT_CHANNEL_KEY']
     halt 401 if channel_key.nil? or channel_key.empty?
     halt 401 unless @channel.auth?(channel_key)
   end
