@@ -428,13 +428,6 @@ $(function() {
             });
             return false;
         });
-        $('#editChannelsDialog [type="submit"]').click(function () {
-            var view = getView();
-            // TODO: implement
-            view.isEdittingChannels(false);
-            view.update();
-            return false;
-        });
         $('#editChannelDialog [name="privacy"]').change(function () {
             var e = $(this);
             var privacy = e.val();
