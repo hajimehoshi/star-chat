@@ -410,11 +410,11 @@ $(function() {
                     return;
                 }
                 var url = location.href + '?key=' + encodeURIComponent(key);
-                $('#invitationURLDialog input[name="invitationURL"]').val(url);
+                $('#invitationURLDialog [name="invitationURL"]').val(url);
             });
             return false;
         });
-        $('#invitationURLDialog input[name="invitationURL"]').click(function () {
+        $('#invitationURLDialog [name="invitationURL"]').click(function () {
             $(this).select();
         });
     })();

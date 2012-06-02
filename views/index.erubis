@@ -111,7 +111,7 @@
         <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <h2>Invitation URL</h2>
         <p>Please tell the below URL to the user you want to invite. This URL will expire in 5 minutes.</p>
-        <p><input type="text" value="" name="invitationURL" /></p>
+        <p><textarea name="invitationURL" rows="3"></textarea></p>
         <p class="buttons"><button title="regenerate">Regenerate</button></p>
       </div>
     </div>

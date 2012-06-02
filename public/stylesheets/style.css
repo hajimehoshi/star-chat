@@ -292,9 +292,10 @@ li .toolIcon {
 #editChannelDialog input[name="password"] {
     width: 200px;
 }
-#invitationURLDialog input[name="invitationURL"] {
+#invitationURLDialog [name="invitationURL"] {
     font-size: 200%;
     width: 600px;
+    word-break: break-all;
 }
 
 /* font-family */
@@ -304,6 +305,9 @@ li .toolIcon {
 }
 td.body {
     font-family: sans-serif;
+}
+#invitationURLDialog [name="invitationURL"] {
+    font-family: monospace;
 }
 
 /* box */
