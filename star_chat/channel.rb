@@ -183,7 +183,7 @@ module StarChat
       # expired
       return false if expire_time < now
       # too future
-      return false if now + 60 <= expire_time
+      return false if now + 60 < expire_time
       channel_name = [channel_name_hex].pack('h*')
       return false if self.name != channel_name
       master_key = @@master_keys[self.name]

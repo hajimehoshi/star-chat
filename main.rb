@@ -237,7 +237,7 @@ get '/channels/:channel_name/key/:expire_time', provides: :json do
   expire_time = params[:expire_time].to_i
   now = Time.now.to_i
   halt 400 if expire_time <= now
-  halt 400 if now + 60 <= expire_time
+  halt 400 if now + 60 < expire_time
   @channel.generate_key(current_user, expire_time)
 end
 
