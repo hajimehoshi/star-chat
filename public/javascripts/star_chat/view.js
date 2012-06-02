@@ -31,6 +31,7 @@ starChat.View = (function () {
         self.searchQuery_ = null;
         self.searchResult_ = [];
         self.isEdittingTopic_ = false;
+        self.errorMessages_ = {};
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -116,6 +117,11 @@ starChat.View = (function () {
                 });
                 lastSessionId = self.session_.id();
             })();
+        }
+        if (this.errorMessages_['addingChannel']) {
+            $('#channelsList .errorMessage').text(this.errorMessages_['addingChannel']).show();
+        } else {
+            $('#channelsList .errorMessage').hide();
         }
     })();
     function updateViewSearch(self) {
@@ -656,6 +662,9 @@ starChat.View = (function () {
         } else {
             return this.isEdittingTopic_;
         }
+    };
+    View.prototype.setErrorMesasge = function (x, message) {
+        this.errorMessages_[x] = message;
     };
     return View;
 })();
