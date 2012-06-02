@@ -1,10 +1,10 @@
 'use strict';
 
 starChat.Channel = (function () {
-    var Channel = function (object) {
-        this.name_  = object.name;
-        this.topic_ = object.topic;
+    var Channel = function (obj) {
+        this.name_  = obj.name;
         this.users_ = [];
+        this.update(obj);
     };
     var cache = {};
     Channel.find = function (name) {
@@ -19,6 +19,9 @@ starChat.Channel = (function () {
         if ('topic' in obj) {
             this.topic_ = obj.topic;
         }
+        if ('privacy' in obj) {
+            this.privacy_ = obj.privacy;
+        }
     };
     Channel.prototype.name = function () {
         return this.name_;
@@ -29,6 +32,16 @@ starChat.Channel = (function () {
             return this;
         } else {
             return this.topic_;
+        }
+    };
+    Channel.prototype.privacy = function (privacy) {
+        if (privacy !== void(0)) {
+            if (privacy == 'public' || privacy == 'private') {
+                this.privacy_ = privacy;
+            }
+            return this;
+        } else {
+            return this.privacy_;
         }
     };
     Channel.prototype.users = function () {
@@ -53,19 +66,22 @@ starChat.Channel = (function () {
         if (idx !== -1) {
             this.users_.splice(idx, 1);
         }
-    }
+    };
     Channel.prototype.load = function (session, callback) {
-        var url = '/channels/' + encodeURIComponent(this.name_);
+        var url = '/channels/' + encodeURIComponent(this.name());
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
-            self.topic_ = data.topic;
+            self.topic(data.topic);
+            if ('privacy' in data) {
+                self.privacy(data.privacy);
+            }
             if (callback !== void(0)) {
                 callback(sessionId);
             }
         });
     };
     Channel.prototype.loadUsers = function (session, callback) {
-        var url = '/channels/' + encodeURIComponent(this.name_) + '/users';
+        var url = '/channels/' + encodeURIComponent(this.name()) + '/users';
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.users_ = data.map(function (obj) {
@@ -78,13 +94,22 @@ starChat.Channel = (function () {
             }
         });
     };
+    Channel.prototype.generateKey = function (session, callback) {
+        var url = '/channels/' + encodeURIComponent(this.name()) + '/keys';
+        var self = this;
+        starChat.ajaxRequest(session, url, 'POST', null, function (sessionId, url, method, data) {
+            if (callback !== void(0)) {
+                callback(sessionId, data.key);
+            }
+        });
+    };
     Channel.prototype.save = (function () {
         var lastTopicBody = null;
         return function (session, callback) {
-            var url = '/channels/' + encodeURIComponent(this.name_);
+            var url = '/channels/' + encodeURIComponent(this.name());
             var params = {};
-            if (this.topic_) {
-                var topicBody = this.topic_.body;
+            if (this.topic()) {
+                var topicBody = this.topic().body;
                 topicBody = topicBody.replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
                 topicBody = topicBody.substring(0, 1024);
                 if (lastTopicBody !== topicBody) {
@@ -92,7 +117,8 @@ starChat.Channel = (function () {
                     lastTopicBody = topicBody
                 }
             }
-            starChat.ajaxRequest(session, url, 'PUT', params, function (sesionId, url, method, data) {
+            params.privacy = this.privacy();
+            starChat.ajaxRequest(session, url, 'PUT', params, function (sessionId, url, method, data) {
                 if (callback !== void(0)) {
                     callback(sessionId);
                 }
@@ -101,5 +127,3 @@ starChat.Channel = (function () {
     })();
     return Channel;
 })();
-
-

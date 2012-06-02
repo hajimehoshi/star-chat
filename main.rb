@@ -156,6 +156,10 @@ before %r{^/channels/([^/]+)} do
         !current_user.subscribing?(@channel)
       halt 401
     end
+    if @channel.private? and
+        !current_user.subscribing?(@channel)
+      halt 401
+    end
   else
     halt 404 unless request.put?
   end
@@ -171,13 +175,18 @@ put '/channels/:channel_name', provides: :json do
     @channel = StarChat::Channel.save(params[:channel_name]).save
     result = 201
   end
+  # TODO: params[:topic][:body]?
   if params[:topic_body]
     topic = @channel.update_topic(current_user, params[:topic_body])
+    # TODO: move after saving?
     broadcast(type: 'topic',
               topic: topic) do |user_name|
       return false unless user = StarChat::User.find(user_name)
       user.subscribing?(@channel)
     end
+  end
+  if params[:privacy]
+    @channel.privacy = params[:privacy]
   end
   @channel.save
   result
@@ -223,6 +232,14 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
+post '/channels/:channel_name/keys', provides: :json do
+  halt 400 unless @channel.private?
+  {
+    channel_name: @channel.name,
+    key:          @channel.generate_key(current_user),
+  }.to_json
+end
+
 before '/subscribings' do
   protect!
   channel_name = params[:channel_name].to_s
@@ -236,9 +253,16 @@ end
 
 put '/subscribings', provides: :json do
   unless @channel
-    @channel = StarChat::Channel.new(@channel_name).save
+    @channel = StarChat::Channel.new(@channel_name)
+    @channel.save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
+  if @channel.private?
+    # TODO: Use one-time password
+    channel_key = request.env['HTTP_X_STARCHAT_CHANNEL_KEY']
+    halt 401 if channel_key.nil? or channel_key.empty?
+    halt 401 unless @channel.auth?(channel_key)
+  end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
             channel_name: @channel.name,

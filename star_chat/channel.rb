@@ -1,14 +1,23 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+require 'digest/sha2'
+require 'securerandom'
+
 module StarChat
 
   class Channel
 
+    @@master_keys = Hash.new do |hash, key|
+      hash[key] = SecureRandom.hex(64)
+    end
+
     def self.find(name)
       key = ['channels', name]
       if RedisDB.exec(:exists, key)
-        # values = RedisDB.exec(:hmget)
-        # params = {}
-        return new(name)
+        values = RedisDB.exec(:hmget, key, 'privacy')
+        params = {
+          privacy: values[0] ? values[0].to_sym : :public,
+        }
+        return new(name, params)
       end
       nil
     end
@@ -19,14 +28,33 @@ module StarChat
       end
     end
 
-    attr_reader :name
-
     def name
       @name
     end
 
     def name=(name)
       @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+    end
+
+    def privacy
+      @privacy
+    end
+
+    def privacy=(privacy)
+      privacy = privacy.to_sym
+      if [:public, :private].include?(privacy)
+        @privacy = privacy
+      else
+        @privacy = :public
+      end
+    end
+
+    def public?
+      privacy == :public
+    end
+
+    def private?
+      privacy == :private
     end
 
     # TODO: Rename 'current_topic_id'
@@ -37,8 +65,10 @@ module StarChat
 
     def initialize(name, options = {})
       options = {
+        privacy: :public,
       }.merge(options)
-      self.name = name
+      self.name    = name
+      self.privacy = options[:privacy]
     end
 
     class ChannelMessages
@@ -81,6 +111,7 @@ module StarChat
     end
 
     def post_message(user, body, created_at = Time.now.to_i)
+      # TODO: Check subscribing?
       message = nil
       # TODO: lock?
       message = Message.new(user.name,
@@ -114,7 +145,8 @@ module StarChat
 
     def to_json(*args)
       hash = {
-        name: name
+        name:    name,
+        privacy: privacy,
       }
       if last_topic_id
         topic = Topic.find(last_topic_id)
@@ -127,9 +159,36 @@ module StarChat
       raise 'The name should not be empty' if name.empty?
       RedisDB.multi do
         RedisDB.exec(:sadd, ['channels'], name)
-        RedisDB.exec(:hmset, ['channels', name], 'dummy', 'dummy')
+        RedisDB.exec(:hmset, ['channels', name],
+                     'privacy', privacy.to_s)
       end
       self
+    end
+
+    def generate_key(user)
+      raise 'invalid user' unless user.subscribing?(self)
+      expire_time = Time.now.to_i + 60 * 5
+      salt             = SecureRandom.hex(16)
+      channel_name_hex = self.name.unpack('h*')[0]
+      master_key       = @@master_keys[self.name]
+      hash = Digest::SHA256.hexdigest("#{expire_time}.#{salt}.#{channel_name_hex}.#{master_key}")
+      "#{expire_time}.#{salt}.#{channel_name_hex}.#{hash}"
+    end
+
+    def auth?(key)
+      segments = key.split('.')
+      return false if segments.length != 4
+      expire_time_str, salt, channel_name_hex, hash = *segments
+      expire_time = expire_time_str.to_i
+      now = Time.now.to_i
+      # expired
+      return false if expire_time < now
+      # too future
+      return false if now + 60 * 5 < expire_time
+      channel_name = [channel_name_hex].pack('h*')
+      return false if self.name != channel_name
+      master_key = @@master_keys[self.name]
+      hash == Digest::SHA256.hexdigest("#{expire_time}.#{salt}.#{channel_name_hex}.#{master_key}")
     end
 
   end

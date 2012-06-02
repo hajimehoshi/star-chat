@@ -12,23 +12,29 @@ starChat.View = (function () {
         // TODO: Model に相当するクラスを作る?
         // TODO: いずれこれらの変数も private (_ 終わり) にする
         self.channelName = '';
-        self.messageScrollTops = {};
-        self.isEdittingChannels = false;
 
         self.lastChannelName_ = '';
         self.newMessages_ = {};
         self.pseudoMessages_ = {};
         self.messageElements_ = {};
         self.messageIdsAlreadyInSection_ = {};
+        self.messageScrollTops_ = {};
         self.dirtyFlags_ = {};
         self.startTime_ = null;
         self.endTime_ = null;
         self.oldMessages_ = {};
         self.isBlinkingTitle_ = false;
-        self.isEdittingUser_ = false;
         self.searchQuery_ = null;
         self.searchResult_ = [];
         self.isEdittingTopic_ = false;
+        self.errorMessages_ = {};
+
+        // Dialogs
+        self.isEdittingUser_ = false;
+        self.isEdittingChannels_ = false;
+        self.isEdittingChannel_ = false;
+        self.edittingChannelName_ = false;
+        self.isShowingInvitationURLDialog_ = false;
 
         self.title_ = 'StarChat (β)';
         document.title = self.title_;
@@ -103,12 +109,8 @@ starChat.View = (function () {
                     var href = '#channels/' + encodeURIComponent(channel.name());
                     a.attr('href', href);
                     a.text(name);
-                    // TODO: Use attr
-                    var icon = $('<img src="" alt="delete" width="16" height="16" class="toolIcon" data-image-icon-name="blackRoundMinus" data-tool-id="delete" />').click(function () {
-                        return self.clickChannelDel_(channel);
-                    });
                     var li = $('<li></li>').attr('data-channel-name', channel.name());
-                    li.append(a).append(icon);
+                    li.append(a);
                     ul.append(li);
                 });
                 ul.find('li').each(function () {
@@ -118,10 +120,10 @@ starChat.View = (function () {
                 });
                 lastSessionId = self.session_.id();
             })();
-            if (self.isEdittingChannels) {
-                $('#channels li img[data-tool-id="delete"]').show().css('display', 'inline');
+            if (self.errorMessages_['addingChannel']) {
+                $('#channels .errorMessage').text(self.errorMessages_['addingChannel']).show();
             } else {
-                $('#channels li img[data-tool-id="delete"]').hide();
+                $('#channels .errorMessage').hide();
             }
         }
     })();
@@ -199,7 +201,7 @@ starChat.View = (function () {
         }
         if (!self.isShowingOldLogs()) {
             section.scroll(function () {
-                self.messageScrollTops[channelName] = section.scrollTop();
+                self.messageScrollTops_[channelName] = section.scrollTop();
             });
         }
         var inputYear   = $('<input type="number" name="year" min="0" max="9999" value="" />');
@@ -268,6 +270,7 @@ starChat.View = (function () {
     }
     function updateViewMessages(self) {
         if (self.channelName) {
+            var h2 = $('#messages h2');
             if (self.isShowingOldLogs()) {
                 var d = new Date(self.startTime_ * 1000);
                 if ((self.endTime_ - self.startTime_) === 60 * 60 * 24 &&
@@ -281,12 +284,20 @@ starChat.View = (function () {
                     var endTime   = starChat.toISO8601(new Date(self.endTime_   * 1000));
                     var oldLogs = '(Old Logs: ' + startTime + '/' + endTime + ')';
                 }
-                $('#messages h2').text(self.channelName + ' ' + oldLogs);
+                h2.find('span').text(self.channelName + ' ' + oldLogs);
             } else {
-                $('#messages h2').text(self.channelName);
+                h2.find('span').text(self.channelName);
+            }
+            var channel = starChat.Channel.find(self.channelName);
+            if (channel.privacy() === 'private') {
+                h2.find('img[alt="private"]').show();
+            } else {
+                h2.find('img[alt="private"]').hide();
             }
         } else {
-            $('#messages h2').text("\u00a0");
+            var h2 = $('#messages h2');
+            h2.find('span').text("\u00a0");
+            h2.find('img[alt="private"]').hide();
         }
         if (!self.isShowingOldLogs()) {
             $('#messages > section').filter(function (i) {
@@ -385,13 +396,13 @@ starChat.View = (function () {
                 }
             } else {
                 if (!self.lastChannelName_ ||
-                    !(self.channelName in self.messageScrollTops)) {
+                    !(self.channelName in self.messageScrollTops_)) {
                     section.scrollTop(section.get(0).scrollHeight);
                 } else {
-                    section.scrollTop(self.messageScrollTops[self.channelName]);
+                    section.scrollTop(self.messageScrollTops_[self.channelName]);
                 }
             }
-            self.messageScrollTops[self.channelName] = section.scrollTop();
+            self.messageScrollTops_[self.channelName] = section.scrollTop();
             self.lastChannelName_ = self.channelName;
         }
     }
@@ -424,27 +435,80 @@ starChat.View = (function () {
         }
     }
     function updateViewUsers(self) {
-        var channel = starChat.Channel.find(self.channelName);
-        var users = channel.users();
-        var userNames = users.map(function (user) {
-            return user.name();
-        }).sort();
         var ul = $('#users');
         ul.empty();
-        userNames.forEach(function (userName) {
-            var li = $('<li></li>');
-            li.text(userName);
-            ul.append(li);
-        });
+        if (self.channelName) {
+            var channel = starChat.Channel.find(self.channelName);
+            var users = channel.users();
+            var userNames = users.map(function (user) {
+                return user.name();
+            }).sort();
+            userNames.forEach(function (userName) {
+                var li = $('<li></li>');
+                li.text(userName);
+                ul.append(li);
+            });
+            if (channel.privacy() === 'private') {
+                $('#invitationLink').show();
+            } else {
+                $('#invitationLink').hide();
+            }
+        } else {
+            $('#invitationLink').hide();
+        }
     }
     function updateViewDialogs(self) {
         $('.dialog').hide();
         var dialogIsShown = false;
-        if (self.isEdittingUser_) {
+        if (self.isEdittingUser()) {
             $('#editUserDialog').show();
-            // TODO: this attribute's name is strange
-            $('#editUserDialog [data-column="name"]').text(self.session().userName());
+            $('#editUserDialog [title="name"]').text(self.session().userName());
+            var user = self.session().user();
+            var val = user.keywords().join('\n');
+            $('#editUserDialog [name="keywords"]').val(val); // Move to the view?
             dialogIsShown = true;
+        }
+        if (self.isEdittingChannels()) {
+            $('#editChannelsDialog').show();
+            var channels = self.session().user().channels();
+            channels = channels.sort(function (a, b) {
+                if (a.name() > b.name()) {
+                    return 1;
+                }
+                if (a.name() < b.name()) {
+                    return -1;
+                }
+                return 0;
+            });
+            var table = $('#editChannelsDialog h2 ~ table');
+            var origTR = table.find('tr.cloneMe').hide();
+            table.find('tr.cloned').not(origTR).remove();
+            channels.forEach(function (channel) {
+                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
+                tr.find('.channelName').text(channel.name());
+                tr.find('.toolIcon').attr('data-channel-name', channel.name());
+                table.append(tr);
+            });
+            dialogIsShown = true;
+        }
+        if (self.isEdittingChannel()) {
+            var channelName = self.edittingChannelName();
+            var channel = starChat.Channel.find(channelName);
+            $('#editChannelDialog [title="channelName"]').text(channel.name());
+            $('#editChannelDialog [name="privacy"]').val(['public']);
+            if (channel.privacy() === 'private') {
+                $('#editChannelDialog [name="privacy"]').val(['private']);
+            }
+            $('#editChannelDialog').show();
+            dialogIsShown = true;
+        } else {
+            $('#editChannelDialog').hide();
+        }
+        if (self.isShowingInvitationURLDialog()) {
+            dialogIsShown = true;
+            $('#invitationURLDialog').show();
+        } else {
+            $('#invitationURLDialog').hide();
         }
         if (dialogIsShown) {
             $('#dialogBackground').show();
@@ -473,6 +537,7 @@ starChat.View = (function () {
         updateViewMessages(this);
         updateViewTopic(this);
         updateViewUsers(this);
+        updateViewDialogs(this);
         $('img[data-image-icon-name]').each(function () {
             var e = $(this);
             if (e.attr('src')) {
@@ -481,8 +546,6 @@ starChat.View = (function () {
             var iconName = e.attr('data-image-icon-name');
             e.attr('src', starChat.Icons[iconName]);
         });
-
-        updateViewDialogs(this);
 
         $('a').filter(function () {
             var href = $(this).attr('href');
@@ -556,11 +619,6 @@ starChat.View = (function () {
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
     };
-    // TODO: 関数名直すべき?
-    View.prototype.clickChannelDel = function (func) {
-        this.clickChannelDel_ = func;
-        return this;
-    };
     View.prototype.resetTimeSpan = function () {
         this.startTime_ = null;
         this.endTime_   = null;
@@ -579,7 +637,7 @@ starChat.View = (function () {
         var key = startTime + '_' + endTime;
         this.oldMessages_[channelName][key] = messages;
     };
-    View.prototype.isEdittingUser = function(value) {
+    View.prototype.isEdittingUser = function (value) {
         if (value !== void(0)) {
             this.isEdittingUser_ = value;
             return this;
@@ -587,8 +645,43 @@ starChat.View = (function () {
             return this.isEdittingUser_;
         }
     };
-    View.prototype.closeDialogs = function() {
-        this.isEdittingUser_ = false;
+    View.prototype.isEdittingChannels = function (value) {
+        if (value !== void(0)) {
+            this.isEdittingChannels_ = value;
+            return this;
+        } else {
+            return this.isEdittingChannels_;
+        }
+    };
+    View.prototype.isEdittingChannel = function (value) {
+        if (value !== void(0)) {
+            this.isEdittingChannel_ = value;
+            return this;
+        } else {
+            return this.isEdittingChannel_;
+        }
+    };
+    View.prototype.edittingChannelName = function (value) {
+        if (value !== void(0)) {
+            this.edittingChannelName_ = value;
+            return this;
+        } else {
+            return this.edittingChannelName_;
+        }
+    }
+    View.prototype.isShowingInvitationURLDialog = function (value) {
+        if (value !== void(0)) {
+            this.isShowingInvitationURLDialog_ = value;
+            return this;
+        } else {
+            return this.isShowingInvitationURLDialog_;
+        }
+    };
+    View.prototype.closeDialogs = function () {
+        this.isEdittingUser(false);
+        this.isEdittingChannels(false);
+        this.isEdittingChannel(false);
+        this.isShowingInvitationURLDialog(false);
     };
     View.prototype.setSearch = function (query, result) {
         this.searchQuery_  = query;
@@ -598,13 +691,16 @@ starChat.View = (function () {
         this.searchQuery_  = null;
         this.searchResult_ = [];
     };
-    View.prototype.isEdittingTopic = function(value) {
+    View.prototype.isEdittingTopic = function (value) {
         if (value !== void(0)) {
             this.isEdittingTopic_ = value;
             return this;
         } else {
             return this.isEdittingTopic_;
         }
+    };
+    View.prototype.setErrorMesasge = function (x, message) {
+        this.errorMessages_[x] = message;
     };
     return View;
 })();

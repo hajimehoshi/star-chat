@@ -1,31 +1,11 @@
 'use strict';
 
 $(function() {
-    var clickChannelDel = function (view) {
-        return function (channel) {
-            var channelName = channel.name();
-            var msg = "Are you sure you want to delete subscribing '" +
-                channelName + "'?"
-            if (!confirm(msg)) {
-                return false;
-            }
-            var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(view.session().userName());
-            starChat.ajaxRequest(view.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
-                starChat.clearFragment();
-                getView().channelName = '';
-                receiveResponse(sessionId, uri, method, data);
-            });
-            return false;
-        };
-    }
     var getView = (function () {
         var view = null;
         return function () {
             if (view === null) {
                 view = new starChat.View(starChat.Session);
-                view.clickChannelDel(clickChannelDel(view));
             }
             return view;
         };
@@ -108,11 +88,15 @@ $(function() {
             view.channelName = '';
             view.resetTimeSpan();
             if (fragment.match(/^channels\//)) {
-                if (fragment.match(/^channels\/([^\/]+)$/)) {
+                var params = {};
+                if (fragment.match(/^channels\/([^\/\?]+)(\?(.*))?$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = null;
                     var endTime     = null;
-                } else if (fragment.match(/^channels\/([^\/]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
+                    if (RegExp.$3) {
+                        params = starChat.parseQuery(RegExp.$3);
+                    }
+                } else if (fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
                     var startTime   = parseInt(decodeURIComponent(RegExp.$2));
                     var endTime     = parseInt(decodeURIComponent(RegExp.$3));
@@ -135,7 +119,12 @@ $(function() {
                             encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
                         starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
                     }
-                    starChat.Channel.find(channelName).loadUsers(view.session(), function () {
+                    var channel = starChat.Channel.find(channelName);
+                    channel.loadUsers(view.session(), function (sessionId) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
                         view.update();
                     });
                     return;
@@ -149,21 +138,33 @@ $(function() {
                 var url = '/subscribings?' +
                     'channel_name=' + encodeURIComponent(channelName) + ';' +
                     'user_name=' + encodeURIComponent(session.userName());
+                var options = {};
+                if ('key' in params) {
+                    options['headers'] = {
+                        'X-StarChat-Channel-Key': params.key,
+                    };
+                }
                 starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
                     receiveResponse(sessionId, uri, method, data);
                     var view = getView();
                     view.channelName = channelName;
                     view.update();
-                    starChat.Channel.find(channelName).loadUsers(view.session(), function () {
+                    var channel = starChat.Channel.find(channelName);
+                    channel.loadUsers(view.session(), function () {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
                         view.update();
                     });
-                });
+                }, options);
             }
         }
     })();
 
     $(window).bind('hashchange', onHashchange);
 
+    // TODO: Remove it!!
     function receiveResponse(sessionId, uri, method, data) {
         var view = getView();
         var session = view.session();
@@ -195,12 +196,6 @@ $(function() {
                     var channelName = params['channel_name'];
                     view.session().user().addChannel(channelName);
                     starChat.Channel.find(channelName).load(view.session());
-                }
-            } else if (method === 'DELETE') {
-                if (uri.match(/^\/subscribings\?/)) {
-                    var params = starChat.parseQuery(uri);
-                    var channelName = params['channel_name'];
-                    view.session().user().removeChannel(channelName);
                 }
             }
         } finally {
@@ -319,12 +314,6 @@ $(function() {
         });
     })();
     (function () {
-        $('#channels menu img[data-tool-id="edit"]').click(function () {
-            var view = getView();
-            view.isEdittingChannels = !view.isEdittingChannels;
-            view.update();
-            return false;
-        });
         $('img[data-tool-id="editTopic"]').click(function () {
             var view = getView();
             view.isEdittingTopic(!view.isEdittingTopic());
@@ -342,9 +331,6 @@ $(function() {
                     if (view.session().id() !== sessionId) {
                         return;
                     }
-                    var user = view.session().user();
-                    var val = user.keywords().join('\n');
-                    $('#editUserDialog [name="keywords"]').val(val);
                     view.update();
                 });
             } else {
@@ -352,9 +338,122 @@ $(function() {
             }
             return false;
         });
+        $('#channels menu img[data-tool-id="edit"]').click(function () {
+            var view = getView();
+            view.isEdittingChannels(!view.isEdittingChannels());
+            if (view.isEdittingChannels()) {
+                var session = view.session();
+                var channels = session.user().channels();
+                channels.forEach(function (channel) {
+                    channel.load(session, function (sessionId) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
+                        view.update();
+                    });
+                });
+            } else {
+                view.update();
+            }
+            return false;
+        });
+        $('#editChannelsDialog img[data-tool-id="edit"]').click(function () {
+            var e = $(this);
+            var channelName = e.attr('data-channel-name');
+            var view = getView();
+            view.isEdittingChannel(true);
+            view.edittingChannelName(channelName);
+            var channel = starChat.Channel.find(channelName);
+            channel.load(view.session(), function (sessionId) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.update(); 
+            });
+            return false;
+        });
+        $('#editChannelsDialog img[data-tool-id="delete"]').click(function () {
+            var e = $(this);
+            var channelName = e.attr('data-channel-name');
+            var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
+            if (!confirm(msg)) {
+                return false;
+            }
+            var view = getView();
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
+                'user_name=' + encodeURIComponent(view.session().user().name());
+            starChat.ajaxRequest(view.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
+                var view = getView();
+                view.session().user().removeChannel(channelName);
+                if (view.channelName === channelName) {
+                    starChat.clearFragment();
+                    view.channelName = null;
+                }
+                view.update();
+            });
+            return false;
+        });
+        $('#invitationLink a').click(function () {
+            var view = getView();
+            var channelName = view.channelName;
+            if (!channelName) {
+                return false;
+            }
+            view.isShowingInvitationURLDialog(true);
+            view.update();
+            $('#invitationURLDialog button[title="regenerate"]').click();
+            return false;
+        });
+        $('#invitationURLDialog button[title="regenerate"]').click(function () {
+            var view = getView();
+            var channelName = view.channelName;
+            if (!channelName) {
+                return false;
+            }
+            var channel = starChat.Channel.find(channelName);
+            channel.generateKey(view.session(), function (sessionId, key) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                var url = location.href + '?key=' + encodeURIComponent(key);
+                $('#invitationURLDialog [name="invitationURL"]').val(url);
+            });
+            return false;
+        });
+        $('#invitationURLDialog [name="invitationURL"]').click(function () {
+            $(this).select();
+        });
     })();
     (function () {
-        $('.dialog').click(function () {
+        $('.dialog').click(function (e) {
+            e.stopPropagation();
+        });
+        $('#editUserDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isEdittingUser(false);
+            view.update();
+            return false;
+        });
+        $('#editChannelsDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isEdittingChannels(false);
+            view.update();
+            return false;
+        });
+        $('#editChannelDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isEdittingChannel(false);
+            view.update();
+            return false;
+        });
+        $('#invitationURLDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isShowingInvitationURLDialog(false);
+            view.update();
             return false;
         });
         $('#dialogBackground').click(function () {
@@ -373,7 +472,33 @@ $(function() {
                 if (view.session().id() !== sessionId) {
                     return;
                 }
-                view.closeDialogs();
+                view.isEdittingUser(false);
+                view.update();
+            });
+            return false;
+        });
+        $('#editChannelDialog [name="privacy"]').change(function () {
+            var e = $(this);
+            var privacy = e.val();
+            if (privacy === 'public') {
+                $('#editChannelDialog [name="password"]').attr('disabled', 'disabled');
+            } else {
+                $('#editChannelDialog [name="password"]').removeAttr('disabled');
+            }
+        });
+        $('#editChannelDialog [type="submit"]').click(function () {
+            var view = getView();
+            var channelName = view.edittingChannelName();
+            var channel = starChat.Channel.find(channelName);
+            var privacy = $('#editChannelDialog [name="privacy"]:checked').val();
+            channel.privacy(privacy);
+            channel.save(view.session(), function (sessionId) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.isEdittingChannel(false);
+                view.edittingChannelName(null);
                 view.update();
             });
             return false;
@@ -383,6 +508,7 @@ $(function() {
         $('#updateTopicForm [type="submit"]').click(function () {
             var topicBody = $('#updateTopicForm [name="body"]').val();
             var view = getView();
+            // TODO: Fix it
             var uri = '/channels/' + encodeURIComponent(view.channelName);
             starChat.ajaxRequest(view.session(), uri, 'PUT', {
                 topic_body: topicBody,
@@ -412,7 +538,6 @@ $(function () {
     if (!$.browser.mozilla) {
         return;
     }
-    /*$('#postMessageForm textarea').css('height', '1.2em');*/
     function relayout() {
         $('#messages > section').height($('#messages').height() -
                                         $('#messages > h2').outerHeight() -
