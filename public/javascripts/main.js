@@ -346,6 +346,38 @@ $(function() {
             }
             return false;
         });
+        $('#editChannelsDialog img[data-tool-id="edit"]').click(function () {
+            var e = $(this);
+            var channelName = e.attr('data-channel-name');
+            var view = getView();
+            view.isEdittingChannel(true);
+            view.edittingChannelName(channelName);
+            // TODO: channel.load
+            view.update();
+            return false;
+        });
+        $('#editChannelsDialog img[data-tool-id="delete"]').click(function () {
+            var e = $(this);
+            var channelName = e.attr('data-channel-name');
+            var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
+            if (!confirm(msg)) {
+                return false;
+            }
+            var view = getView();
+            var url = '/subscribings?' +
+                'channel_name=' + encodeURIComponent(channelName) + ';' +
+                'user_name=' + encodeURIComponent(view.session().user().name());
+            starChat.ajaxRequest(view.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
+                var view = getView();
+                view.session().user().removeChannel(channelName);
+                if (view.channelName === channelName) {
+                    starChat.clearFragment();
+                    view.channelName = null;
+                }
+                view.update();
+            });
+            return false;
+        });
     })();
     (function () {
         $('.dialog').click(function (e) {
@@ -419,6 +451,7 @@ $(function() {
         $('#updateTopicForm [type="submit"]').click(function () {
             var topicBody = $('#updateTopicForm [name="body"]').val();
             var view = getView();
+            // TODO: Fix it
             var uri = '/channels/' + encodeURIComponent(view.channelName);
             starChat.ajaxRequest(view.session(), uri, 'PUT', {
                 topic_body: topicBody,

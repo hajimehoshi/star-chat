@@ -457,35 +457,9 @@ starChat.View = (function () {
             var origTR = table.find('tr.cloneMe').hide();
             table.find('tr.cloned').not(origTR).remove();
             channels.forEach(function (channel) {
-                var tr = origTR.clone(false).removeClass('cloneMe').addClass('cloned').show();
+                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
                 tr.find('.channelName').text(channel.name());
-                tr.find('[data-tool-id="editChannel"]').click(function () {
-                    self.isEdittingChannel(true);
-                    self.edittingChannelName(channel.name());
-                    setTimeout(function () {
-                        self.update();
-                    }, 0);
-                    return false;
-                });
-                tr.find('[data-tool-id="deleteChannel"]').click(function () {
-                    var channelName = channel.name();
-                    var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
-                    if (!confirm(msg)) {
-                        return false;
-                    }
-                    var url = '/subscribings?' +
-                        'channel_name=' + encodeURIComponent(channelName) + ';' +
-                        'user_name=' + encodeURIComponent(self.session().user().name());
-                    starChat.ajaxRequest(self.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
-                        self.session().user().removeChannel(channelName);
-                        if (self.channelName === channelName) {
-                            starChat.clearFragment();
-                            self.channelName = null;
-                        }
-                        self.update();
-                    });
-                    return false;
-                });
+                tr.find('.toolIcon').attr('data-channel-name', channel.name());
                 table.append(tr);
             });
             dialogIsShown = true;
