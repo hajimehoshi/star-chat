@@ -8,7 +8,7 @@ starChat.Session = (function () {
             this.id_ = 0;
         }
         if (this.id_) {
-            this.user_ = new starChat.User(userName);
+            this.user_ = starChat.User.find(userName);
             this.password_ = password;
         }
     };
