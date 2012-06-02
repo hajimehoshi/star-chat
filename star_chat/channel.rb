@@ -1,9 +1,14 @@
+# coding: utf-8
 require 'digest/sha2'
 require 'securerandom'
 
 module StarChat
 
   class Channel
+
+    @@master_keys = Hash.new do |hash, key|
+      hash[key] = SecureRandom.hex(64)
+    end
 
     def self.find(name)
       key = ['channels', name]
@@ -158,6 +163,31 @@ module StarChat
                      'privacy', privacy.to_s)
       end
       self
+    end
+
+    def generate_key(user, expire_time = Time.now.to_i + 60)
+      raise 'invalid user' unless user.subscribing?(self)
+      salt             = SecureRandom.hex(16)
+      channel_name_hex = self.name.unpack('h*')[0]
+      master_key       = @@master_keys[self.name] # もっと適当にする? ワンタイム適当ハッシュを作ればよかったのでは
+      hash = Digest::SHA256.hexdigest("#{expire_time}.#{salt}.#{channel_name_hex}.#{master_key}")
+      "#{expire_time}.#{salt}.#{channel_name_hex}.#{hash}"
+    end
+
+    def auth?(key)
+      segments = key.split('.')
+      return false if segments.length != 5
+      expire_time_str, salt, channel_name_hex, invited_user_name_hex, hash = *segments
+      expire_time = expire_time_str.to_i
+      now = Time.now.to_i
+      # expired
+      return false if expire_time < now
+      # too future
+      return false if now + 60 <= expire_time
+      channel_name = [channel_name_hex].pack('h*')
+      return false if self.name != channel_name
+      master_key = @@master_keys[self.name]
+      hash == Digest::SHA256.hexdigest("#{expire_time}.#{salt}.#{channel_name_hex}.#{master_key}")
     end
 
   end

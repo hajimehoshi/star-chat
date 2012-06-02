@@ -69,10 +69,6 @@ helpers do
     end
   end
 
-  def channel_key
-    request['X-StarChat-Channel-Key']
-  end
-
   def uri_encode(str)
     # Rack::Utils.escape is not for URI but for application/x-www-form-urlencoded
     Rack::Utils.escape(str).gsub('+', '%20')
@@ -160,6 +156,10 @@ before %r{^/channels/([^/]+)} do
         !current_user.subscribing?(@channel)
       halt 401
     end
+    if @channel.private? and
+        !current_user.subscribing?(@channel)
+      halt 401
+    end
   else
     halt 404 unless request.put?
   end
@@ -232,10 +232,13 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
-get '/channels/:channel_name/permit_key', provides: :json do
+get '/channels/:channel_name/key/:expire_time', provides: :json do
   halt 400 unless @channel.private?
-  # implement
-  ''
+  expire_time = params[:expire_time].to_i
+  now = Time.now.to_i
+  halt 400 if expire_time <= now
+  halt 400 if now + 60 <= expire_time
+  @channel.generate_key(current_user, expire_time)
 end
 
 before '/subscribings' do
@@ -251,14 +254,15 @@ end
 
 put '/subscribings', provides: :json do
   unless @channel
+    channel_key = request['X-StarChat-Channel-Key']
     @channel = StarChat::Channel.new(@channel_name)
     @channel.save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
   if @channel.private?
     # TODO: Use one-time password
-    # halt 401 if channel_password.nil? or channel_password.empty?
-    # halt 401 unless @channel.auth?(channel_password)
+    halt 401 if channel_key.nil? or channel_key.empty?
+    halt 401 unless @channel.auth?(channel_key)
   end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
