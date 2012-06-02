@@ -655,7 +655,7 @@ starChat.View = (function () {
         this.searchQuery_  = null;
         this.searchResult_ = [];
     };
-    View.prototype.isEdittingTopic = function(value) {
+    View.prototype.isEdittingTopic = function (value) {
         if (value !== void(0)) {
             this.isEdittingTopic_ = value;
             return this;

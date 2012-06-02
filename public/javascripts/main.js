@@ -489,7 +489,6 @@ $(function () {
     if (!$.browser.mozilla) {
         return;
     }
-    /*$('#postMessageForm textarea').css('height', '1.2em');*/
     function relayout() {
         $('#messages > section').height($('#messages').height() -
                                         $('#messages > h2').outerHeight() -
