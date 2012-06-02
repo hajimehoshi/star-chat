@@ -523,6 +523,7 @@ $(function() {
                 user_name:  view.session().user().name(),
                 body:       topicBody,
             });
+            // TODO: close the textarea even when failured
             channel.save(view.session(), function (sessionId) {
                 var view = getView();
                 if (view.session().id() !== sessionId) {
