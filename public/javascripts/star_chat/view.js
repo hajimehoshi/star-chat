@@ -243,7 +243,8 @@ starChat.View = (function () {
         createdAtTD.append(createdAtTime).addClass('createdAt');
         messageTR.append(createdAtTD);
 
-        var userNameTD = $('<td></td>').text(message.user_name);
+        var user = starChat.User.find(message.user_name);
+        var userNameTD = $('<td></td>').text(user.nick());
         userNameTD.addClass('userName');
         messageTR.append(userNameTD);
 
@@ -435,12 +436,12 @@ starChat.View = (function () {
         if (self.channelName) {
             var channel = starChat.Channel.find(self.channelName);
             var users = channel.users();
-            var userNames = users.map(function (user) {
-                return user.name();
+            var userNicks = users.map(function (user) {
+                return user.nick();
             }).sort();
-            userNames.forEach(function (userName) {
+            userNicks.forEach(function (userNick) {
                 var li = $('<li></li>');
-                li.text(userName);
+                li.text(userNick);
                 ul.append(li);
             });
             if (channel.privacy() === 'private') {
@@ -459,6 +460,7 @@ starChat.View = (function () {
             $('#editUserDialog').show();
             $('#editUserDialog [title="name"]').text(self.session().userName());
             var user = self.session().user();
+            $('#editUserDialog [name="nick"]').val(user.nick());
             var val = user.keywords().join('\n');
             $('#editUserDialog [name="keywords"]').val(val); // Move to the view?
             dialogIsShown = true;

@@ -3,6 +3,7 @@
 starChat.User = (function () {
     var User = function (name) {
         this.name_ = name;
+        this.nick_ = name;
         this.channels_ = [];
         this.keywords_ = [];
     };
@@ -24,8 +25,13 @@ starChat.User = (function () {
     User.prototype.name = function () {
         return this.name_;
     };
-    User.prototype.nick = function () {
-        return this.nick_;
+    User.prototype.nick = function (value) {
+        if (value !== void(0)) {
+            this.nick_ = value;
+            return this;
+        } else {
+            return this.nick_;
+        }
     };
     User.prototype.channels = function () {
         return this.channels_;
@@ -88,6 +94,7 @@ starChat.User = (function () {
     User.prototype.save = function (session, callback) {
         var url = '/users/' + encodeURIComponent(this.name_);
         starChat.ajaxRequest(session, url, 'PUT', {
+            nick:     this.nick_,
             keywords: this.keywords_,
         }, function (sessionId, url, method, data) {
             if (callback !== void(0)) {

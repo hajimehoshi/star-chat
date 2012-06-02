@@ -66,6 +66,10 @@
               <td title="name"></td>
             </tr>
             <tr>
+              <th>Nick:</th>
+              <td><input name="nick" /></td>
+            </tr>
+            <tr>
               <th>Keywords:</th>
               <td><textarea name="keywords" cols="15" rows="10" ></textarea></td>
             </tr>

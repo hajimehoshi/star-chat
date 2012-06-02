@@ -472,9 +472,11 @@ $(function() {
             return false;
         });
         $('#editUserDialog [type="submit"]').click(function () {
+            var nick     = $('#editUserDialog [name="nick"]').val();
             var keywords = $('#editUserDialog [name="keywords"]').val().split('\n');
             var view = getView();
             var user = view.session().user();
+            user.nick(nick);
             user.keywords(keywords);
             user.save(view.session(), function (sessionId) {
                 var view = getView();

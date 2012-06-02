@@ -87,7 +87,6 @@ end
 before %r{^/users/([^/]+)} do
   protect!
   user_name = params[:captures][0]
-  halt 401 if user_name != current_user.name
 end
 
 get '/users/:user_name', provides: :json do
@@ -95,6 +94,8 @@ get '/users/:user_name', provides: :json do
 end
 
 put '/users/:user_name', provides: :json do
+  user_name = params[:user_name].to_s
+  halt 401 if user_name != current_user.name
   if params[:nick]
     current_user.nick = params[:nick].to_s
   end
@@ -106,17 +107,26 @@ put '/users/:user_name', provides: :json do
 end
 
 get '/users/:user_name/ping', provides: :json do
+  user_name = params[:user_name].to_s
+  halt 401 if user_name != current_user.name
   {
     result: 'pong',
   }.to_json
 end
 
 get '/users/:user_name/channels', provides: :json do
-  current_user.channels.to_json
+  user_name = params[:user_name].to_s
+  if user_name == current_user.name
+    current_user.channels.to_json
+  else
+    # TODO: 直す
+    [].to_json
+  end
 end
 
 get '/users/:user_name/stream', provides: :json do
   user_name = params[:user_name].to_s
+  halt 401 if user_name != current_user.name
   stream(:keep_open) do |out|
     subscribe = [user_name, out]
     settings.streams << subscribe

@@ -100,8 +100,8 @@ module StarChat
 
     def to_h
       {
-        name: name,
-        nick: nick,
+        name:     name,
+        nick:     nick,
         keywords: keywords,
       }
     end
@@ -114,7 +114,6 @@ module StarChat
       # TODO: validate
       RedisDB.exec(:hmset,
                    ['users', name],
-                   'name', name,
                    'nick', nick,
                    'keywords', keywords.to_json)
       self
