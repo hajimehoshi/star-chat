@@ -513,7 +513,9 @@ $(function() {
             // TODO: Fix it
             var uri = '/channels/' + encodeURIComponent(view.channelName);
             starChat.ajaxRequest(view.session(), uri, 'PUT', {
-                topic_body: topicBody,
+                topic: {
+                    body: topicBody,
+                },
             }, function (sessionId, uri, method, data) {
                 receiveResponse(sessionId, uri, method, data);
                 var view = getView();

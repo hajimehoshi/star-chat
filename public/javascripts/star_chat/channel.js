@@ -116,7 +116,9 @@ starChat.Channel = (function () {
                 topicBody = topicBody.replace(/^\s*(.*?)\s*$/, '$1').replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
                 topicBody = topicBody.substring(0, 1024);
                 if (lastTopicBody !== topicBody) {
-                    params['topic_body'] = topicBody;
+                    params.topic = {
+                        body: topicBody,
+                    }
                     lastTopicBody = topicBody
                 }
             }

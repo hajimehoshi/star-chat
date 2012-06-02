@@ -176,8 +176,8 @@ put '/channels/:channel_name', provides: :json do
     result = 201
   end
   # TODO: params[:topic][:body]?
-  if params[:topic_body]
-    topic = @channel.update_topic(current_user, params[:topic_body])
+  if params[:topic][:body]
+    topic = @channel.update_topic(current_user, params[:topic][:body])
     # TODO: move after saving?
     broadcast(type: 'topic',
               topic: topic) do |user_name|
