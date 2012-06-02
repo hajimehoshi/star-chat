@@ -104,6 +104,8 @@ $(function() {
                 } else {
                     return;
                 }
+                channelName = channelName.replace(/^\s*(.*?)\s*$/, '$1').replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
+                channelName = channelName.substring(0, 32);
                 var isAlreadyJoined = false;
                 view.session().user().channels().forEach(function (channel) {
                     if (channel.name() === channelName) {

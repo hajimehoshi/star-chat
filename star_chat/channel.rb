@@ -33,7 +33,7 @@ module StarChat
     end
 
     def name=(name)
-      @name = name.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+      @name = name.strip.gsub(/(?![\n\r\t])[\x00-\x1f\x7f]/, '')[0, 32]
     end
 
     def privacy

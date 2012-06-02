@@ -2,7 +2,10 @@
 
 starChat.Channel = (function () {
     var Channel = function (obj) {
-        this.name_  = obj.name;
+        var name = obj.name;
+        name = name.replace(/^\s*(.*?)\s*$/, '$1').replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
+        name = name.substring(0, 32);
+        this.name_  = name;
         this.users_ = [];
         this.update(obj);
     };
@@ -110,7 +113,7 @@ starChat.Channel = (function () {
             var params = {};
             if (this.topic()) {
                 var topicBody = this.topic().body;
-                topicBody = topicBody.replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
+                topicBody = topicBody.replace(/^\s*(.*?)\s*$/, '$1').replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
                 topicBody = topicBody.substring(0, 1024);
                 if (lastTopicBody !== topicBody) {
                     params['topic_body'] = topicBody;
