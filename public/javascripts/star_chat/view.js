@@ -267,6 +267,7 @@ starChat.View = (function () {
     }
     function updateViewMessages(self) {
         if (self.channelName) {
+            var h2 = $('#messages h2');
             if (self.isShowingOldLogs()) {
                 var d = new Date(self.startTime_ * 1000);
                 if ((self.endTime_ - self.startTime_) === 60 * 60 * 24 &&
@@ -280,12 +281,18 @@ starChat.View = (function () {
                     var endTime   = starChat.toISO8601(new Date(self.endTime_   * 1000));
                     var oldLogs = '(Old Logs: ' + startTime + '/' + endTime + ')';
                 }
-                $('#messages h2').text(self.channelName + ' ' + oldLogs);
+                h2.find('span').text(self.channelName + ' ' + oldLogs);
             } else {
-                $('#messages h2').text(self.channelName);
+                h2.find('span').text(self.channelName);
+            }
+            var channel = starChat.Channel.find(self.channelName);
+            if (channel.privacy() === 'private') {
+                h2.find('img[alt="private"]').show();
+            } else {
+                h2.find('img[alt="private"]').hide();
             }
         } else {
-            $('#messages h2').text("\u00a0");
+            $('#messages h2 span').text("\u00a0");
         }
         if (!self.isShowingOldLogs()) {
             $('#messages > section').filter(function (i) {

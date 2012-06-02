@@ -2,10 +2,9 @@
 
 starChat.Channel = (function () {
     var Channel = function (obj) {
-        this.name_    = obj.name;
-        this.topic_   = obj.topic;
-        this.privacy_ = obj.privacy;
+        this.name_  = obj.name;
         this.users_ = [];
+        this.update(obj);
     };
     var cache = {};
     Channel.find = function (name) {
@@ -20,8 +19,8 @@ starChat.Channel = (function () {
         if ('topic' in obj) {
             this.topic_ = obj.topic;
         }
-        if ('password_locked' in obj) {
-            this.isPasswordLocked_ = obj.password_locked;
+        if ('privacy' in obj) {
+            this.privacy_ = obj.privacy;
         }
     };
     Channel.prototype.name = function () {
