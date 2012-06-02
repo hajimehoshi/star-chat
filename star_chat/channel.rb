@@ -165,11 +165,12 @@ module StarChat
       self
     end
 
-    def generate_key(user, expire_time = Time.now.to_i + 60)
+    def generate_key(user)
       raise 'invalid user' unless user.subscribing?(self)
+      expire_time = Time.now.to_i + 60 * 5
       salt             = SecureRandom.hex(16)
       channel_name_hex = self.name.unpack('h*')[0]
-      master_key       = @@master_keys[self.name] # もっと適当にする? ワンタイム適当ハッシュを作ればよかったのでは
+      master_key       = @@master_keys[self.name]
       hash = Digest::SHA256.hexdigest("#{expire_time}.#{salt}.#{channel_name_hex}.#{master_key}")
       "#{expire_time}.#{salt}.#{channel_name_hex}.#{hash}"
     end
@@ -183,7 +184,7 @@ module StarChat
       # expired
       return false if expire_time < now
       # too future
-      return false if now + 60 < expire_time
+      return false if now + 60 * 5 < expire_time
       channel_name = [channel_name_hex].pack('h*')
       return false if self.name != channel_name
       master_key = @@master_keys[self.name]
