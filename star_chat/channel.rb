@@ -58,9 +58,17 @@ module StarChat
     end
 
     # TODO: Rename 'current_topic_id'
-    def last_topic_id
+    def current_topic_id
       topic_id = RedisDB.exec(:lindex, ['channels', name, 'topics'], -1)
       topic_id ? topic_id.to_i : nil
+    end
+
+    def current_topic
+      if current_topic_id
+        Topic.find(current_topic_id)
+      else
+        nil
+      end
     end
 
     def initialize(name, options = {})
@@ -125,7 +133,6 @@ module StarChat
     end
 
     def update_topic(user, body, created_at = Time.now.to_i)
-      topic = nil
       # TODO: lock?
       topic = Topic.new(user.name,
                         self.name,
@@ -148,9 +155,8 @@ module StarChat
         name:    name,
         privacy: privacy,
       }
-      if last_topic_id
-        topic = Topic.find(last_topic_id)
-        hash[:topic] = topic.to_h
+      if current_topic
+        hash[:topic] = current_topic
       end
       hash.to_json(*args)
     end
