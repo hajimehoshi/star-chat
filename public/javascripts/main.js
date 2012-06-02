@@ -510,17 +510,19 @@ $(function() {
         $('#updateTopicForm [type="submit"]').click(function () {
             var topicBody = $('#updateTopicForm [name="body"]').val();
             var view = getView();
-            // TODO: Fix it
-            var uri = '/channels/' + encodeURIComponent(view.channelName);
-            starChat.ajaxRequest(view.session(), uri, 'PUT', {
-                topic: {
-                    body: topicBody,
-                },
-            }, function (sessionId, uri, method, data) {
-                receiveResponse(sessionId, uri, method, data);
+            var channel = starChat.Channel.find(view.channelName);
+            channel.topic({
+                created_at: parseInt($.now() / 1000),
+                user_name:  view.session().user().name(),
+                body:       topicBody,
+            });
+            channel.save(view.session(), function (sessionId) {
                 var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
                 view.isEdittingTopic(false);
-                starChat.ajaxRequest(view.session(), uri, 'GET', null, receiveResponse);
+                view.update();
             });
             return false;
         });
