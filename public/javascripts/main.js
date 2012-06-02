@@ -352,8 +352,14 @@ $(function() {
             var view = getView();
             view.isEdittingChannel(true);
             view.edittingChannelName(channelName);
-            // TODO: channel.load
-            view.update();
+            var channel = starChat.Channel.find(channelName);
+            channel.load(view.session(), function (sessionId) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.update(); 
+            });
             return false;
         });
         $('#editChannelsDialog img[data-tool-id="delete"]').click(function () {
