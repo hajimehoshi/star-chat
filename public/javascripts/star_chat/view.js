@@ -432,18 +432,25 @@ starChat.View = (function () {
         }
     }
     function updateViewUsers(self) {
-        var channel = starChat.Channel.find(self.channelName);
-        var users = channel.users();
-        var userNames = users.map(function (user) {
-            return user.name();
-        }).sort();
         var ul = $('#users');
         ul.empty();
-        userNames.forEach(function (userName) {
-            var li = $('<li></li>');
-            li.text(userName);
-            ul.append(li);
-        });
+        if (self.channelName) {
+            var channel = starChat.Channel.find(self.channelName);
+            var users = channel.users();
+            var userNames = users.map(function (user) {
+                return user.name();
+            }).sort();
+            userNames.forEach(function (userName) {
+                var li = $('<li></li>');
+                li.text(userName);
+                ul.append(li);
+            });
+            if (channel.privacy() === 'private') {
+                $('#inviteLink').show();
+            } else {
+                $('#inviteLink').hide();
+            }
+        }
     }
     function updateViewDialogs(self) {
         $('.dialog').hide();
