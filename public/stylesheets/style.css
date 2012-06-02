@@ -136,14 +136,11 @@ h1 {
     margin-bottom: 5px;
 }
 .sidebar a:visited {
-    color: #555;
+    color: #000 !important;
 }
 
 #channelsList a.dirty {
     color: #900 !important;
-}
-#channelsList a:visited {
-    color: #000;
 }
 
 #messages {
