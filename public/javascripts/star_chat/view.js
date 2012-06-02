@@ -494,9 +494,8 @@ starChat.View = (function () {
             var channelName = self.edittingChannelName();
             var channel = starChat.Channel.find(channelName);
             $('#editChannelDialog [title="channelName"]').text(channel.name());
-            if (!channel.isPasswordLocked()) {
-                $('#editChannelDialog [name="privacy"]').val(['public']);
-            } else {
+            $('#editChannelDialog [name="privacy"]').val(['public']);
+            if (channel.privacy() === 'private') {
                 $('#editChannelDialog [name="privacy"]').val(['private']);
             }
             $('#editChannelDialog').show();
