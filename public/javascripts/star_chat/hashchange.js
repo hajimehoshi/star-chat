@@ -57,7 +57,7 @@
                                 encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
                             starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
                                 var view = getView();
-                                if (session.id() !== sessionId) {
+                                if (view.session().id() !== sessionId) {
                                     return;
                                 }
                                 view.setOldMessages(channelName, startTime, endTime, data);
