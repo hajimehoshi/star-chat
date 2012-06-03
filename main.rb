@@ -87,15 +87,32 @@ end
 before %r{^/users/([^/]+)} do
   protect!
   user_name = params[:captures][0]
+  @user = StarChat::User.find(user_name)
+  if @user.nil?
+    if current_user.name == user_name
+      @user = StarChat::User.new(user_name).save
+    else
+      halt 404
+    end
+  end
+  if (request.put? or request.delete? or request.post?) and
+      current_user.name != @user.name
+    halt 401
+  end
 end
 
 get '/users/:user_name', provides: :json do
-  current_user.to_json
+  if @user.name == current_user.name
+    current_user.to_json
+  else
+    {
+      name: @user.name,
+      nick: @user.nick,
+    }.to_json
+  end
 end
 
 put '/users/:user_name', provides: :json do
-  user_name = params[:user_name].to_s
-  halt 401 if user_name != current_user.name
   if params[:nick]
     current_user.nick = params[:nick].to_s
   end
@@ -107,16 +124,14 @@ put '/users/:user_name', provides: :json do
 end
 
 get '/users/:user_name/ping', provides: :json do
-  user_name = params[:user_name].to_s
-  halt 401 if user_name != current_user.name
+  halt 401 if @user.name != current_user.name
   {
     result: 'pong',
   }.to_json
 end
 
 get '/users/:user_name/channels', provides: :json do
-  user_name = params[:user_name].to_s
-  if user_name == current_user.name
+  if @user.name == current_user.name
     current_user.channels.to_json
   else
     # TODO: 直す
@@ -125,10 +140,9 @@ get '/users/:user_name/channels', provides: :json do
 end
 
 get '/users/:user_name/stream', provides: :json do
-  user_name = params[:user_name].to_s
-  halt 401 if user_name != current_user.name
+  halt 401 if @user.name != current_user.name
   stream(:keep_open) do |out|
-    subscribe = [user_name, out]
+    subscribe = [@user.name, out]
     settings.streams << subscribe
     if params[:start_time]
       start_time = params[:start_time].to_i
