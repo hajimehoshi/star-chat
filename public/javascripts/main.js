@@ -212,9 +212,6 @@ $(function() {
             var id = $.now();
             starChat.ajaxRequest(session, url, 'POST', {
                 body: body,
-            }, function (sessionId, uri, method, data) {
-                var view = getView();
-                receiveResponse(sessionId, uri, method, data);
             });
             var message = {
                 body: body,

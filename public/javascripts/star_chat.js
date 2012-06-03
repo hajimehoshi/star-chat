@@ -47,7 +47,7 @@ starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, op
             },
         },
     }
-    if (callbackSuccess !== void(0) ||
+    if (callbackSuccess !== void(0) &&
         callbackSuccess !== null) {
         args.success = function (data, textStatus, jqXHR) {
             callbackSuccess(sessionId, url, method, data);
