@@ -97,29 +97,6 @@ $(function() {
         });
     }
 
-    // TODO: Remove it!!
-    function receiveResponse(sessionId, uri, method, data) {
-        var view = getView();
-        var session = view.session();
-        if (session.id() === 0) {
-            return;
-        }
-        if (session.id() !== sessionId) {
-            return;
-        }
-        try {
-            if (method === 'GET') {
-                if (uri.match(/^\/messages\/search\/([^\/]+)$/)) {
-                    var query = decodeURIComponent(RegExp.$1);
-                    view.setSearch(query, data);
-                }
-            }
-        } finally {
-            view.update();
-            $(window).trigger('hashchange');
-        }
-    }
-    
     (function () {
         var form = $('#logInForm');
         var userName = localStorage.userName;
@@ -178,7 +155,14 @@ $(function() {
                 return false;
             }
             var url = '/messages/search/' + encodeURIComponent(query);
-            starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+            starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.setSearch(query, data);
+                view.update();
+            });
             return false;
         });
     })();
