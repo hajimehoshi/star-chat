@@ -114,6 +114,7 @@ end
 
 put '/users/:user_name', provides: :json do
   if params[:nick]
+    # TODO: check uniqueness?
     current_user.nick = params[:nick].to_s
   end
   if params[:keywords] and params[:keywords].kind_of?(Array)
