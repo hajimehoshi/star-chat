@@ -38,7 +38,17 @@ $(function() {
                     view.update();
                 });
                 var url = '/channels/' + encodeURIComponent(channel.name()) + '/messages/recent';
-                starChat.ajaxRequest(session, url, 'GET', null, receiveResponse);
+                starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
+                    var view = getView();
+                    if (view.session().id() !== sessionId) {
+                        return;
+                    }
+                    data.forEach(function (message) {
+                        view.addNewMessage(channel.name(), message, false);
+                    });
+                    view.update();
+                    $(window).trigger('hashchange');
+                });
             });
         });
         stream.start(view);
@@ -99,12 +109,7 @@ $(function() {
         }
         try {
             if (method === 'GET') {
-                if (uri.match(/^\/channels\/([^\/]+)\/messages\/recent/)) {
-                    var channelName = decodeURIComponent(RegExp.$1);
-                    data.forEach(function (message) {
-                        view.addNewMessage(channelName, message, false);
-                    });
-                } else if (uri.match(/^\/messages\/search\/([^\/]+)$/)) {
+                if (uri.match(/^\/messages\/search\/([^\/]+)$/)) {
                     var query = decodeURIComponent(RegExp.$1);
                     view.setSearch(query, data);
                 }
