@@ -1,6 +1,9 @@
 'use strict';
 
 starChat.User = (function () {
+    /**
+     * @constructor
+     */
     var User = function (name) {
         this.name_ = name;
         this.nick_ = name;
@@ -95,7 +98,7 @@ starChat.User = (function () {
         var url = '/users/' + encodeURIComponent(this.name_);
         starChat.ajaxRequest(session, url, 'PUT', {
             nick:     this.nick_,
-            keywords: this.keywords_,
+            keywords: this.keywords_
         }, function (sessionId, url, method, data) {
             if (callback !== void(0)) {
                 callback(sessionId);

@@ -2,6 +2,15 @@
 
 var starChat = {};
 
+/**
+ * @param {string|number} val
+ * @return {number}
+ * @nosideeffects
+ */
+starChat.parseInt = function (val) {
+    return window.parseInt(val, 10);
+};
+
 starChat.isSameArray = function (a, b, func) {
     if (!func) {
         func = function (x, y) {
@@ -19,6 +28,15 @@ starChat.isSameArray = function (a, b, func) {
     return true;
 };
 
+/**
+ * @param {starChat.Session} session
+ * @param {string} url
+ * @param {string} method
+ * @param {Object} data
+ * @param {function(number,string,string,Object)=} callbackSuccess
+ * @param {Object=} options
+ * @return {jQuery.jqXHR}
+ */
 starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, options) {
     var sessionId = session.id();
     var userName  = session.userName();
@@ -44,8 +62,8 @@ starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, op
                 if ('401' in options) {
                     options[401]();
                 }
-            },
-        },
+            }
+        }
     }
     if (callbackSuccess !== void(0) &&
         callbackSuccess !== null) {
@@ -100,6 +118,10 @@ starChat.parseQuery = function (str) {
     return params;
 };
 
+/**
+ * @param {Date} date
+ * @param {string=} type
+ */
 starChat.toISO8601 = function (date, type) {
     if (type === void(0)) {
         type = 'datetime';
@@ -137,6 +159,9 @@ starChat.escapeHTML = function (str) {
     return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
+/**
+ * @suppress {globalThis}
+ */
 jQuery.fn.outerHTML = function(s) {
     return (s)
         ? this.before(s).remove()

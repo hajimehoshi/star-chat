@@ -28,8 +28,8 @@
                     }
                 } else if (fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
                     var channelName = decodeURIComponent(RegExp.$1);
-                    var startTime   = parseInt(decodeURIComponent(RegExp.$2));
-                    var endTime     = parseInt(decodeURIComponent(RegExp.$3));
+                    var startTime   = starChat.parseInt(decodeURIComponent(RegExp.$2));
+                    var endTime     = starChat.parseInt(decodeURIComponent(RegExp.$3));
                     view.setTimeSpan(startTime, endTime);
                 } else {
                     return;
@@ -54,7 +54,7 @@
                         if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
                             var url = '/channels/' + encodeURIComponent(channelName) +
                                 '/messages/by_time_span/' +
-                                encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
+                                encodeURIComponent(String(startTime)) + ',' + encodeURIComponent(String(endTime));
                             starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
                                 var view = getView();
                                 if (view.session().id() !== sessionId) {

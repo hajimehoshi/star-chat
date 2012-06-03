@@ -1,6 +1,12 @@
 'use strict';
 
+/**
+ * @typedef {!Object}
+ */
 starChat.Session = (function () {
+    /**
+     * @constructor
+     */
     var Session = function (id, userName, password) {
         if (id !== void(0)) {
             this.id_ = id;

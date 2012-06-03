@@ -38,7 +38,7 @@ starChat.Stream = (function () {
             success: function (data, textStatus, jqXHR) {
                 self.continuingErrorNum_ = 0;
                 setTimeout(function () {
-                    restartStream(parseInt($.now() / 1000) - 10);
+                    restartStream(starChat.parseInt($.now() / 1000) - 10);
                 }, 0);
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -51,7 +51,7 @@ starChat.Stream = (function () {
                     return;
                 }
                 setTimeout(function () {
-                    restartStream(parseInt($.now() / 1000) - 10);
+                    restartStream(starChat.parseInt($.now() / 1000) - 10);
                 }, 2000);
             },
             xhrFields: {
@@ -79,8 +79,8 @@ starChat.Stream = (function () {
                         self.packetProcessor_.process(packet, view);
                     }
                     view.update();
-                },
-            },
+                }
+            }
         });
     };
     Stream.prototype.stop = function () {

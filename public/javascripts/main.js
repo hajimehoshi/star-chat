@@ -93,7 +93,7 @@ $(function() {
             },
             statusCode: {
                 401: logOut
-            },
+            }
         });
     }
 
@@ -195,7 +195,7 @@ $(function() {
                 '/messages';
             var id = $.now();
             starChat.ajaxRequest(session, url, 'POST', {
-                body: body,
+                body: body
             });
             var message = {
                 body: body,
@@ -203,7 +203,7 @@ $(function() {
                 user_name: session.user().name(),
                 pseudo_message_id: id,
                 id: 0,
-                created_at: parseInt($.now() / 1000),
+                created_at: starChat.parseInt($.now() / 1000)
             };
             view.addPseudoMessage(message);
             view.update();
@@ -410,9 +410,9 @@ $(function() {
             var view = getView();
             var channel = starChat.Channel.find(view.channelName);
             channel.topic({
-                created_at: parseInt($.now() / 1000),
+                created_at: starChat.parseInt($.now() / 1000),
                 user_name:  view.session().user().name(),
-                body:       topicBody,
+                body:       topicBody
             });
             // TODO: close the textarea even when failured
             channel.save(view.session(), function (sessionId) {

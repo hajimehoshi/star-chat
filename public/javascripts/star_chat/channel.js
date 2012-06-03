@@ -1,6 +1,9 @@
 'use strict';
 
 starChat.Channel = (function () {
+    /**
+     * @constructor
+     */
     var Channel = function (obj) {
         var name = obj.name;
         name = name.replace(/^\s*(.*?)\s*$/, '$1').replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
@@ -15,7 +18,7 @@ starChat.Channel = (function () {
             return cache[name];
         }
         return cache[name] = new Channel({
-            name: name,
+            name: name
         });
     };
     Channel.prototype.update = function (obj) {
@@ -117,7 +120,7 @@ starChat.Channel = (function () {
                 topicBody = topicBody.substring(0, 1024);
                 if (lastTopicBody !== topicBody) {
                     params.topic = {
-                        body: topicBody,
+                        body: topicBody
                     }
                     lastTopicBody = topicBody
                 }

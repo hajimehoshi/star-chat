@@ -21,7 +21,7 @@ starChat.Subscribing = (function () {
         var options = {};
         if (this.key_) {
             options['headers'] = {
-                'X-StarChat-Channel-Key': this.key_,
+                'X-StarChat-Channel-Key': this.key_
             };
         }
         var self = this;
