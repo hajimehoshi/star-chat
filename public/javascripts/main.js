@@ -151,21 +151,15 @@ $(function() {
                 if (!confirm(msg)) {
                     return;
                 }
-                var url = '/subscribings?' +
-                    'channel_name=' + encodeURIComponent(channelName) + ';' +
-                    'user_name=' + encodeURIComponent(session.userName());
-                var options = {};
+                var subscribing = new starChat.Subscribing(channelName, session.user().name());
                 if ('key' in params) {
-                    options['headers'] = {
-                        'X-StarChat-Channel-Key': params.key,
-                    };
+                    subscribing.key(params.key);
                 }
-                options[401] = function () {
-                    alert('Error! 401 Forbidden');
-                };
-                starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
-                    receiveResponse(sessionId, uri, method, data);
+                subscribing.save(session, function (sessionId) {
                     var view = getView();
+                    if (view.session().id() !== sessionId) {
+                        return;
+                    }
                     view.channelName = channelName;
                     view.update();
                     var channel = starChat.Channel.find(channelName);
@@ -176,7 +170,8 @@ $(function() {
                         }
                         view.update();
                     });
-                }, options);
+                });
+                return false;
             }
         }
     })();
@@ -208,13 +203,6 @@ $(function() {
                 } else if (uri.match(/^\/messages\/search\/([^\/]+)$/)) {
                     var query = decodeURIComponent(RegExp.$1);
                     view.setSearch(query, data);
-                }
-            } else if (method === 'PUT') {
-                if (uri.match(/^\/subscribings\?/)) {
-                    var params = starChat.parseQuery(uri);
-                    var channelName = params['channel_name'];
-                    view.session().user().addChannel(channelName);
-                    starChat.Channel.find(channelName).load(view.session());
                 }
             }
         } finally {
@@ -257,17 +245,14 @@ $(function() {
             if (!channelName) {
                 return false;
             }
-            var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(session.userName());
-            starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
+            var subscribing = new starChat.Subscribing(channelName, session.user().name());
+            subscribing.save(session, function (sessionId) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
                 form.find('[name="name"]').val('');
-                receiveResponse(sessionId, uri, method, data);
                 location.hash = 'channels/' + encodeURIComponent(channelName);
-            }, {
-                401: function () {
-                    alert('Error!: 401 Forbidden');
-                },
             });
             return false;
         });
