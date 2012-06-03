@@ -160,6 +160,9 @@ $(function() {
                         'X-StarChat-Channel-Key': params.key,
                     };
                 }
+                options[401] = function () {
+                    alert('Error! 401 Forbidden');
+                };
                 starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, uri, method, data) {
                     receiveResponse(sessionId, uri, method, data);
                     var view = getView();
@@ -261,6 +264,10 @@ $(function() {
                 form.find('[name="name"]').val('');
                 receiveResponse(sessionId, uri, method, data);
                 location.hash = 'channels/' + encodeURIComponent(channelName);
+            }, {
+                401: function () {
+                    alert('Error!: 401 Forbidden');
+                },
             });
             return false;
         });

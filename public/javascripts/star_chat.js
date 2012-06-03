@@ -39,7 +39,13 @@ starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, op
         cache:      false,
         beforeSend: beforeSend,
         dataType:   'json',
-        statusCode: {},
+        statusCode: {
+            401: function () {
+                if ('401' in options) {
+                    options[401]();
+                }
+            },
+        },
     }
     if (callbackSuccess !== void(0) ||
         callbackSuccess !== null) {
