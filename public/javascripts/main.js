@@ -104,11 +104,6 @@ $(function() {
                     data.forEach(function (message) {
                         view.addNewMessage(channelName, message, false);
                     });
-                } else if (uri.match(/^\/channels\/([^\/]+)\/messages\/by_time_span\/(\d+),(\d+)$/)) {
-                    var channelName = decodeURIComponent(RegExp.$1);
-                    var startTime   = decodeURIComponent(RegExp.$2);
-                    var endTime     = decodeURIComponent(RegExp.$3);
-                    view.setOldMessages(channelName, startTime, endTime, data);
                 } else if (uri.match(/^\/messages\/search\/([^\/]+)$/)) {
                     var query = decodeURIComponent(RegExp.$1);
                     view.setSearch(query, data);
