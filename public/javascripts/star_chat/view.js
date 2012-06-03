@@ -40,7 +40,7 @@ starChat.View = (function () {
         document.title = self.title_;
         stopBlinkingTitle(self);
     }
-    function startBlinkingTitle(self, anotherTitle) {
+    function startBlinkingTitle(self) {
         if (self.isBlinkingTitle_) {
             return;
         }
@@ -56,7 +56,7 @@ starChat.View = (function () {
             }
             document.title = {
                 0: self.title_,
-                1: anotherTitle,
+                1: '(*) ' + self.title_,
             }[i];
             setTimeout(function () {
                 loop(1 - i);
@@ -326,7 +326,14 @@ starChat.View = (function () {
             });
         });
         if (hitKeyword && !starChat.isFocused()) {
-            startBlinkingTitle(self, '(*) ' + self.title_);
+            startBlinkingTitle(self);
+        }
+        self.title_ = 'StarChat (β)';
+        if (self.channelName) {
+            self.title_ += ' - ' + self.channelName;
+            if (!self.isBlinkingTitle_) {
+                document.title = self.title_;
+            }
         }
 
         if (!self.channelName) {
