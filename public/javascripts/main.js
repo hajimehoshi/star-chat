@@ -390,17 +390,17 @@ $(function() {
                 return false;
             }
             var view = getView();
-            var url = '/subscribings?' +
-                'channel_name=' + encodeURIComponent(channelName) + ';' +
-                'user_name=' + encodeURIComponent(view.session().user().name());
-            starChat.ajaxRequest(view.session(), url, 'DELETE', null, function (sessionId, uri, method, data) {
+            var subscribing = new starChat.Subscribing(channelName, view.session().user().name());
+            subscribing.destroy(view.session(), function (sessionId) {
                 var view = getView();
-                view.session().user().removeChannel(channelName);
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
                 if (view.channelName === channelName) {
                     starChat.clearFragment();
                     view.channelName = null;
                 }
-                view.update();
+                view.update(); 
             });
             return false;
         });

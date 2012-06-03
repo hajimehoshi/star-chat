@@ -37,7 +37,9 @@ starChat.Subscribing = (function () {
         var url = '/subscribings?' +
             'channel_name=' + encodeURIComponent(this.channelName_) + ';' +
             'user_name=' + encodeURIComponent(this.userName_);
+        var self = this;
         starChat.ajaxRequest(session, url, 'DELETE', null, function (sessionId, url, method, data) {
+            session.user().removeChannel(self.channelName_);
             if (callback !== void(0)) {
                 callback(sessionId);
             }
