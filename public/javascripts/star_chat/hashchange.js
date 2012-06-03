@@ -19,17 +19,18 @@
             view.resetTimeSpan();
             if (fragment.match(/^channels\//)) {
                 var params = {};
-                if (fragment.match(/^channels\/([^\/\?]+)(\?(.*))?$/)) {
-                    var channelName = decodeURIComponent(RegExp.$1);
+                var match;
+                if (match = fragment.match(/^channels\/([^\/\?]+)(\?(.*))?$/)) {
+                    var channelName = decodeURIComponent(match[1]);
                     var startTime   = null;
                     var endTime     = null;
-                    if (RegExp.$3) {
-                        params = starChat.parseQuery(RegExp.$3);
+                    if (match[3]) {
+                        params = starChat.parseQuery(match[3]);
                     }
-                } else if (fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
-                    var channelName = decodeURIComponent(RegExp.$1);
-                    var startTime   = starChat.parseInt(decodeURIComponent(RegExp.$2));
-                    var endTime     = starChat.parseInt(decodeURIComponent(RegExp.$3));
+                } else if (match = fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
+                    var channelName = decodeURIComponent(match[1]);
+                    var startTime   = starChat.parseInt(decodeURIComponent(match[2]));
+                    var endTime     = starChat.parseInt(decodeURIComponent(match[3]));
                     view.setTimeSpan(startTime, endTime);
                 } else {
                     return;
