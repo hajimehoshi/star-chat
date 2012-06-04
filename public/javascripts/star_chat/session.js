@@ -7,7 +7,7 @@ starChat.Session = (function () {
      * @param {string} userName
      * @param {string} password
      */
-    starChat.Session = function (id, userName, password) {
+    var Session = function (id, userName, password) {
         if (id !== void(0)) {
             this.id_ = id;
         } else {
