@@ -446,13 +446,18 @@ starChat.View = (function () {
         ul.empty();
         if (self.channelName) {
             var channel = starChat.Channel.find(self.channelName);
-            var users = channel.users();
-            var userNicks = users.map(function (user) {
-                return user.nick();
-            }).sort();
-            userNicks.forEach(function (userNick) {
+            var users = channel.users().sort(function (a, b) {
+                if (a.nick() > b.nick()) {
+                    return 1;
+                }
+                if (a.nick() < b.nick()) {
+                    return -1;
+                }
+                return 0;
+            });
+            users.forEach(function (user) {
                 var li = $('<li></li>');
-                li.text(userNick);
+                li.text(user.nick()).attr('title', user.name());
                 ul.append(li);
             });
             if (channel.privacy() === 'private') {
