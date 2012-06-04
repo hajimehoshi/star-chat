@@ -261,6 +261,9 @@ post '/channels/:channel_name/messages', provides: :json do
   sleep(1) if development?
   body = params[:body].to_s
   message = @channel.post_message(current_user, body)
+  if params[:notice]
+    message.notice = params[:notice] == 'true'
+  end
   # TODO: In fact, the real-time search is not needed.
   StarChat::GroongaDB.add_message(message)
   broadcast(type: 'message',
