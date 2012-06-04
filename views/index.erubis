@@ -36,7 +36,7 @@
         </ul>
       </section>
       <section id="messages">
-        <h2>&#xa0;</h2>
+        <h2><span>&#xa0;</span> <img src="" alt="private" width="16" height="16" data-image-icon-name="whitePadlockClosed" /></h2>
         <section data-channel-name=""></section>
         <form action="." id="postMessageForm" method="post">
           <p><textarea name="body" rows="1"></textarea><input type="submit" name="send" value="Send" /></p>
@@ -52,24 +52,70 @@
         <h2>Users</h2>
         <ul id="users">
         </ul>
+        <p id="invitationLink"><a href="#">Invite...</a></p>
       </section>
     </section>
     <div id="dialogBackground">
       <div id="editUserDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
-          <h2>Edit User</h2>
+          <h2>User</h2>
           <table>
             <tr>
               <th>Name:</th>
-              <td data-column="name"></td>
+              <td title="name"></td>
+            </tr>
+            <tr>
+              <th>Nick:</th>
+              <td><input name="nick" /></td>
             </tr>
             <tr>
               <th>Keywords:</th>
               <td><textarea name="keywords" cols="15" rows="10" ></textarea></td>
             </tr>
           </table>
-          <p class="buttons"><input type="submit" value="OK"></p>
+          <p class="buttons"><input type="submit" value="Update"></p>
         </form>
+      </div>
+      <div id="editChannelsDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
+        <h2>Channels</h2>
+        <table>
+          <tr class="cloneMe" data-channel-name="">
+            <td class="channelName">...</td>
+            <td><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackCog" data-tool-id="edit" class="toolIcon" /></td>
+            <td><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackRoundMinus" data-tool-id="delete" class="toolIcon" /></td>
+          </tr>
+        </table>
+      </div>
+      <div id="editChannelDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
+        <form>
+          <h2>Channel</h2>
+          <table>
+            <tr>
+              <th>Name:</th>
+              <td title="channelName"></td>
+            </tr>
+            <tr>
+              <th>Privacy:</th>
+              <td>
+                <form action="." method="post">
+                  <input type="radio" name="privacy" value="public" id="editChannelPrivacyPublic" checked="checked" /><label for="editChannelPrivacyPublic">Public</label><br />
+                  <input type="radio" name="privacy" value="private" id="editChannelPrivacyPrivate" /><label for="editChannelPrivacyPrivate">Private</label>
+                </form>
+              </td>
+            </tr>
+          </table>
+          <p class="buttons"><input type="submit" value="Update" /></p>
+        </form>
+      </div>
+      <div id="invitationURLDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
+        <h2>Invitation URL</h2>
+        <p>Please tell the below URL to the user you want to invite. This URL will expire in 5 minutes.</p>
+        <p><textarea name="invitationURL" rows="3"></textarea></p>
+        <p class="buttons"><button title="regenerate">Regenerate</button></p>
       </div>
     </div>
     <!-- TODO: write footer -->
@@ -81,7 +127,9 @@
     <script src="/javascripts/star_chat/stream.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/user.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/channel.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/subscribing.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/view.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/hashchange.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/main.js?_=<%= launched_time %>"></script>
   </body>
 </html>

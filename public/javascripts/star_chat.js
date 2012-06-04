@@ -2,6 +2,15 @@
 
 var starChat = {};
 
+/**
+ * @param {string|number} val
+ * @return {number}
+ * @nosideeffects
+ */
+starChat.parseInt = function (val) {
+    return window.parseInt(val, 10);
+};
+
 starChat.isSameArray = function (a, b, func) {
     if (!func) {
         func = function (x, y) {
@@ -19,71 +28,48 @@ starChat.isSameArray = function (a, b, func) {
     return true;
 };
 
-starChat.getAddAuthHeaderFunc = function (userName, password) {
-    return function (xhr) {
-        xhr.setRequestHeader('Authorization',
-                             'Basic ' + btoa(userName + ':' + password));
-    }
-};
-
-starChat.ajax = function (userName, password, url, method, callbacks, data, sessionId) {
-    var args = {
-        url: url,
-        type: method,
-        cache: false,
-        beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
-        dataType: 'json',
-        statusCode: {},
-    }
-    if (data) {
-        args.data = data;
-    }
-    if ('logOut' in callbacks) {
-        args.statusCode[401] = callbacks.logOut;
-    }
-    if ('onprogress' in callbacks) {
-        args.xhrFields = {
-            onprogress: callbacks.onprogress,
-        };
-    }
-    if ('success' in callbacks) {
-        args.success = callbacks.success;
-    }
-    if ('error' in callbacks) {
-        args.error = callbacks.error;
-    }
-    if ('complete' in callbacks) {
-        args.complete = callbacks.complete;
-    }
-    var jq = $.ajax(args)
-    jq.starChatRequestURI = url;
-    if ($.isNumeric(sessionId)) {
-        jq.starChatSessionId = sessionId;
-    }
-    return jq;
-};
-
-starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, callbackComplete) {
+/**
+ * @param {starChat.Session} session
+ * @param {string} url
+ * @param {string} method
+ * @param {Object} data
+ * @param {function(number,string,string,Object)=} callbackSuccess
+ * @param {Object=} options
+ * @return {jQuery.jqXHR}
+ */
+starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, options) {
     var sessionId = session.id();
     var userName  = session.userName();
     var password  = session.password();
-    var args = {
-        url: url,
-        type: method,
-        cache: false,
-        beforeSend: starChat.getAddAuthHeaderFunc(userName, password),
-        dataType: 'json',
-        statusCode: {},
+    var beforeSend = function (xhr) {
+        xhr.setRequestHeader('Authorization',
+                             'Basic ' + btoa(userName + ':' + password));
+        if (options && 'headers' in options) {
+            var headers = options.headers;
+            Object.keys(headers).forEach(function (key) {
+                xhr.setRequestHeader(key, headers[key]);
+            });
+        };
     }
-    if (callbackSuccess !== void(0)) {
+    var args = {
+        url:        url,
+        type:       method,
+        cache:      false,
+        beforeSend: beforeSend,
+        dataType:   'json',
+        statusCode: {
+            401: function () {
+                if ('401' in options) {
+                    options[401]();
+                }
+            }
+        }
+    }
+    if (callbackSuccess !== void(0) &&
+        callbackSuccess !== null) {
         args.success = function (data, textStatus, jqXHR) {
             callbackSuccess(sessionId, url, method, data);
         };
-    }
-    if (callbackComplete !== void(0)) {
-        args.complete = function (jqXHR, textStatus) {
-            callbackComplete();
-        }
     }
     if (data) {
         args.data = data;
@@ -132,6 +118,10 @@ starChat.parseQuery = function (str) {
     return params;
 };
 
+/**
+ * @param {Date} date
+ * @param {string=} type
+ */
 starChat.toISO8601 = function (date, type) {
     if (type === void(0)) {
         type = 'datetime';
@@ -169,6 +159,9 @@ starChat.escapeHTML = function (str) {
     return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 
+/**
+ * @suppress {globalThis}
+ */
 jQuery.fn.outerHTML = function(s) {
     return (s)
         ? this.before(s).remove()

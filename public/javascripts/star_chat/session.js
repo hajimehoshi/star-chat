@@ -1,6 +1,12 @@
 'use strict';
 
+/**
+ * @typedef {!Object}
+ */
 starChat.Session = (function () {
+    /**
+     * @constructor
+     */
     var Session = function (id, userName, password) {
         if (id !== void(0)) {
             this.id_ = id;
@@ -8,7 +14,7 @@ starChat.Session = (function () {
             this.id_ = 0;
         }
         if (this.id_) {
-            this.user_ = new starChat.User(userName);
+            this.user_ = starChat.User.find(userName);
             this.password_ = password;
         }
     };

@@ -87,16 +87,45 @@ end
 before %r{^/users/([^/]+)} do
   protect!
   user_name = params[:captures][0]
-  halt 401 if user_name != current_user.name
+  @user = StarChat::User.find(user_name)
+  if @user.nil?
+    if current_user.name == user_name
+      @user = StarChat::User.new(user_name).save
+    else
+      halt 404
+    end
+  end
+  if (request.put? or request.delete? or request.post?) and
+      current_user.name != @user.name
+    halt 401
+  end
 end
 
 get '/users/:user_name', provides: :json do
-  current_user.to_json
+  if @user.name == current_user.name
+    current_user.to_json
+  else
+    {
+      name: @user.name,
+      nick: @user.nick,
+    }.to_json
+  end
 end
 
 put '/users/:user_name', provides: :json do
   if params[:nick]
-    current_user.nick = params[:nick].to_s
+    # TODO: check uniqueness?
+    nick = params[:nick].to_s.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+    if current_user.nick != nick
+      current_user.nick = nick
+      broadcast(type: 'user',
+                user: {
+                  name: current_user.name,
+                  nick: current_user.nick,
+                }) do
+        true
+      end
+    end
   end
   if params[:keywords] and params[:keywords].kind_of?(Array)
     current_user.keywords = params[:keywords]
@@ -106,19 +135,25 @@ put '/users/:user_name', provides: :json do
 end
 
 get '/users/:user_name/ping', provides: :json do
+  halt 401 if @user.name != current_user.name
   {
     result: 'pong',
   }.to_json
 end
 
 get '/users/:user_name/channels', provides: :json do
-  current_user.channels.to_json
+  if @user.name == current_user.name
+    current_user.channels.to_json
+  else
+    # TODO: 直す
+    [].to_json
+  end
 end
 
 get '/users/:user_name/stream', provides: :json do
-  user_name = params[:user_name].to_s
+  halt 401 if @user.name != current_user.name
   stream(:keep_open) do |out|
-    subscribe = [user_name, out]
+    subscribe = [@user.name, out]
     settings.streams << subscribe
     if params[:start_time]
       start_time = params[:start_time].to_i
@@ -156,6 +191,10 @@ before %r{^/channels/([^/]+)} do
         !current_user.subscribing?(@channel)
       halt 401
     end
+    if @channel.private? and
+        !current_user.subscribing?(@channel)
+      halt 401
+    end
   else
     halt 404 unless request.put?
   end
@@ -171,13 +210,19 @@ put '/channels/:channel_name', provides: :json do
     @channel = StarChat::Channel.save(params[:channel_name]).save
     result = 201
   end
-  if params[:topic_body]
-    topic = @channel.update_topic(current_user, params[:topic_body])
+  # TODO: params[:topic][:body]?
+  if params[:topic] and params[:topic][:body]
+    topic = @channel.update_topic(current_user, params[:topic][:body])
+    halt 409 if topic.nil?
+    # TODO: move after saving?
     broadcast(type: 'topic',
               topic: topic) do |user_name|
       return false unless user = StarChat::User.find(user_name)
       user.subscribing?(@channel)
     end
+  end
+  if params[:privacy]
+    @channel.privacy = params[:privacy]
   end
   @channel.save
   result
@@ -223,6 +268,14 @@ post '/channels/:channel_name/messages', provides: :json do
   201
 end
 
+post '/channels/:channel_name/keys', provides: :json do
+  halt 400 unless @channel.private?
+  {
+    channel_name: @channel.name,
+    key:          @channel.generate_key(current_user),
+  }.to_json
+end
+
 before '/subscribings' do
   protect!
   channel_name = params[:channel_name].to_s
@@ -236,9 +289,16 @@ end
 
 put '/subscribings', provides: :json do
   unless @channel
-    @channel = StarChat::Channel.new(@channel_name).save
+    @channel = StarChat::Channel.new(@channel_name)
+    @channel.save
   end
   halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
+  if @channel.private?
+    # TODO: Use one-time password
+    channel_key = request.env['HTTP_X_STARCHAT_CHANNEL_KEY']
+    halt 401 if channel_key.nil? or channel_key.empty?
+    halt 401 unless @channel.auth?(channel_key)
+  end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
             channel_name: @channel.name,
