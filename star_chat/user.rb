@@ -3,7 +3,6 @@ require 'securerandom'
 
 module StarChat
 
-  # TODO: def id
   class User
 
     @@password_cache = {}

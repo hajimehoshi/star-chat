@@ -118,6 +118,13 @@ put '/users/:user_name', provides: :json do
     nick = params[:nick].to_s.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
     if current_user.nick != nick
       current_user.nick = nick
+      broadcast(type: 'user',
+                user: {
+                  name: current_user.name,
+                  nick: current_user.nick,
+                }) do
+        true
+      end
     end
   end
   if params[:keywords] and params[:keywords].kind_of?(Array)
