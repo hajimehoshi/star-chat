@@ -115,7 +115,10 @@ end
 put '/users/:user_name', provides: :json do
   if params[:nick]
     # TODO: check uniqueness?
-    current_user.nick = params[:nick].to_s
+    nick = params[:nick].to_s.strip.gsub(/[[:cntrl:]]/, '')[0, 32]
+    if current_user.nick != nick
+      current_user.nick = nick
+    end
   end
   if params[:keywords] and params[:keywords].kind_of?(Array)
     current_user.keywords = params[:keywords]
