@@ -167,15 +167,7 @@ $(function() {
         });
     })();
     (function () {
-        var form = $('#postMessageForm');
-        form.find('[name="body"]').keypress(function (e) {
-            if (e.which === 13) {
-                form.find('[type="submit"]').click();
-                return false;
-            }
-            return true;
-        });
-        form.find('[type="submit"]').click(function () {
+        function postMessage(notice) {
             var session = getView().session();
             if (!session.isLoggedIn()) {
                 // TODO: show alert or do something
@@ -195,7 +187,8 @@ $(function() {
                 '/messages';
             var id = $.now();
             starChat.ajaxRequest(session, url, 'POST', {
-                body: body
+                body:   body,
+                notice: notice
             });
             var message = {
                 body: body,
@@ -203,12 +196,24 @@ $(function() {
                 user_name: session.user().name(),
                 pseudo_message_id: id,
                 id: 0,
-                created_at: starChat.parseInt($.now() / 1000)
+                created_at: starChat.parseInt($.now() / 1000),
+                notice: notice
             };
             view.addPseudoMessage(message);
             view.update();
             form.find('[name="body"]').val('');
             return false;
+        }
+        var form = $('#postMessageForm');
+        form.find('[name="body"]').keypress(function (e) {
+            if (e.which === 13) {
+                postMessage(e.ctrlKey);
+                return false;
+            }
+            return true;
+        });
+        form.find('[type="submit"]').click(function () {
+            postMessage();
         });
     })();
     (function () {

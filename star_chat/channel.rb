@@ -118,14 +118,14 @@ module StarChat
       Message.find_by_list(redis_key, idx1, idx2 - idx1)
     end
 
-    def post_message(user, body, created_at = Time.now.to_i)
+    def post_message(user, body, notice, created_at = Time.now.to_i)
       # TODO: Check subscribing?
-      message = nil
       # TODO: lock?
       message = Message.new(user.name,
                             body,
                             created_at:   created_at,
-                            channel_name: name).save
+                            channel_name: name,
+                            notice:       notice).save
       RedisDB.exec(:rpush,
                    ['channels', name, 'messages'],
                    message.id)
