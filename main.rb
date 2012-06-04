@@ -210,21 +210,25 @@ put '/channels/:channel_name', provides: :json do
     @channel = StarChat::Channel.save(params[:channel_name]).save
     result = 201
   end
-  # TODO: params[:topic][:body]?
+  updated = false
   if params[:topic] and params[:topic][:body]
     topic = @channel.update_topic(current_user, params[:topic][:body])
-    halt 409 if topic.nil?
-    # TODO: move after saving?
-    broadcast(type: 'topic',
-              topic: topic) do |user_name|
+    updated = true if topic
+  end
+  if params[:privacy]
+    if @channel.privacy != params[:privacy]
+      @channel.privacy = params[:privacy]
+      updated = true
+    end
+  end
+  @channel.save
+  if updated
+    broadcast(type: 'channel',
+              channel: @channel) do |user_name|
       return false unless user = StarChat::User.find(user_name)
       user.subscribing?(@channel)
     end
   end
-  if params[:privacy]
-    @channel.privacy = params[:privacy]
-  end
-  @channel.save
   result
 end
 

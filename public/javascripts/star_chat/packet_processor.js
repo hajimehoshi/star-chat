@@ -33,6 +33,13 @@ starChat.PacketProcessor = (function () {
             user.update(userObj);
         }
     }
+    function processPacketChannel(packet, view) {
+        var channelObj = packet.channel;
+        if (channelObj) {
+            var channel = starChat.Channel.find(channelObj.name);
+            channel.update(channelObj);
+        }
+    }
     PacketProcessor.prototype.process = function (packet, view) {
         if (packet.type === 'message') {
             processPacketMessage(packet, view);
@@ -40,10 +47,10 @@ starChat.PacketProcessor = (function () {
             processPacketSubscribing(packet, view);
         } else if (packet.type === 'delete_subscribing') {
             processPacketDeleteSubscribing(packet, view);
-        } else if (packet.type === 'topic') {
-            processPacketTopic(packet, view);
         } else if (packet.type === 'user') {
             processPacketUser(packet, view);
+        } else if (packet.type === 'channel') {
+            processPacketChannel(packet, view);
         } else {
             console.error('Received an unknown packet:');
             console.error(packet);
