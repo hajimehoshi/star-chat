@@ -206,7 +206,9 @@ $(function() {
         }
         var form = $('#postMessageForm');
         form.find('[name="body"]').keypress(function (e) {
-            if (e.which === 13) {
+            // In Chrome of Windows, e.which may have the value 10 instead of 13.
+            // I don't know the reason.
+            if (e.which === 13 || e.which === 10) {
                 postMessage(e.ctrlKey);
                 return false;
             }
