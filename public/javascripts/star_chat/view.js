@@ -253,10 +253,13 @@ starChat.View = (function () {
         messageTR.append(userNameTD);
 
         var bodyTD = $('<td></td>').addClass('body').text(message.body);
+        if (message.notice) {
+            bodyTD.addClass('notice');
+        }
         starChat.replaceURLWithLinks(bodyTD);
 
         var emphasizedNum = 0;
-        if (keywords !== void(0)) {
+        if (keywords !== void(0) && !message.notice) {
             keywords.forEach(function (keyword) {
                 emphasizedNum += starChat.emphasizeKeyword(bodyTD, keyword);
             });

@@ -203,6 +203,9 @@ h1 {
 #messages > section td.body {
     word-wrap: break-word;
 }
+#messages > section td.body.notice {
+    color: #888;
+}
 #postMessageForm {
     margin: 0;
     padding: 0;

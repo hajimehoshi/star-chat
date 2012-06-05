@@ -11,11 +11,12 @@ module StarChat
       key = ['messages', id]
       # TODO: lock?
       nil unless RedisDB.exec(:exists, key)
-      values = RedisDB.exec(:hmget, key, 'user_name', 'body', 'created_at', 'channel_name')
+      values = RedisDB.exec(:hmget, key, 'user_name', 'body', 'created_at', 'channel_name', 'notice')
       Message.new(values[0], values[1],
-                  id:           id,
-                  created_at:   values[2],
-                  channel_name: values[3])
+                  id:           id.to_i,
+                  created_at:   values[2].to_i,
+                  channel_name: values[3],
+                  notice:       values[4] == 'true')
     end
 
     def self.find_by_list(redis_key, idx, len)
@@ -31,15 +32,17 @@ module StarChat
                                   'messages:*->user_name',
                                   'messages:*->body',
                                   'messages:*->created_at',
-                                  'messages:*->channel_name'],
+                                  'messages:*->channel_name',
+                                  'messages:*->notice'],
                             limit: limit)
-      (values.size / 5).times.map do |i|
-        idx = i * 5
+      (values.size / 6).times.map do |i|
+        idx = i * 6
         Message.new(values[idx+1],
                     values[idx+2],
-                    id:           values[idx],
-                    created_at:   values[idx+3],
-                    channel_name: values[idx+4])
+                    id:           values[idx].to_i,
+                    created_at:   values[idx+3].to_i,
+                    channel_name: values[idx+4],
+                    notice:       values[idx+5] == 'true')
       end
     end
 
@@ -65,17 +68,27 @@ module StarChat
     end
     private(:body=)
 
+    def notice?
+      @notice ||= false
+    end
+
+    def notice=(notice)
+      @notice = !!notice
+    end
+
     def initialize(user_name, body, options = {})
       options = {
         created_at:   Time.now.to_i,
         id:           nil,
         channel_name: '',
+        notice:       false,
       }.merge(options)
       @user_name    = user_name
       self.body     = body
       @created_at   = options[:created_at].to_i
       @id           = (options[:id] ? options[:id].to_i : nil)
       @channel_name = options[:channel_name].to_s
+      self.notice   = options[:notice]
     end
 
     def to_json(*args)
@@ -85,6 +98,7 @@ module StarChat
         body:         body,
         created_at:   created_at,
         channel_name: channel_name,
+        notice:       notice?,
       }.to_json(*args)
     end
 
@@ -96,7 +110,8 @@ module StarChat
                    'created_at',   created_at,
                    'user_name',    user_name,
                    'body',         body,
-                   'channel_name', channel_name)
+                   'channel_name', channel_name,
+                   'notice',       notice? ? 'true' : 'false')
       self
     end
 
