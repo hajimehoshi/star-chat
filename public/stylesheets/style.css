@@ -163,7 +163,12 @@ h1 {
     font-weight: bold;
     margin: 0;
     padding: 10px 20px;
+    position: relative;
     text-shadow: #556 0 -1px;
+}
+#messages h2 img.toolIcon {
+    position: absolute;
+    right: 20px;
 }
 #messages > section {
     margin: 0;
