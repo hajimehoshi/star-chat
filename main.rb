@@ -181,6 +181,10 @@ get '/users/:user_name/stream', provides: :json do
   end
 end
 
+before %r{^/.+} do
+  halt 406 unless request.accept?(mime_type(:json))
+end
+
 before %r{^/channels/([^/]+)} do
   protect!
   channel_name = params[:captures][0]
