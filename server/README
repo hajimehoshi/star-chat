@@ -1,0 +1,3 @@
+* How to install
+
+$ sudo /usr/local/go/bin/go get github.com/simonz05/godis
