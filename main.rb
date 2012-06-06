@@ -255,6 +255,10 @@ get '/channels/:channel_name/messages/:range', provides: :json do
   end
 end
 
+before %r{/channels/[^/]+/messages(/.+)?$} do
+  halt 401 unless current_user.subscribing?(@channel)
+end
+
 get '/channels/:channel_name/messages/by_time_span/:start_time,:end_time', provides: :json do
   start_time = params[:start_time].to_i
   end_time   = params[:end_time].to_i
