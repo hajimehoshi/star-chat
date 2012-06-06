@@ -84,6 +84,10 @@ get '/', provides: :html do
   erb(:index)
 end
 
+before %r{^/.+} do
+  halt 406 unless request.accept?(mime_type(:json))
+end
+
 before %r{^/users/([^/]+)} do
   protect!
   user_name = params[:captures][0]
@@ -179,10 +183,6 @@ get '/users/:user_name/stream', provides: :json do
       settings.streams.delete(subscribe)
     end
   end
-end
-
-before %r{^/.+} do
-  halt 406 unless request.accept?(mime_type(:json))
 end
 
 before %r{^/channels/([^/]+)} do
