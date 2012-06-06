@@ -604,7 +604,9 @@ starChat.View = (function () {
             return;
         }
         this.newMessages_[channelName].push(message);
-        if (setDirtyFlag && channelName !== this.channelName) {
+        if (setDirtyFlag &&
+            channelName !== this.channelName &&
+            message.user_name !== this.session().user().name()) {
             this.setDirtyFlag(channelName, true);
         }
         if (message.user_name === this.session().user().name()) {
