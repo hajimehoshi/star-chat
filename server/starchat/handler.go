@@ -56,16 +56,16 @@ func (self *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (self *Handler) serveTop(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
 func (self *Handler) serveItems(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	
 }
 
 func (self *Handler) serveStream(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Connection", "close")
 }
