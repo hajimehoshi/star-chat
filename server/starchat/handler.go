@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 const (
@@ -47,10 +48,10 @@ func NewHandler(db DB) *Handler {
 
 func (self *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
-	switch path {
-	case "/":
+	switch {
+	case path == "/":
 		self.serveTop(w, r)
-	case "/messages/stream":
+	case regexp.MustCompile("^/users/[^/]+/stream$").MatchString(path):
 		self.serveStream(w, r)
 	default:
 		self.serveItems(w, r)
@@ -62,7 +63,23 @@ func (self *Handler) serveTop(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
+func authorizedUser(r *http.Request) *User {
+	authorization := r.Header.Get("Authorization")
+	re := regexp.MustCompile("^Basic (.+)$")
+	matches := re.FindStringSubmatch(authorization)
+	if len(matches) != 2 {
+		return nil
+	}
+	// TODO: Implement
+	return nil
+}
+
 func (self *Handler) serveItems(w http.ResponseWriter, r *http.Request) {
+	user := authorizedUser(r)
+	if user == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	value := map[string]string {
 		"result": "pong",
@@ -75,6 +92,11 @@ func (self *Handler) serveItems(w http.ResponseWriter, r *http.Request) {
 }
 
 func (self *Handler) serveStream(w http.ResponseWriter, r *http.Request) {
+	user := authorizedUser(r)
+	if user == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Connection", "close")
 }

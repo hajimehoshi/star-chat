@@ -29,10 +29,25 @@ var testCases = []testCase{
 		RequestMethod:      "GET",
 		RequestPath:        "/users/foo/ping",
 		ResponseStatusCode: http.StatusOK,
-	ResponseJSONBody: map[string]string{
-			"result": "pong",
+		ResponseJSONBody:   map[string]string{"result": "pong",
 		},
 	},
+}
+
+type dummyDB struct {
+}
+
+func (db *dummyDB) Get(key []string) (interface{}, error) {
+	/*if key == []string{"users", "foo"} {
+		return "hoge", nil
+	}*/
+	return nil, nil
+}
+func (db *dummyDB) Set(key []string) error {
+	return nil
+}
+func (db *dummyDB) Multi(f func(starchat.DB)) error {
+	return nil
 }
 
 func checkTestCase(t *testing.T, rootURL string, tc *testCase) {
@@ -51,7 +66,7 @@ func checkTestCase(t *testing.T, rootURL string, tc *testCase) {
 		statusCode     := resp.StatusCode
 		wantStatusCode := tc.ResponseStatusCode
 		if statusCode != wantStatusCode {
-			t.Errorf("Status Code = %q; want %q", statusCode, wantStatusCode)
+			t.Fatalf("Status Code = %d; want %d", statusCode, wantStatusCode)
 		}
 	}
 	{
@@ -84,7 +99,8 @@ func checkTestCase(t *testing.T, rootURL string, tc *testCase) {
 }
 
 func TestHandler(t *testing.T) {
-	handler := starchat.NewHandler(nil)
+	db := &dummyDB{}
+	handler := starchat.NewHandler(db)
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
