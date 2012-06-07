@@ -218,6 +218,22 @@ h1 {
     height: 2em;
     padding: 0.5em 0.5em 0 0.5em;
 }
+#userNameCandidates {
+    display: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    bottom: 2.5em;
+}
+#userNameCandidates li {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-color: #999;
+    border-style: solid;
+    border-width: 1px;
+    display: inline;
+    margin: 0;
+    padding: 0.5em;
+}
 
 #updateTopicForm {
     display: none;

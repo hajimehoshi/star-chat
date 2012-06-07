@@ -206,6 +206,8 @@ $(function() {
         }
         var form = $('#postMessageForm');
         form.find('[name="body"]').keydown(function (e) {
+            $('#userNameCandidates').hide();
+
             // In Chrome of Windows, e.which may have the value 10 instead of 13.
             // I don't know the reason.
             if (e.which === 13 || e.which === 10) {
@@ -234,23 +236,48 @@ $(function() {
                     }
                     return nick.indexOf(currentHead) === 0;
                 });
-                if (userNicks.length === 0) {
+                userNicks = $.unique(userNicks).sort();
+
+                switch (userNicks.length) {
+                case 0:
                     return false;
-                }
-                console.log(userNicks);
-                if (userNicks.length === 1) {
+                case 1:
+                    var nick = userNicks[0];
                     var val = $(this).val();
                     var newVal = val.substring(0, idx - currentHead.length) +
-                        userNicks[0] +
+                        nick +
                         val.substring(idx);
                     $(this).val(newVal);
                     // TODO: 先頭だったら "foo: " と補完したい
+                    this.selectionStart = this.selectionEnd = idx - currentHead.length + nick.length;
                     return false;
+                default:
+                    var commonHead = userNicks[0];
+                    userNicks.forEach(function (nick) {
+                        commonHead = starChat.getCommonHead(commonHead, nick);
+                    });
+                    if (currentHead === commonHead) {
+                        var ul = $('#userNameCandidates');
+                        ul.empty();
+                        userNicks.forEach(function (nick) {
+                            var li = $('<li></li>').text(nick);
+                            ul.append(li);
+                        });
+                        ul.show();
+                    } else {
+                        var val = $(this).val();
+                        var newVal = val.substring(0, idx - currentHead.length) +
+                            commonHead +
+                            val.substring(idx);
+                        $(this).val(newVal);
+                        this.selectionStart = this.selectionEnd = idx - currentHead.length + commonHead.length;
+                    }
                 }
-
                 return false;
             }
             return true;
+        }).blur(function () {
+            $('#userNameCandidates').hide();
         });
         form.find('[type="submit"]').click(function () {
             postMessage();
