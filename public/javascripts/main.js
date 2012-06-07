@@ -205,11 +205,49 @@ $(function() {
             return false;
         }
         var form = $('#postMessageForm');
-        form.find('[name="body"]').keypress(function (e) {
+        form.find('[name="body"]').keydown(function (e) {
             // In Chrome of Windows, e.which may have the value 10 instead of 13.
             // I don't know the reason.
             if (e.which === 13 || e.which === 10) {
                 postMessage(e.ctrlKey);
+                return false;
+            }
+            if (e.which === 9) {
+                var idx = this.selectionStart;
+                var match = $(this).val().substring(0, idx).match(/([\x21-\x7e]+)$/);
+                if (!match) {
+                    return false;
+                }
+                var currentHead = match[1];
+
+                var view = getView();
+                var channelName = view.channelName;
+                if (!channelName) {
+                    return false;
+                }
+                var channel = starChat.Channel.find(channelName);
+                var userNicks = channel.users().map(function (user) {
+                    return user.nick();
+                }).filter(function (nick) {
+                    if (!nick.match(/^[\x21-\x7e]+$/)) {
+                        return false;
+                    }
+                    return nick.indexOf(currentHead) === 0;
+                });
+                if (userNicks.length === 0) {
+                    return false;
+                }
+                console.log(userNicks);
+                if (userNicks.length === 1) {
+                    var val = $(this).val();
+                    var newVal = val.substring(0, idx - currentHead.length) +
+                        userNicks[0] +
+                        val.substring(idx);
+                    $(this).val(newVal);
+                    // TODO: 先頭だったら "foo: " と補完したい
+                    return false;
+                }
+
                 return false;
             }
             return true;
