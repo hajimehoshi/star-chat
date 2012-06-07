@@ -196,6 +196,9 @@ starChat.View = (function () {
         }
         if (!self.isShowingOldLogs()) {
             section.scroll(function () {
+                if (self.channelName !== channelName) {
+                    return;
+                }
                 self.messageScrollTops_[channelName] = section.scrollTop();
             });
         }
