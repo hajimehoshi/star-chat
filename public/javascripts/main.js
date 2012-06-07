@@ -216,6 +216,7 @@ $(function() {
         });
         form.find('[type="submit"]').click(function () {
             postMessage();
+            return false;
         });
     })();
     (function () {
