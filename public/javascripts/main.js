@@ -244,12 +244,18 @@ $(function() {
                 case 1:
                     var nick = userNicks[0];
                     var val = $(this).val();
-                    var newVal = val.substring(0, idx - currentHead.length) +
-                        nick +
-                        val.substring(idx);
+                    var newVal = val.substring(0, idx - currentHead.length);
+                    if (this.selectionStart === this.selectionEnd &&
+                        this.selectionStart === currentHead.length) {
+                        newVal += nick + ': ';
+                        var newSegmentLength = nick.length + 2;
+                    } else {
+                        newVal += nick;
+                        var newSegmentLength = nick.length;
+                    }
+                    newVal += val.substring(idx);
                     $(this).val(newVal);
-                    // TODO: 先頭だったら "foo: " と補完したい
-                    this.selectionStart = this.selectionEnd = idx - currentHead.length + nick.length;
+                    this.selectionStart = this.selectionEnd = idx - currentHead.length + newSegmentLength;
                     return false;
                 default:
                     var commonHead = userNicks[0];
