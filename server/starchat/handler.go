@@ -1,7 +1,9 @@
 package starchat
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -62,7 +64,14 @@ func (self *Handler) serveTop(w http.ResponseWriter, r *http.Request) {
 
 func (self *Handler) serveItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	
+	value := map[string]string {
+		"result": "pong",
+	}
+	json, err := json.Marshal(value)
+	if err != nil {
+		log.Fatal(err)
+	}
+	w.Write(json)
 }
 
 func (self *Handler) serveStream(w http.ResponseWriter, r *http.Request) {
