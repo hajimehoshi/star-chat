@@ -1,8 +1,8 @@
 package starchat_test
 
 import (
+	"."
 	"net/http/httptest"
-	"starchat"
 	"testing"
 )
 
