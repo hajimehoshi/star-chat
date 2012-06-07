@@ -219,20 +219,24 @@ h1 {
     padding: 0.5em 0.5em 0 0.5em;
 }
 #userNameCandidates {
+    bottom: 2.5em;
+    box-shadow:         0 0 8px #000;
+    -moz-box-shadow:    0 0 8px #000;
+    -webkit-box-shadow: 0 0 8px #000;
     display: none;
     margin: 0;
-    padding: 0;
+    padding: 0.5em 0 0.25em 0;
     position: absolute;
-    bottom: 2.5em;
+    z-index: 2;
 }
 #userNameCandidates li {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.9);
     border-color: #999;
     border-style: solid;
     border-width: 1px;
     display: inline;
     margin: 0;
-    padding: 0.5em;
+    padding: 0.5em 0.5em 0.25em 0.5em;
 }
 
 #updateTopicForm {

@@ -237,7 +237,6 @@ $(function() {
                     return nick.indexOf(currentHead) === 0;
                 });
                 userNicks = $.unique(userNicks).sort();
-
                 switch (userNicks.length) {
                 case 0:
                     return false;
@@ -269,6 +268,7 @@ $(function() {
                             var li = $('<li></li>').text(nick);
                             ul.append(li);
                         });
+                        ul.css('left', Measurement.caretPos(this).left);
                         ul.show();
                     } else {
                         var val = $(this).val();
