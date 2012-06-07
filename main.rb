@@ -84,6 +84,10 @@ get '/', provides: :html do
   erb(:index)
 end
 
+before %r{^/.+} do
+  halt 406 unless request.accept?(mime_type(:json))
+end
+
 before %r{^/users/([^/]+)} do
   protect!
   user_name = params[:captures][0]
@@ -249,6 +253,10 @@ get '/channels/:channel_name/messages/:range', provides: :json do
   else
     halt 404
   end
+end
+
+before %r{/channels/[^/]+/messages(/.+)?$} do
+  halt 401 unless current_user.subscribing?(@channel)
 end
 
 get '/channels/:channel_name/messages/by_time_span/:start_time,:end_time', provides: :json do

@@ -45,28 +45,21 @@
                     }
                 });
                 if (isAlreadyJoined || view.isShowingOldLogs()) {
-                    var channel = starChat.Channel.find(channelName);
-                    channel.loadUsers(view.session(), function (sessionId) {
-                        var view = getView();
-                        if (view.session().id() !== sessionId) {
-                            return;
-                        }
-                        view.channelName = channelName;
-                        if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
-                            var url = '/channels/' + encodeURIComponent(channelName) +
-                                '/messages/by_time_span/' +
-                                encodeURIComponent(String(startTime)) + ',' + encodeURIComponent(String(endTime));
-                            starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
-                                var view = getView();
-                                if (view.session().id() !== sessionId) {
-                                    return;
-                                }
-                                view.setOldMessages(channelName, startTime, endTime, data);
-                                view.update();
-                            });
-                        }
-                        view.update();
-                    });
+                    view.channelName = channelName;
+                    if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
+                        var url = '/channels/' + encodeURIComponent(channelName) +
+                            '/messages/by_time_span/' +
+                            encodeURIComponent(String(startTime)) + ',' + encodeURIComponent(String(endTime));
+                        starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
+                            var view = getView();
+                            if (view.session().id() !== sessionId) {
+                                return;
+                            }
+                            view.setOldMessages(channelName, startTime, endTime, data);
+                            view.update();
+                        });
+                    }
+                    view.update();
                     return;
                 }
                 // Confirming joining the new channel
