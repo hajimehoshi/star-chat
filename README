@@ -1,3 +1,12 @@
 * How to run
 
 $ thin -C (MODE).yml start
+
+
+* Dependencies
+
+jQuery
+  http://jquery.com/
+
+caretposition.js
+  https://github.com/akiroom/caretposition.js
