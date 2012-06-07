@@ -268,7 +268,9 @@ $(function() {
                             var li = $('<li></li>').text(nick);
                             ul.append(li);
                         });
-                        ul.css('left', Measurement.caretPos(this).left);
+                        var pos = Measurement.caretPos(this);
+                        ul.css('left', pos.left);
+                        ul.css('top', pos.top - 30);
                         ul.show();
                     } else {
                         var val = $(this).val();

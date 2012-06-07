@@ -219,7 +219,6 @@ h1 {
     padding: 0.5em 0.5em 0 0.5em;
 }
 #userNameCandidates {
-    bottom: 2.5em;
     box-shadow:         0 0 8px #000;
     -moz-box-shadow:    0 0 8px #000;
     -webkit-box-shadow: 0 0 8px #000;
