@@ -205,17 +205,91 @@ $(function() {
             return false;
         }
         var form = $('#postMessageForm');
-        form.find('[name="body"]').keypress(function (e) {
+        form.find('[name="body"]').keydown(function (e) {
+            $('#userNameCandidates').hide();
+
             // In Chrome of Windows, e.which may have the value 10 instead of 13.
             // I don't know the reason.
             if (e.which === 13 || e.which === 10) {
                 postMessage(e.ctrlKey);
                 return false;
             }
+            if (e.which === 9) {
+                var idx = this.selectionStart;
+                var match = $(this).val().substring(0, idx).match(/([\x21-\x7e]+)$/);
+                if (!match) {
+                    return false;
+                }
+                var currentHead = match[1];
+
+                var view = getView();
+                var channelName = view.channelName;
+                if (!channelName) {
+                    return false;
+                }
+                var channel = starChat.Channel.find(channelName);
+                var userNicks = channel.users().map(function (user) {
+                    return user.nick();
+                }).filter(function (nick) {
+                    if (!nick.match(/^[\x21-\x7e]+$/)) {
+                        return false;
+                    }
+                    return nick.indexOf(currentHead) === 0;
+                });
+                userNicks = $.unique(userNicks).sort();
+                switch (userNicks.length) {
+                case 0:
+                    return false;
+                case 1:
+                    var nick = userNicks[0];
+                    var val = $(this).val();
+                    var newVal = val.substring(0, idx - currentHead.length);
+                    if (this.selectionStart === this.selectionEnd &&
+                        this.selectionStart === currentHead.length) {
+                        newVal += nick + ': ';
+                        var newSegmentLength = nick.length + 2;
+                    } else {
+                        newVal += nick;
+                        var newSegmentLength = nick.length;
+                    }
+                    newVal += val.substring(idx);
+                    $(this).val(newVal);
+                    this.selectionStart = this.selectionEnd = idx - currentHead.length + newSegmentLength;
+                    return false;
+                default:
+                    var commonHead = userNicks[0];
+                    userNicks.forEach(function (nick) {
+                        commonHead = starChat.getCommonHead(commonHead, nick);
+                    });
+                    if (currentHead === commonHead) {
+                        var ul = $('#userNameCandidates');
+                        ul.empty();
+                        userNicks.forEach(function (nick) {
+                            var li = $('<li></li>').text(nick);
+                            ul.append(li);
+                        });
+                        var pos = Measurement.caretPos(this);
+                        ul.css('left', pos.left);
+                        ul.css('top', pos.top - 30);
+                        ul.show();
+                    } else {
+                        var val = $(this).val();
+                        var newVal = val.substring(0, idx - currentHead.length) +
+                            commonHead +
+                            val.substring(idx);
+                        $(this).val(newVal);
+                        this.selectionStart = this.selectionEnd = idx - currentHead.length + commonHead.length;
+                    }
+                }
+                return false;
+            }
             return true;
+        }).blur(function () {
+            $('#userNameCandidates').hide();
         });
         form.find('[type="submit"]').click(function () {
             postMessage();
+            return false;
         });
     })();
     (function () {

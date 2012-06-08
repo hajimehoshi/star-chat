@@ -249,3 +249,17 @@ starChat.isFocused = (function () {
         return isFocused_;
     };
 })();
+
+starChat.getCommonHead = function (str1, str2) {
+    var length = Math.min(str1.length, str2.length);
+    var str = '';
+    for (var i = 0; i < length; i++) {
+        var c1 = str1.charAt(i);
+        var c2 = str2.charAt(i);
+        if (c1 !== c2) {
+            return str;
+        }
+        str += c1;
+    }
+    return str;
+};
