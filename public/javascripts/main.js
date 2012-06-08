@@ -265,7 +265,11 @@ $(function() {
                         var ul = $('#userNameCandidates');
                         ul.empty();
                         userNicks.forEach(function (nick) {
-                            var li = $('<li></li>').text(nick);
+                            var li = $('<li></li>').text(commonHead);
+                            if (commonHead !== nick) {
+                                li.append($('<em></em>').text(nick[commonHead.length]));
+                                li.append(document.createTextNode(nick.substring(commonHead.length + 1)));
+                            }
                             ul.append(li);
                         });
                         var pos = Measurement.caretPos(this);
