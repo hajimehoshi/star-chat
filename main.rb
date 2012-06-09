@@ -101,7 +101,7 @@ before %r{^/users/([^/]+)} do
   end
   if (request.put? or request.delete? or request.post?) and
       current_user.name != @user.name
-    halt 401
+    halt 403
   end
 end
 
@@ -139,7 +139,7 @@ put '/users/:user_name', provides: :json do
 end
 
 get '/users/:user_name/ping', provides: :json do
-  halt 401 if @user.name != current_user.name
+  halt 403 if @user.name != current_user.name
   {
     result: 'pong',
   }.to_json
@@ -155,7 +155,7 @@ get '/users/:user_name/channels', provides: :json do
 end
 
 get '/users/:user_name/stream', provides: :json do
-  halt 401 if @user.name != current_user.name
+  halt 403 if @user.name != current_user.name
   stream(:keep_open) do |out|
     subscribe = [@user.name, out]
     settings.streams << subscribe
@@ -193,11 +193,11 @@ before %r{^/channels/([^/]+)} do
   if @channel
     if (request.put? or request.delete? or request.post?) and
         !current_user.subscribing?(@channel)
-      halt 401
+      halt 403
     end
     if @channel.private? and
         !current_user.subscribing?(@channel)
-      halt 401
+      halt 403
     end
   else
     halt 404 unless request.put?
@@ -256,7 +256,7 @@ get '/channels/:channel_name/messages/:range', provides: :json do
 end
 
 before %r{/channels/[^/]+/messages(/.+)?$} do
-  halt 401 unless current_user.subscribing?(@channel)
+  halt 403 unless current_user.subscribing?(@channel)
 end
 
 get '/channels/:channel_name/messages/by_time_span/:start_time,:end_time', provides: :json do
@@ -295,7 +295,7 @@ before '/subscribings' do
   user_name    = params[:user_name].to_s
   halt 400 unless channel_name.kind_of?(String)
   halt 400 unless user_name.kind_of?(String)
-  halt 401 if user_name != current_user.name
+  halt 403 if user_name != current_user.name
   @channel = StarChat::Channel.find(channel_name)
   @channel_name = channel_name
 end
@@ -309,8 +309,8 @@ put '/subscribings', provides: :json do
   if @channel.private?
     # TODO: Use one-time password
     channel_key = request.env['HTTP_X_STARCHAT_CHANNEL_KEY']
-    halt 401 if channel_key.nil? or channel_key.empty?
-    halt 401 unless @channel.auth?(channel_key)
+    halt 403 if channel_key.nil? or channel_key.empty?
+    halt 403 unless @channel.auth?(channel_key)
   end
   StarChat::Subscribing.save(@channel, current_user)
   broadcast(type: 'subscribing',
