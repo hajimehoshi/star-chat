@@ -510,7 +510,14 @@ starChat.View = (function () {
         for (var ym = firstYM;
              ym <= todayYM;) {
             try {
-                var li = $('<li></li>').text(ym);
+                var text = String(ym).substr(0, 4) + '-' + String(ym).substr(4);
+                var a = $('<a></a>').text(text);
+                var startTime = Math.floor(new Date(ym / 100, ym % 100 - 1, 1).getTime() / 1000);
+                var endTime   = Math.floor(new Date(ym / 100, ym % 100 - 1, 2).getTime() / 1000);
+                var href = '#channels/' + encodeURIComponent(channel.name()) +
+                    '/old_logs/by_time_span/' + startTime + ',' + endTime;
+                a.attr('href', href);
+                var li = $('<li></li>').append(a);
                 ul.append(li);
             } finally {
                 ym++;
@@ -519,6 +526,10 @@ starChat.View = (function () {
                 }
             }
         }
+        var href = '#channels/' + encodeURIComponent(channel.name());
+        var a = $('<a></a>').text('Now').attr('href', href);
+        var li = $('<li></li>').append(a);
+        ul.append(li);
     }
     function updateViewDialogs(self) {
         $('.dialog').hide();
