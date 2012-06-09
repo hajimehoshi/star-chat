@@ -471,8 +471,7 @@ starChat.View = (function () {
             return;
         }
 
-        var firstTime = new Date(firstMessage.created_at);
-        var firstDate = new Date(firstTime * 1000);
+        var firstDate = new Date(firstMessage.created_at * 1000);
         var firstYear  = Math.floor(firstDate.getFullYear());
         var firstMonth = Math.floor(firstDate.getMonth()) + 1;
         var firstYM    = firstYear * 100 + firstMonth;
@@ -501,7 +500,7 @@ starChat.View = (function () {
                 var text = String(ym).substr(0, 4) + '-' + String(ym).substr(4);
                 var a = $('<a></a>').text(text);
                 if (ym === firstYM) {
-                    var startTime = ymToUNIXTime(ym, firstDate.getDay());
+                    var startTime = ymToUNIXTime(ym, firstDate.getDate());
                 } else {
                     var startTime = ymToUNIXTime(ym, 1);
                 }
