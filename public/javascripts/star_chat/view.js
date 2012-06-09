@@ -19,6 +19,7 @@ starChat.View = (function () {
         self.messageElements_ = {};
         self.messageIdsAlreadyInSection_ = {};
         self.messageScrollTops_ = {};
+        self.isScrolling_ = false;
         self.dirtyFlags_ = {};
         self.startTime_ = null;
         self.endTime_ = null;
@@ -196,6 +197,9 @@ starChat.View = (function () {
         }
         if (!self.isShowingOldLogs()) {
             section.scroll(function () {
+                if (self.channelName !== channelName) {
+                    return;
+                }
                 self.messageScrollTops_[channelName] = section.scrollTop();
             });
         }
@@ -395,25 +399,32 @@ starChat.View = (function () {
 
         $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
 
-        if (!self.isShowingOldLogs() && !section.is(':animated')) {
-            if (self.lastChannelName_ === self.channelName) {
-                if (isBottom) {
-                    setTimeout(function () {
-                        section.animate({scrollTop: section.get(0).scrollHeight}, {
-                            duration: 750
-                        })
-                    }, 0);
-                }
-            } else {
-                if (!self.lastChannelName_ ||
-                    !(self.channelName in self.messageScrollTops_)) {
-                    section.scrollTop(section.get(0).scrollHeight);
+        if (!self.isShowingOldLogs() && !self.isScrolling_) {
+            self.isScrolling_ = true;
+            // Manipurate the scrool top after elements are set completely.
+            setTimeout(function () {
+                if (self.lastChannelName_ === self.channelName &&
+                    isBottom) {
+                    section.animate({scrollTop: section.get(0).scrollHeight}, {
+                        duration: 750,
+                        complete: function () {
+                            self.messageScrollTops_[self.channelName] = section.scrollTop();
+                            self.lastChannelName_ = self.channelName;
+                            self.isScrolling_ = false;
+                        }
+                    });
                 } else {
-                    section.scrollTop(self.messageScrollTops_[self.channelName]);
+                    if (!self.lastChannelName_ ||
+                        !(self.channelName in self.messageScrollTops_)) {
+                        section.scrollTop(section.get(0).scrollHeight);
+                    } else {
+                        section.scrollTop(self.messageScrollTops_[self.channelName]);
+                    }
+                    self.messageScrollTops_[self.channelName] = section.scrollTop();
+                    self.lastChannelName_ = self.channelName;
+                    self.isScrolling_ = false;
                 }
-            }
-            self.messageScrollTops_[self.channelName] = section.scrollTop();
-            self.lastChannelName_ = self.channelName;
+            }, 0);
         }
     }
     function updateViewTopic(self) {
@@ -604,9 +615,12 @@ starChat.View = (function () {
             return;
         }
         this.newMessages_[channelName].push(message);
-        if (setDirtyFlag && channelName !== this.channelName) {
+        if (setDirtyFlag &&
+            channelName !== this.channelName &&
+            message.user_name !== this.session().user().name()) {
             this.setDirtyFlag(channelName, true);
         }
+        // TODO: Emphasize channel name?
         if (message.user_name === this.session().user().name()) {
             var body = message.body;
             var id = $('[data-pseudo-message-id]').filter(function () {
