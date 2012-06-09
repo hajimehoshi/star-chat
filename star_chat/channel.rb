@@ -81,9 +81,11 @@ module StarChat
 
     class ChannelMessages
       include Enumerable
+
       def initialize(channel_name)
         @key = ['channels', channel_name, 'messages']
       end
+
       def each
         idx = 0
         loop do
@@ -96,6 +98,7 @@ module StarChat
           idx += 100
         end
       end
+
     end
 
     def messages(idx = nil, len = nil)

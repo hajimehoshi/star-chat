@@ -46,6 +46,7 @@ $(function() {
                     data.forEach(function (message) {
                         view.addNewMessage(channel.name(), message, false);
                     });
+                    // TODO: call this only one time?
                     view.update();
                     $(window).trigger('hashchange');
                 });

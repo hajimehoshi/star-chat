@@ -483,6 +483,43 @@ starChat.View = (function () {
             $('#invitationLink').hide();
         }
     }
+    function updateViewTimeline(self) {
+        if (!self.channelName) {
+            return;
+        }
+        var channel = starChat.Channel.find(self.channelName);
+        var firstMessage = channel.firstMessage();
+        if (!firstMessage) {
+            return;
+        }
+        console.log(firstMessage);
+
+        var firstTime = new Date(firstMessage.created_at);
+        var firstDate = new Date(firstTime * 1000);
+        var firstYear  = Math.floor(firstDate.getFullYear());
+        var firstMonth = Math.floor(firstDate.getMonth()) + 1;
+        var firstYM    = firstYear * 100 + firstMonth;
+        
+        var today = new Date();
+        var todayYear  = Math.floor(today.getFullYear());
+        var todayMonth = Math.floor(today.getMonth()) + 1;
+        var todayYM    = todayYear * 100 + todayMonth;
+        
+        var ul = $('#timeline');
+        ul.empty();
+        for (var ym = firstYM;
+             ym <= todayYM;) {
+            try {
+                var li = $('<li></li>').text(ym);
+                ul.append(li);
+            } finally {
+                ym++;
+                if (13 <= (ym % 100)) {
+                    ym = (Math.floor(ym / 100) + 1) * 100 + 1;
+                }
+            }
+        }
+    }
     function updateViewDialogs(self) {
         $('.dialog').hide();
         var dialogIsShown = false;
@@ -564,6 +601,7 @@ starChat.View = (function () {
         updateViewMessages(this);
         updateViewTopic(this);
         updateViewUsers(this);
+        updateViewTimeline(this);
         updateViewDialogs(this);
         $('img[data-image-icon-name]').each(function () {
             var e = $(this);

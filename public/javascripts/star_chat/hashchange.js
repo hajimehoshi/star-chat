@@ -45,7 +45,6 @@
                     }
                 });
                 if (isAlreadyJoined || view.isShowingOldLogs()) {
-                    view.channelName = channelName;
                     if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
                         var url = '/channels/' + encodeURIComponent(channelName) +
                             '/messages/by_time_span/' +
@@ -59,6 +58,20 @@
                             view.update();
                         });
                     }
+                    var channel = starChat.Channel.find(channelName);
+                    if (!channel.firstMessage()) {
+                        channel.loadFirstMessage(session, function (sessionId) {
+                            var view = getView();
+                            if (view.session().id() !== sessionId) {
+                                return;
+                            }
+                            if (!channel.firstMessage()) {
+                                return;
+                            }
+                            view.update();
+                        });
+                    }
+                    view.channelName = channelName;
                     view.update();
                     return;
                 }
@@ -87,6 +100,18 @@
                         }
                         view.update();
                     });
+                    if (!channel.firstMessage()) {
+                        channel.loadFirstMessage(session, function (sessionId) {
+                            var view = getView();
+                            if (view.session().id() !== sessionId) {
+                                return;
+                            }
+                            if (!channel.firstMessage()) {
+                                return;
+                            }
+                            view.update();
+                        });
+                    }
                 });
                 return false;
             }
