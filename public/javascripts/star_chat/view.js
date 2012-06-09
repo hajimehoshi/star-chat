@@ -203,28 +203,6 @@ starChat.View = (function () {
                 self.messageScrollTops_[channelName] = section.scrollTop();
             });
         }
-        var inputYear   = $('<input type="number" name="year" min="0" max="9999" value="" />');
-        var inputMonth  = $('<input type="number" name="month" min="1" max="12" value="" />');
-        var inputDay    = $('<input type="number" name="day" min="1" max="31" value="" />');
-        var inputSubmit = $('<input type="submit" value="Show" />');
-        var oldLogsP    = $('<p></p>').append('Old Logs: ');
-        oldLogsP.append(inputYear).append('-').append(inputMonth).append('-').append(inputDay);
-        oldLogsP.append(inputSubmit);
-        var oldLogsForm = $('<form action="." method="get"></form>');
-        oldLogsForm.append(oldLogsP);
-        inputSubmit.click(function () {
-            var year  = inputYear.val();
-            var month = inputMonth.val();
-            var day   = inputDay.val();
-            var startTime = (new Date(year, month - 1, day)).getTime() / 1000;
-            var endTime   = startTime + 60 * 60 * 24;
-            var fragment = 'channels/' + encodeURIComponent(channelName) +
-                '/old_logs/by_time_span/' +
-                encodeURIComponent(String(startTime)) + ',' + encodeURIComponent(String(endTime));
-            location.hash = fragment;
-            return false;
-        });
-        section.append(oldLogsForm);
         $('#messages h2').after(section);
         return section;
     }
