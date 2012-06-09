@@ -470,7 +470,6 @@ starChat.View = (function () {
         if (!firstMessage) {
             return;
         }
-        console.log(firstMessage);
 
         var firstTime = new Date(firstMessage.created_at);
         var firstDate = new Date(firstTime * 1000);
@@ -482,26 +481,62 @@ starChat.View = (function () {
         var todayYear  = Math.floor(today.getFullYear());
         var todayMonth = Math.floor(today.getMonth()) + 1;
         var todayYM    = todayYear * 100 + todayMonth;
+
+        function ymToUNIXTime(ym, day) {
+            if (day === void(0)) {
+                day = 1;
+            }
+            return Math.floor(new Date(ym / 100, ym % 100 - 1, day).getTime() / 1000);
+        }
         
         var ul = $('#timeline');
         ul.empty();
         for (var ym = firstYM;
              ym <= todayYM;) {
+            var nextYM = ym + 1;
+            if (13 <= (nextYM % 100)) {
+                nextYM = (Math.floor(ym / 100) + 1) * 100 + 1;
+            }
             try {
                 var text = String(ym).substr(0, 4) + '-' + String(ym).substr(4);
                 var a = $('<a></a>').text(text);
-                var startTime = Math.floor(new Date(ym / 100, ym % 100 - 1, 1).getTime() / 1000);
-                var endTime   = Math.floor(new Date(ym / 100, ym % 100 - 1, 2).getTime() / 1000);
+                if (ym === firstYM) {
+                    var startTime = ymToUNIXTime(ym, firstDate.getDay());
+                } else {
+                    var startTime = ymToUNIXTime(ym, 1);
+                }
+                var endTime   = startTime + 60 * 60 * 24;
                 var href = '#channels/' + encodeURIComponent(channel.name()) +
                     '/old_logs/by_time_span/' + startTime + ',' + endTime;
                 a.attr('href', href);
                 var li = $('<li></li>').append(a);
+                if (startTime <= self.startTime_ &&
+                    self.startTime_ < ymToUNIXTime(nextYM, 1)) {
+                    var currentMonth = ym % 100;
+                    var ul2 = $('<ul></ul>');
+                    for (;
+                         (new Date(startTime * 1000)).getMonth() + 1 === currentMonth &&
+                         startTime <= (today.getTime() / 1000);
+                        ) {
+                        try {
+                            var li2 = $('<li></li>');
+                            text = starChat.toISO8601(new Date(startTime * 1000), 'date');
+                            var a = $('<a></a>').text(text);
+                            var href = '#channels/' + encodeURIComponent(channel.name()) +
+                                '/old_logs/by_time_span/' + startTime + ',' + endTime;
+                            a.attr('href', href);
+                            li2.append(a);
+                            ul2.append(li2);
+                        } finally {
+                            startTime += 60 * 60 * 24;
+                            endTime   += 60 * 60 * 24;
+                        }
+                    }
+                    li.append(ul2);
+                }
                 ul.append(li);
             } finally {
-                ym++;
-                if (13 <= (ym % 100)) {
-                    ym = (Math.floor(ym / 100) + 1) * 100 + 1;
-                }
+                ym = nextYM;
             }
         }
         var href = '#channels/' + encodeURIComponent(channel.name());

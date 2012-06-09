@@ -135,6 +135,9 @@ h1 {
 .sidebar li {
     margin-bottom: 5px;
 }
+.sidebar ul ul {
+    margin: 5px 0 0 10px;
+}
 .sidebar a:visited {
     color: #000 !important;
 }
