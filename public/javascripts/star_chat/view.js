@@ -380,6 +380,9 @@ starChat.View = (function () {
                     var nextDateStr = starChat.toISO8601(message.created_at, 'date');
                     if (!lastDateStr || (lastDateStr !== nextDateStr)) {
                         var tr = dateToElement(nextDateStr);
+                        if (table.find('tr.date').length === 0) {
+                            tr.addClass('imcomplete'); // The first tr.date needs to load messages
+                        }
                         table.append(tr);
                     }
                     table.append(self.messageElements_[message.id]);
@@ -413,7 +416,7 @@ starChat.View = (function () {
 
         if (!self.isShowingOldLogs() && !self.isScrolling_) {
             self.isScrolling_ = true;
-            if (self.time_) {
+            if (self.time_ && self.channelName) {
                 var target = null;
                 $('[data-unix-time]').each(function () {
                     var e = $(this);
@@ -426,12 +429,38 @@ starChat.View = (function () {
                 if (target !== null) {
                     target = target.parent().parent(); // tr
                 }
+                if (target === null ||
+                    (starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date') !==
+                     starChat.toISO8601(self.time_, 'date'))) {
+                    var scrollTop = 0;
+                    var date = new Date(self.time_ * 1000);
+                    var dateStr = starChat.toISO8601(self.time_, 'date');
+                    var tr = dateToElement(dateStr);
+                    var nextTR = $('table.messages tr.date').filter(function () {
+                        var e = $(this);
+                        var nextUNIXTime = e.find('time').attr('data-unix-time');
+                        return self.time_ < nextUNIXTime;
+                    }).first();
+                    if (nextTR.length === 1) {
+                        tr.insertBefore(nextTR);
+                    } else {
+                        $('table.messages').append(tr);
+                    }
+                    tr.addClass('imcomplete'); // needs to load messages
+                    target = tr;
+                    // TODO: Is it OK to load messages here?
+                    /*var channel = starChat.find(self.channelName);
+                    var startTime = 0;
+                    var endTime   = startTime + 60 * 60 * 24;
+                    channel.loadMessagesByTimeSpan(self.session(), startTime, endTime, function (sessionId) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
+                    });*/
+                }
                 if (target !== null) {
                     var scrollTop = target.position().top + section.scrollTop() - 40;
-                } else {
-                    var scrollTop = 0;
-                    // 新規作成する必要がある?
-                    //var dateStr = 
                 }
                 section.animate({scrollTop: scrollTop}, {
                     complete: function () {
