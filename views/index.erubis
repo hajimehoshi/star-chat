@@ -38,7 +38,6 @@
       <section id="messages">
         <h2><span>&#xa0;</span> <img src="" alt="private" width="16" height="16" data-image-icon-name="whitePadlockClosed" /><!-- img src="" alt="logs" width="16" height="16" data-image-icon-name="whiteCalendar1" data-tool-id="logs" class="toolIcon" /--></h2>
         <section data-channel-name=""></section>
-        </ul>
         <form action="." id="postMessageForm" method="post">
           <ul id="userNameCandidates"></ul>
           <p><textarea name="body" rows="1"></textarea><input type="submit" name="send" value="Send" /></p>
