@@ -21,6 +21,7 @@ starChat.View = (function () {
         self.messageScrollTops_ = {};
         self.isScrolling_ = false;
         self.dirtyFlags_ = {};
+        self.time_ = null;
         self.startTime_ = null; // TODO: Remove it
         self.endTime_ = null;   // TODO: Remove it
         self.oldMessages_ = {}; // TODO: Remove it and Use Channel.prototype.messages instead.
@@ -146,11 +147,10 @@ starChat.View = (function () {
             time.setMinutes(0);
             time.setSeconds(0);
             time.setMilliseconds(0);
-            var startTime = starChat.parseInt(time.getTime() / 1000);
-            var endTime   = startTime + 60 * 60 * 24;
+            var time = starChat.parseInt(time.getTime() / 1000);
             var channelNameLink = $('<a></a>').text(message.channel_name);
             var channelUrl = '#channels/' + encodeURIComponent(message.channel_name) +
-                '/old_logs/by_time_span/' + startTime + ',' + endTime;
+                '/old_logs/by_time/' + time;
             channelNameLink.attr('href', channelUrl);
             // TODO: highlight
 
@@ -401,30 +401,43 @@ starChat.View = (function () {
 
         if (!self.isShowingOldLogs() && !self.isScrolling_) {
             self.isScrolling_ = true;
-            // Manipurate the scrool top after elements are set completely.
-            setTimeout(function () {
-                if (self.lastChannelName_ === self.channelName &&
-                    isBottom) {
-                    section.animate({scrollTop: section.get(0).scrollHeight}, {
-                        duration: 750,
-                        complete: function () {
-                            self.messageScrollTops_[self.channelName] = section.scrollTop();
-                            self.lastChannelName_ = self.channelName;
-                            self.isScrolling_ = false;
-                        }
-                    });
-                } else {
-                    if (!self.lastChannelName_ ||
-                        !(self.channelName in self.messageScrollTops_)) {
-                        section.scrollTop(section.get(0).scrollHeight);
-                    } else {
-                        section.scrollTop(self.messageScrollTops_[self.channelName]);
+            if (self.time_) {
+                var scrollTop = 0;
+                section.animate({scrollTop: scrollTop}, {
+                    duration: 750,
+                    complete: function () {
+                        self.messageScrollTops_[self.channelName] = section.scrollTop();
+                        self.lastChannelName_ = self.channelName;
+                        self.isScrolling_ = false;
                     }
-                    self.messageScrollTops_[self.channelName] = section.scrollTop();
-                    self.lastChannelName_ = self.channelName;
-                    self.isScrolling_ = false;
-                }
-            }, 0);
+                });
+                self.time_ = null;
+            } else {
+                // Manipurate the scrool top after elements are set completely.
+                setTimeout(function () {
+                    if (self.lastChannelName_ === self.channelName &&
+                        isBottom) {
+                        section.animate({scrollTop: section.get(0).scrollHeight}, {
+                            duration: 750,
+                            complete: function () {
+                                self.messageScrollTops_[self.channelName] = section.scrollTop();
+                                self.lastChannelName_ = self.channelName;
+                                self.isScrolling_ = false;
+                            }
+                        });
+                    } else {
+                        if (!self.lastChannelName_ ||
+                            !(self.channelName in self.messageScrollTops_)) {
+                            section.scrollTop(section.get(0).scrollHeight);
+                        } else {
+                            section.scrollTop(self.messageScrollTops_[self.channelName]);
+                        }
+                        self.messageScrollTops_[self.channelName] = section.scrollTop();
+                        self.lastChannelName_ = self.channelName;
+                        self.isScrolling_ = false;
+                    }
+                }, 0);
+            }
         }
     }
     function updateViewTopic(self) {
@@ -528,7 +541,7 @@ starChat.View = (function () {
                 }
                 var endTime   = startTime + 60 * 60 * 24;
                 var href = '#channels/' + encodeURIComponent(channel.name()) +
-                    '/old_logs/by_time_span/' + startTime + ',' + endTime;
+                    '/old_logs/by_time/' + startTime;
                 a.attr('href', href);
                 var li = $('<li></li>').append(a);
                 if (startTime <= self.startTime_ &&
@@ -544,7 +557,7 @@ starChat.View = (function () {
                             text = starChat.toISO8601(new Date(startTime * 1000), 'date');
                             var a = $('<a></a>').text(text);
                             var href = '#channels/' + encodeURIComponent(channel.name()) +
-                                '/old_logs/by_time_span/' + startTime + ',' + endTime;
+                                '/old_logs/by_time/' + startTime;
                             a.attr('href', href);
                             li2.append(a);
                             ul2.append(li2);
@@ -733,14 +746,20 @@ starChat.View = (function () {
     View.prototype.setDirtyFlag = function (channelName, value) {
         this.dirtyFlags_[channelName] = value;
     };
+    View.prototype.setTime = function (time) {
+        this.time_ = time;
+    };
+    // deprecated?
     View.prototype.resetTimeSpan = function () {
         this.startTime_ = null;
         this.endTime_   = null;
     };
+    // deprecated?
     View.prototype.setTimeSpan = function (startTime, endTime) {
         this.startTime_ = startTime;
         this.endTime_   = endTime;
     };
+    // deprecated?
     View.prototype.isShowingOldLogs = function () {
         return $.isNumeric(this.startTime_) && $.isNumeric(this.endTime_);
     };
