@@ -147,11 +147,13 @@ starChat.View = (function () {
             time.setMinutes(0);
             time.setSeconds(0);
             time.setMilliseconds(0);
-            var time = starChat.parseInt(time.getTime() / 1000);
+            var startTime = starChat.parseInt(time.getTime() / 1000);
+            var endTime   = startTime + 60 * 60 * 24;
             var channelNameLink = $('<a></a>').text(message.channel_name);
             var channelUrl = '#channels/' + encodeURIComponent(message.channel_name) +
-                '/old_logs/by_time/' + time;
+                '/old_logs/by_time_span/' + startTime + ',' + endTime; // TODO: Modify
             channelNameLink.attr('href', channelUrl);
+            // TODO: Modify links?
             // TODO: highlight
 
             li.append(createdAtE);
@@ -420,7 +422,9 @@ starChat.View = (function () {
                 if (target !== null) {
                     var scrollTop = target.position().top + section.scrollTop() - 20;
                 } else {
-                    var scrollTop = section.get(0).scrollHeight; // bottom
+                    var scrollTop = 0;
+                    // 新規作成する必要がある?
+                    //var dateStr = 
                 }
                 section.animate({scrollTop: scrollTop}, {
                     complete: function () {
@@ -557,10 +561,15 @@ starChat.View = (function () {
                 } else {
                     var startTime = ymToUNIXTime(ym, 1);
                 }
-                var endTime   = startTime + 60 * 60 * 24;
-                var href = '#channels/' + encodeURIComponent(channel.name()) +
-                    '/old_logs/by_time/' + startTime;
-                a.attr('href', href);
+                (function () {
+                    var s = startTime;
+                    a.attr('href', '#').click(function () {
+                        console.log(s);
+                        self.setTime(s);
+                        self.update();
+                        return false;
+                    });
+                })();
                 var li = $('<li></li>').append(a);
                 /*if (startTime <= self.startTime_ &&
                     self.startTime_ < ymToUNIXTime(nextYM, 1)) {*/
@@ -570,20 +579,20 @@ starChat.View = (function () {
                     for (;
                          (new Date(startTime * 1000)).getMonth() + 1 === currentMonth &&
                          startTime <= (today.getTime() / 1000);
-                        ) {
-                        try {
-                            var li2 = $('<li></li>');
-                            text = starChat.toISO8601(new Date(startTime * 1000), 'date');
-                            var a = $('<a></a>').text(text);
-                            var href = '#channels/' + encodeURIComponent(channel.name()) +
-                                '/old_logs/by_time/' + startTime;
-                            a.attr('href', href);
-                            li2.append(a);
-                            ul2.append(li2);
-                        } finally {
-                            startTime += 60 * 60 * 24;
-                            endTime   += 60 * 60 * 24;
-                        }
+                         startTime += 60 * 60 * 24) {
+                        var li2 = $('<li></li>');
+                        text = starChat.toISO8601(new Date(startTime * 1000), 'date');
+                        var a = $('<a></a>').text(text);
+                        (function () {
+                            var s = startTime;
+                            a.attr('href', '#').click(function () {
+                                self.setTime(s);
+                                self.update();
+                                return false;
+                            });
+                        })();
+                        li2.append(a);
+                        ul2.append(li2);
                     }
                     li.append(ul2);
                 }
