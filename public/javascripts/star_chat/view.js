@@ -350,7 +350,9 @@ starChat.View = (function () {
         }
         if (!self.isShowingOldLogs()) {
             if (self.channelName in self.newMessages_) {
-                var lastUNIXTime = table.find('time').last().attr('data-unix-time');
+                var lastUNIXTime = table.find('tr.message').
+                    not('[data-pseudo-message-id]').find('time').
+                    last().attr('data-unix-time');
                 var msgs = self.newMessages_[self.channelName];
                 msgs.forEach(function (message) {
                     if (message.id in self.messageIdsAlreadyInSection_) {
