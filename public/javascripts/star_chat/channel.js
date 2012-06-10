@@ -8,10 +8,10 @@ starChat.Channel = (function () {
         var name = obj.name;
         name = name.replace(/^\s*(.*?)\s*$/, '$1').replace(/(?![\n\r\t])[\x00-\x1f\x7f]/mg, '');
         name = name.substring(0, 32);
-        this.name_         = name;
-        this.users_        = [];
-        this.messages_     = {};
-        this.firstMessage_ = null;
+        this.name_               = name;
+        this.users_              = [];
+        this.messagesByTimeSpan_ = {};
+        this.firstMessage_       = null;
         this.update(obj);
     };
     var cache = {};
@@ -78,6 +78,14 @@ starChat.Channel = (function () {
     Channel.prototype.firstMessage = function () {
         return this.firstMessage_;
     };
+    Channel.prototype.messagesByTimespan = function (startTime, endTime) {
+        var key = startTime + ',' + endTime;
+        if (key in this.messagesByTimeSpan_) {
+            return this.messagesByTimeSpan_[key];
+        } else {
+            return [];
+        }
+    };
     Channel.prototype.load = function (session, callback) {
         var url = '/channels/' + encodeURIComponent(this.name());
         var self = this;
@@ -110,6 +118,18 @@ starChat.Channel = (function () {
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.firstMessage_ = data[0];
+            if (callback !== void(0)) {
+                callback(sessionId, data.key);
+            }
+        });
+    };
+    Channel.prototype.loadMessagesByTimeSpan = function (session, startTime, endTime, callback) {
+        var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_time_span/' +
+            encodeURIComponent(startTime) + ',' + encodeURIComponent(endTime);
+        var self = this;
+        starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
+            var key = startTime + ',' + endTime;
+            self.messagesByTimeSpan[key] = data;
             if (callback !== void(0)) {
                 callback(sessionId, data.key);
             }
