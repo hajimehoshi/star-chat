@@ -448,16 +448,6 @@ starChat.View = (function () {
                     }
                     tr.addClass('imcomplete'); // needs to load messages
                     target = tr;
-                    // TODO: Is it OK to load messages here?
-                    /*var channel = starChat.find(self.channelName);
-                    var startTime = 0;
-                    var endTime   = startTime + 60 * 60 * 24;
-                    channel.loadMessagesByTimeSpan(self.session(), startTime, endTime, function (sessionId) {
-                        var view = getView();
-                        if (view.session().id() !== sessionId) {
-                            return;
-                        }
-                    });*/
                 }
                 if (target !== null) {
                     var scrollTop = target.position().top + section.scrollTop() - 40;
@@ -497,6 +487,31 @@ starChat.View = (function () {
                 }, 0);
             }
         }
+    }
+    function loadMessages(self) {
+        if (!self.channelName) {
+            return;
+        }
+        $('table.messages tr.date.imcomplete').each(function () {
+            var e = $(this);
+            var channel = starChat.Channel.find(self.channelName);
+            var startTime = Math.floor(e.find('time').attr('data-unix-time'));
+            var endTime   = startTime + 60 * 60 * 24;
+            channel.loadMessagesByTimeSpan(self.session(), startTime, endTime, function (sessionId, data) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                var table = $('table.messages');
+                var lastTR = e;
+                data.forEach(function (message) {
+                    var messageTR = messageToElement(message);
+                    messageTR.insertAfter(lastTR);
+                    lastTR = messageTR;
+                });
+            });
+            e.removeClass('imcomplete');
+        });
     }
     function updateViewTopic(self) {
         var form = $('#updateTopicForm');
@@ -721,6 +736,7 @@ starChat.View = (function () {
         updateViewChannels(this);
         updateViewSearch(this);
         updateViewMessages(this);
+        loadMessages(this);
         updateViewTopic(this);
         updateViewUsers(this);
         updateViewTimeline(this);

@@ -119,7 +119,7 @@ starChat.Channel = (function () {
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.firstMessage_ = data[0];
             if (callback !== void(0)) {
-                callback(sessionId, data.key);
+                callback(sessionId, data);
             }
         });
     };
@@ -129,9 +129,9 @@ starChat.Channel = (function () {
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             var key = startTime + ',' + endTime;
-            self.messagesByTimeSpan[key] = data;
+            self.messagesByTimeSpan_[key] = data;
             if (callback !== void(0)) {
-                callback(sessionId, data.key);
+                callback(sessionId, data);
             }
         });
     };
