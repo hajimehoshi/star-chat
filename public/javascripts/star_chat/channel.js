@@ -114,7 +114,7 @@ starChat.Channel = (function () {
         });
     };
     Channel.prototype.loadFirstMessage = function (session, callback) {
-        var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_index/1,1';
+        var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_index/0,1';
         var self = this;
         starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
             self.firstMessage_ = data[0];

@@ -576,11 +576,16 @@ starChat.View = (function () {
         if (!self.channelName) {
             return;
         }
+
+        var ul = $('#timeline');
+        ul.empty();
+
         var channel = starChat.Channel.find(self.channelName);
         var firstMessage = channel.firstMessage();
         if (!firstMessage) {
             return;
         }
+        console.log(firstMessage);
 
         var firstDate = new Date(firstMessage.created_at * 1000);
         var firstYear  = Math.floor(firstDate.getFullYear());
@@ -599,8 +604,6 @@ starChat.View = (function () {
             return Math.floor(new Date(ym / 100, ym % 100 - 1, day).getTime() / 1000);
         }
         
-        var ul = $('#timeline');
-        ul.empty();
         for (var ym = firstYM;
              ym <= todayYM;) {
             var nextYM = ym + 1;
