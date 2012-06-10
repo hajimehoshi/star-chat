@@ -15,6 +15,7 @@
                 return;
             }
             lastFragment = fragment;
+            $('#timeline').hide();
             view.channelName = '';
             if (fragment.match(/^channels\//)) {
                 var params = {};
