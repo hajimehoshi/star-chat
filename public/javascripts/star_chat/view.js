@@ -365,7 +365,7 @@ starChat.View = (function () {
                     }
                     var nextDateStr = starChat.toISO8601(message.created_at, 'date');
                     if (!lastDateStr || (lastDateStr !== nextDateStr)) {
-                        var unixTime = Math.floor(new Date(nextDateStr.substr(0, 4), nextDateStr.substr(4, 2)).getTime() / 1000);
+                        var unixTime = Math.floor(new Date(nextDateStr.substr(0, 4), nextDateStr.substr(5, 2)).getTime() / 1000);
                         var tr = $('<tr></tr>').addClass('date');
                         var td = $('<td></td>').attr('colspan', '3');
                         var time = $('<time></time>').text(nextDateStr).attr('date-unix-time', unixTime);
