@@ -526,6 +526,9 @@ $(function () {
                                         $('#messages > h2').outerHeight() -
                                         $('#messages > form').height());
         $('.sidebar').height($(window).height() - $('header').outerHeight());
+        var messages = $('#messages');
+        $('#timeline').css('top', (messages.offset().top + 50) + 'px').
+            css('right', (messages.offset().left + 20) + 'px');
     }
     var isRequestedRelayouting = false;
     $(window).resize(function () {
