@@ -751,6 +751,7 @@ starChat.View = (function () {
         // TODO: Emphasize channel name?
         if (message.user_name === this.session().user().name()) {
             var body = message.body;
+            // Is it OK to use the global selection?
             var id = $('[data-pseudo-message-id]').filter(function () {
                 var e = $(this);
                 if (e.attr('data-removed') === 'true') {
