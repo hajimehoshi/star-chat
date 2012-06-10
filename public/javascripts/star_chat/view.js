@@ -532,7 +532,7 @@ starChat.View = (function () {
             return;
         }
 
-        var ul = $('#timeline');
+        var ul = $('#timeline ul');
         ul.empty();
 
         var channel = starChat.Channel.find(self.channelName);
@@ -566,21 +566,13 @@ starChat.View = (function () {
             }
             try {
                 var text = String(ym).substr(0, 4) + '-' + String(ym).substr(4);
-                var a = $('<a></a>').text(text);
+                var span = $('<span></span>').text(text);
+                var li = $('<li></li>').append(span);
                 if (ym === firstYM) {
                     var startTime = ymToUNIXTime(ym, firstDate.getDate());
                 } else {
                     var startTime = ymToUNIXTime(ym, 1);
                 }
-                (function () {
-                    var s = startTime;
-                    a.attr('href', '#').click(function () {
-                        self.setTime(s);
-                        self.update();
-                        return false;
-                    });
-                })();
-                var li = $('<li></li>').append(a);
                 var currentMonth = ym % 100;
                 var ul2 = $('<ul></ul>');
                 for (;
@@ -588,7 +580,7 @@ starChat.View = (function () {
                      startTime <= (today.getTime() / 1000);
                      startTime += 60 * 60 * 24) {
                     var li2 = $('<li></li>');
-                    text = starChat.toISO8601(new Date(startTime * 1000), 'date');
+                    text = starChat.toISO8601(new Date(startTime * 1000), 'date').substr(8, 2);
                     var a = $('<a></a>').text(text);
                     (function () {
                         var s = startTime;

@@ -298,6 +298,12 @@ $(function() {
         });
     })();
     (function () {
+        $('img[data-tool-id="toggleTimeline"]').click(function () {
+            $('#timeline').toggle();
+            return false;
+        });
+    })();
+    (function () {
         $('img[data-tool-id="editTopic"]').click(function () {
             var view = getView();
             view.isEdittingTopic(!view.isEdittingTopic());
