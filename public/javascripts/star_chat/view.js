@@ -418,7 +418,7 @@ starChat.View = (function () {
             self.isScrolling_ = true;
             if (self.time_ && self.channelName) {
                 var target = null;
-                $('[data-unix-time]').each(function () {
+                section.find('[data-unix-time]').each(function () {
                     var e = $(this);
                     if (self.time_ < starChat.parseInt(e.attr('data-unix-time'))) {
                         return false;
@@ -430,13 +430,13 @@ starChat.View = (function () {
                     target = target.parent().parent(); // tr
                 }
                 if (target === null ||
-                    (starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date') !==
-                     starChat.toISO8601(self.time_, 'date'))) {
+                    (starChat.toISO8601(self.time_, 'date') !==
+                     starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
                     var scrollTop = 0;
                     var date = new Date(self.time_ * 1000);
                     var dateStr = starChat.toISO8601(self.time_, 'date');
                     var tr = dateToElement(dateStr);
-                    var nextTR = $('table.messages tr.date').filter(function () {
+                    var nextTR = section.find('table.messages tr.date').filter(function () {
                         var e = $(this);
                         var nextUNIXTime = e.find('time').attr('data-unix-time');
                         return self.time_ < nextUNIXTime;
@@ -444,13 +444,15 @@ starChat.View = (function () {
                     if (nextTR.length === 1) {
                         tr.insertBefore(nextTR);
                     } else {
-                        $('table.messages').append(tr);
+                        section.find('table.messages').append(tr);
                     }
                     tr.addClass('imcomplete'); // needs to load messages
                     target = tr;
                 }
                 if (target !== null) {
                     var scrollTop = target.position().top + section.scrollTop() - 40;
+                } else {
+                    var scrollTop = section.get(0).scrollHeight();
                 }
                 section.animate({scrollTop: scrollTop}, {
                     complete: function () {
@@ -492,7 +494,8 @@ starChat.View = (function () {
         if (!self.channelName) {
             return;
         }
-        $('table.messages tr.date.imcomplete').each(function () {
+        var section = getSectionElement(self);
+        section.find('table.messages tr.date.imcomplete').each(function () {
             var e = $(this);
             var channel = starChat.Channel.find(self.channelName);
             var startTime = Math.floor(e.find('time').attr('data-unix-time'));
@@ -502,7 +505,7 @@ starChat.View = (function () {
                 if (view.session().id() !== sessionId) {
                     return;
                 }
-                var table = $('table.messages');
+                var table = section.find('table.messages');
                 var lastTR = e;
                 data.forEach(function (message) {
                     var messageTR = messageToElement(message);
