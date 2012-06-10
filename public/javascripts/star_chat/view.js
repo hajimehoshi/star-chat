@@ -607,8 +607,11 @@ starChat.View = (function () {
                 ym = nextYM;
             }
         }
-        var href = '#channels/' + encodeURIComponent(channel.name());
-        var a = $('<a></a>').text('Now').attr('href', href);
+        var a = $('<a></a>').text('Now').attr('href', '#').click(function () {
+            self.setTime(Math.floor($.now() / 1000));
+            self.update();
+            return false;
+        });
         var li = $('<li></li>').append(a);
         ul.append(li);
     }
