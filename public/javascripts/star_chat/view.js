@@ -509,8 +509,13 @@ starChat.View = (function () {
                 var lastTR = e;
                 data.forEach(function (message) {
                     var messageTR = messageToElement(message);
-                    messageTR.insertAfter(lastTR);
-                    lastTR = messageTR;
+                    var tr = section.find('tr.message[data-message-id="' + message.id + '"]');
+                    if (0 < tr.length) {
+                        lastTR = tr;
+                    } else {
+                        messageTR.insertAfter(lastTR);
+                        lastTR = messageTR;
+                    }
                 });
             });
             e.removeClass('imcomplete');
