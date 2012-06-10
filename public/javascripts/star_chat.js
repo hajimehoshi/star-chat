@@ -119,10 +119,13 @@ starChat.parseQuery = function (str) {
 };
 
 /**
- * @param {Date} date
+ * @param {Date|Number} date
  * @param {string=} type
  */
 starChat.toISO8601 = function (date, type) {
+    if ($.isNumeric(date)) {
+        date = new Date(date * 1000);
+    }
     if (type === void(0)) {
         type = 'datetime';
     }

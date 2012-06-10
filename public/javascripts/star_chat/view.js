@@ -225,7 +225,7 @@ starChat.View = (function () {
         }
         var timeStr = h + ':' + m;
         var createdAtTD = $('<td></td>');
-        var createdAtTime = $('<time></time>').text(timeStr).attr('data-unix-time', message.created_at);;
+        var createdAtTime = $('<time></time>').text(timeStr).attr('data-unix-time', message.created_at);
         createdAtTD.append(createdAtTime).addClass('createdAt');
         messageTR.append(createdAtTD);
 
@@ -339,17 +339,37 @@ starChat.View = (function () {
         var table = section.find('table.messages');
         if (table.length === 0) {
             table = $('<table></table>').addClass('messages');
+            // A dummy TR is needed because the first TR defines the layout of the table.
+            var tr = $('<tr></tr>').addClass('message');
+            tr.append($('<td></td>').addClass('createdAt'));
+            tr.append($('<td></td>').addClass('userName'));
+            tr.append($('<td></td>').addClass('body'));
+            tr.css('height', 0);
+            table.append(tr);
             section.append(table);
-        }        
+        }
         if (!self.isShowingOldLogs()) {
             if (self.channelName in self.newMessages_) {
+                var lastUNIXTime = table.find('time').last().attr('data-unix-time');
                 var msgs = self.newMessages_[self.channelName];
                 msgs.forEach(function (message) {
                     if (message.id in self.messageIdsAlreadyInSection_) {
                         return;
                     }
                     self.messageIdsAlreadyInSection_[message.id] = true;
+                    var lastDateStr = null;
+                    if (lastUNIXTime) {
+                        lastDateStr = starChat.toISO8601(lastUNIXTime, 'date');
+                    }
+                    var nextDateStr = starChat.toISO8601(message.created_at, 'date');
+                    if (!lastDateStr || (lastDateStr !== nextDateStr)) {
+                        var tr = $('<tr></tr>').addClass('date');
+                        var td = $('<td></td>').attr('colspan', '3').text(nextDateStr);
+                        tr.append(td);
+                        table.append(tr);
+                    }
                     table.append(self.messageElements_[message.id]);
+                    lastUNIXTime = message.created_at;
                 });
                 self.newMessages_[self.channelName] = [];
             }
