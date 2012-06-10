@@ -158,6 +158,18 @@ starChat.toISO8601 = function (date, type) {
     }
 };
 
+starChat.toUNIXTime = function (str) {
+    var match;
+    if (match = str.match(/^(\d{4})-(\d{2})-(\d{2})$/)) {
+        var year  = starChat.parseInt(match[1]);
+        var month = starChat.parseInt(match[2]);
+        var day   = starChat.parseInt(match[3]);
+        return Math.floor(new Date(year, month - 1, day).getTime() / 1000);
+    } else {
+        throw "Sorry, other formats are not implemented."
+    }
+};
+
 starChat.escapeHTML = function (str) {
     return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };

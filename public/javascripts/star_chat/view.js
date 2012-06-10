@@ -237,10 +237,7 @@ starChat.View = (function () {
         return messageTR;
     }
     function dateToElement(dateStr) {
-        var year  = Math.floor(dateStr.substr(0, 4));
-        var month = Math.floor(dateStr.substr(5, 2));
-        var day   = Math.floor(dateStr.substr(8, 2));
-        var unixTime = Math.floor(new Date(year, month - 1, day).getTime() / 1000);
+        var unixTime = starChat.toUNIXTime(dateStr);
         var tr = $('<tr></tr>').addClass('date');
         var td = $('<td></td>').attr('colspan', '3');
         var time = $('<time></time>').text(dateStr).attr('data-unix-time', unixTime);
@@ -336,13 +333,19 @@ starChat.View = (function () {
                 if (lastUNIXTime) {
                     lastDateStr = starChat.toISO8601(lastUNIXTime, 'date');
                 }
-                var nextDateStr = starChat.toISO8601(message.created_at, 'date');
+                var nextDateStr      = starChat.toISO8601(message.created_at, 'date');
+                var nextDateUNIXTime = starChat.toUNIXTime(nextDateStr);
                 if (!lastDateStr || (lastDateStr !== nextDateStr)) {
-                    var tr = dateToElement(nextDateStr);
-                    if (table.find('tr.date').length === 0) {
-                        tr.addClass('imcomplete'); // The first tr.date needs to load messages
+                    if (table.find('tr.date').filter(function () {
+                        return Math.floor($(this).find('time').attr('data-unix-time')) === nextDateUNIXTime;
+                    }).length === 0) {
+                        var tr = dateToElement(nextDateStr);
+                        // The first tr.date needs to load messages
+                        if (table.find('tr.date').length === 0) {
+                            tr.addClass('imcomplete');
+                        }
+                        table.append(tr);
                     }
-                    table.append(tr);
                 }
                 table.append(self.messageElements_[message.id]);
                 lastUNIXTime = message.created_at;
