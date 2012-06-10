@@ -32,6 +32,7 @@
                     var time        = starChat.parseInt(decodeURIComponent(match[2]));
                     view.setTime(time);
                 } else if (match = fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
+                    // TODO: Deprecate?
                     var channelName = decodeURIComponent(match[1]);
                     var startTime   = starChat.parseInt(decodeURIComponent(match[2]));
                     var endTime     = starChat.parseInt(decodeURIComponent(match[3]));

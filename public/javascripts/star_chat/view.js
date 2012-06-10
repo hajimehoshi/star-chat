@@ -365,8 +365,11 @@ starChat.View = (function () {
                     }
                     var nextDateStr = starChat.toISO8601(message.created_at, 'date');
                     if (!lastDateStr || (lastDateStr !== nextDateStr)) {
+                        var unixTime = Math.floor(new Date(nextDateStr.substr(0, 4), nextDateStr.substr(4, 2)).getTime() / 1000);
                         var tr = $('<tr></tr>').addClass('date');
-                        var td = $('<td></td>').attr('colspan', '3').text(nextDateStr);
+                        var td = $('<td></td>').attr('colspan', '3');
+                        var time = $('<time></time>').text(nextDateStr).attr('date-unix-time', unixTime);
+                        td.append(time);
                         tr.append(td);
                         table.append(tr);
                     }
@@ -402,9 +405,24 @@ starChat.View = (function () {
         if (!self.isShowingOldLogs() && !self.isScrolling_) {
             self.isScrolling_ = true;
             if (self.time_) {
-                var scrollTop = 0;
+                var target = null;
+                $('[data-unix-time]').each(function () {
+                    var e = $(this);
+                    if (self.time_ < starChat.parseInt(e.attr('data-unix-time'))) {
+                        return false;
+                    }
+                    target = e;
+                    return true;
+                });
+                if (target !== null) {
+                    target = target.parent().parent(); // tr
+                }
+                if (target !== null) {
+                    var scrollTop = target.position().top + section.scrollTop() - 20;
+                } else {
+                    var scrollTop = section.get(0).scrollHeight; // bottom
+                }
                 section.animate({scrollTop: scrollTop}, {
-                    duration: 750,
                     complete: function () {
                         self.messageScrollTops_[self.channelName] = section.scrollTop();
                         self.lastChannelName_ = self.channelName;
@@ -544,8 +562,9 @@ starChat.View = (function () {
                     '/old_logs/by_time/' + startTime;
                 a.attr('href', href);
                 var li = $('<li></li>').append(a);
-                if (startTime <= self.startTime_ &&
-                    self.startTime_ < ymToUNIXTime(nextYM, 1)) {
+                /*if (startTime <= self.startTime_ &&
+                    self.startTime_ < ymToUNIXTime(nextYM, 1)) {*/
+                if (true) { // temporal
                     var currentMonth = ym % 100;
                     var ul2 = $('<ul></ul>');
                     for (;
