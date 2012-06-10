@@ -255,6 +255,18 @@ starChat.View = (function () {
         messageTR.data('emphasizedNum', emphasizedNum);
         return messageTR;
     }
+    function dateToElement(dateStr) {
+        var year  = Math.floor(dateStr.substr(0, 4));
+        var month = Math.floor(dateStr.substr(5, 2));
+        var day   = Math.floor(dateStr.substr(8, 2));
+        var unixTime = Math.floor(new Date(year, month - 1, day).getTime() / 1000);
+        var tr = $('<tr></tr>').addClass('date');
+        var td = $('<td></td>').attr('colspan', '3');
+        var time = $('<time></time>').text(dateStr).attr('data-unix-time', unixTime);
+        td.append(time);
+        tr.append(td);
+        return tr;
+    }
     function updateViewMessages(self) {
         if (self.channelName) {
             var h2 = $('#messages h2');
@@ -367,15 +379,7 @@ starChat.View = (function () {
                     }
                     var nextDateStr = starChat.toISO8601(message.created_at, 'date');
                     if (!lastDateStr || (lastDateStr !== nextDateStr)) {
-                        var nextYear  = Math.floor(nextDateStr.substr(0, 4));
-                        var nextMonth = Math.floor(nextDateStr.substr(5, 2));
-                        var nextDay   = Math.floor(nextDateStr.substr(8, 2));
-                        var unixTime = Math.floor(new Date(nextYear, nextMonth - 1, nextDay).getTime() / 1000);
-                        var tr = $('<tr></tr>').addClass('date');
-                        var td = $('<td></td>').attr('colspan', '3');
-                        var time = $('<time></time>').text(nextDateStr).attr('data-unix-time', unixTime);
-                        td.append(time);
-                        tr.append(td);
+                        var tr = dateToElement(nextDateStr);
                         table.append(tr);
                     }
                     table.append(self.messageElements_[message.id]);
