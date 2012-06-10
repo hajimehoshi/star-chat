@@ -217,8 +217,9 @@ h1 {
     color: #888;
 }
 #messages > section tr.date td {
-    color: #999;
-    font-weight: bold;
+    color: #ccc;
+    padding-top: 10px;
+    font-size: 250%;
 }
 #postMessageForm {
     margin: 0;
