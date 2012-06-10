@@ -245,6 +245,10 @@ get '/channels/:channel_name/users', provides: :json do
   end.to_json
 end
 
+before %r{/channels/[^/]+/messages(/.+)?$} do
+  halt 403 unless current_user.subscribing?(@channel)
+end
+
 get '/channels/:channel_name/messages/:range', provides: :json do
   range = params[:range].to_s
   if range == 'recent'
@@ -255,8 +259,9 @@ get '/channels/:channel_name/messages/:range', provides: :json do
   end
 end
 
-before %r{/channels/[^/]+/messages(/.+)?$} do
-  halt 403 unless current_user.subscribing?(@channel)
+get '/channels/:channel_name/messages/by_index/:start,:length', provides: :json do
+  idx, len = params[:start].to_i, params[:length].to_i
+  @channel.messages(idx, len).to_json
 end
 
 get '/channels/:channel_name/messages/by_time_span/:start_time,:end_time', provides: :json do

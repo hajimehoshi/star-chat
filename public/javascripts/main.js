@@ -46,6 +46,7 @@ $(function() {
                     data.forEach(function (message) {
                         view.addNewMessage(channel.name(), message, false);
                     });
+                    // TODO: call this only one time?
                     view.update();
                     $(window).trigger('hashchange');
                 });
@@ -324,21 +325,7 @@ $(function() {
         $('#channels menu img[data-tool-id="edit"]').click(function () {
             var view = getView();
             view.isEdittingChannels(!view.isEdittingChannels());
-            if (view.isEdittingChannels()) {
-                var session = view.session();
-                var channels = session.user().channels();
-                channels.forEach(function (channel) {
-                    channel.load(session, function (sessionId) {
-                        var view = getView();
-                        if (view.session().id() !== sessionId) {
-                            return;
-                        }
-                        view.update();
-                    });
-                });
-            } else {
-                view.update();
-            }
+            view.update();
             return false;
         });
         $('#editChannelsDialog img[data-tool-id="edit"]').click(function () {

@@ -135,6 +135,9 @@ h1 {
 .sidebar li {
     margin-bottom: 5px;
 }
+.sidebar ul ul {
+    margin: 5px 0 0 10px;
+}
 .sidebar a:visited {
     color: #000 !important;
 }
@@ -147,6 +150,7 @@ h1 {
     background-color: #fff;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 #messages h2 {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0.80, #889), color-stop(0.00, #556));
@@ -163,7 +167,12 @@ h1 {
     font-weight: bold;
     margin: 0;
     padding: 10px 20px;
+    position: relative;
     text-shadow: #556 0 -1px;
+}
+#messages h2 img.toolIcon {
+    position: absolute;
+    right: 20px;
 }
 #messages > section {
     margin: 0;
@@ -180,31 +189,37 @@ h1 {
     border-collapse: separate;
     border-spacing: 0 5px;
     margin-bottom: 10px;
+    margin-top: -5px; /* The first line is dummy, and it has 5-px border-spacing. */
     table-layout: fixed;
     width: 100%;
 }
 #messages > section td {
     vertical-align: top;
 }
-#messages > section td.createdAt {
+#messages > section tr.message td.createdAt {
     color: #999;
     font-size: 80%;
     padding-top: 4px;
     padding-right: 10px;
     width: 40px;
 }
-#messages > section td.userName {
+#messages > section tr.message td.userName {
     color: #338;
     padding-right: 10px;
     text-align: right;
     width: 120px;
     word-wrap: break-word;
 }
-#messages > section td.body {
+#messages > section tr.message td.body {
     word-wrap: break-word;
 }
-#messages > section td.body.notice {
+#messages > section tr.message td.body.notice {
     color: #888;
+}
+#messages > section tr.date td {
+    color: #ccc;
+    padding-top: 10px;
+    font-size: 250%;
 }
 #postMessageForm {
     margin: 0;
@@ -247,6 +262,10 @@ h1 {
 }
 #topic {
     margin: 0;
+}
+#timeline {
+}
+#timeline li {
 }
 
 .toolIcon {
