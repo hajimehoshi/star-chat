@@ -16,7 +16,6 @@
             }
             lastFragment = fragment;
             view.channelName = '';
-            view.resetTimeSpan();
             if (fragment.match(/^channels\//)) {
                 var params = {};
                 var match;
