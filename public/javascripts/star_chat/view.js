@@ -142,18 +142,14 @@ starChat.View = (function () {
 
             var bodyE = $(document.createTextNode(message.body));
 
-            var time = new Date(message.created_at * 1000);
-            time.setHours(0);
-            time.setMinutes(0);
-            time.setSeconds(0);
-            time.setMilliseconds(0);
-            var startTime = starChat.parseInt(time.getTime() / 1000);
-            var endTime   = startTime + 60 * 60 * 24;
             var channelNameLink = $('<a></a>').text(message.channel_name);
-            var channelUrl = '#channels/' + encodeURIComponent(message.channel_name) +
-                '/old_logs/by_time_span/' + startTime + ',' + endTime; // TODO: Modify
-            channelNameLink.attr('href', channelUrl);
-            // TODO: Modify links?
+            channelNameLink.attr('href', '#').click(function () {
+                location.hash = 'channels/' + encodeURIComponent(message.channel_name);
+                self.channelName = message.channel_name;
+                self.setTime(message.created_at);
+                self.update();
+                return false;
+            });
             // TODO: highlight
 
             li.append(createdAtE);
