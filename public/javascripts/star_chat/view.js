@@ -367,10 +367,13 @@ starChat.View = (function () {
                     }
                     var nextDateStr = starChat.toISO8601(message.created_at, 'date');
                     if (!lastDateStr || (lastDateStr !== nextDateStr)) {
-                        var unixTime = Math.floor(new Date(nextDateStr.substr(0, 4), nextDateStr.substr(5, 2)).getTime() / 1000);
+                        var nextYear  = Math.floor(nextDateStr.substr(0, 4));
+                        var nextMonth = Math.floor(nextDateStr.substr(5, 2));
+                        var nextDay   = Math.floor(nextDateStr.substr(8, 2));
+                        var unixTime = Math.floor(new Date(nextYear, nextMonth - 1, nextDay).getTime() / 1000);
                         var tr = $('<tr></tr>').addClass('date');
                         var td = $('<td></td>').attr('colspan', '3');
-                        var time = $('<time></time>').text(nextDateStr).attr('date-unix-time', unixTime);
+                        var time = $('<time></time>').text(nextDateStr).attr('data-unix-time', unixTime);
                         td.append(time);
                         tr.append(td);
                         table.append(tr);
@@ -420,7 +423,7 @@ starChat.View = (function () {
                     target = target.parent().parent(); // tr
                 }
                 if (target !== null) {
-                    var scrollTop = target.position().top + section.scrollTop() - 20;
+                    var scrollTop = target.position().top + section.scrollTop() - 40;
                 } else {
                     var scrollTop = 0;
                     // 新規作成する必要がある?
