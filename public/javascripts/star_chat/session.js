@@ -33,7 +33,7 @@ starChat.Session.prototype.password = function () {
 };
 
 /**
- * @return {string}
+ * @return {starChat.User}
  */
 starChat.Session.prototype.user = function () {
     return this.user_;

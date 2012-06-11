@@ -213,7 +213,8 @@ starChat.View = (function () {
         messageTR.append(createdAtTD);
 
         var user = starChat.User.find(message.user_name);
-        var userNameTD = $('<td></td>').text(user.nick()).attr('title', user.name());
+        var nick = String(user.nick());
+        var userNameTD = $('<td></td>').text(nick).attr('title', user.name());
         userNameTD.addClass('userName');
         messageTR.append(userNameTD);
 
