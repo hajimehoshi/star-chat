@@ -34,7 +34,7 @@ starChat.PacketProcessor = (function () {
         }
     }
     function processPacketChannel(packet, view) {
-        var channelObj = packet.channel;
+        var channelObj = /** @type {{channel: {name: string}}} */packet.channel;
         if (channelObj) {
             var channel = starChat.Channel.find(channelObj.name);
             channel.update(channelObj);

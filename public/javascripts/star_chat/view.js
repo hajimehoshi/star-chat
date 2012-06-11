@@ -370,7 +370,8 @@ starChat.View = (function () {
                 var target = null;
                 section.find('[data-unix-time]').each(function () {
                     var e = $(this);
-                    if (self.time_ < starChat.parseInt(e.attr('data-unix-time'))) {
+                    var unixTime = starChat.parseInt(String(e.attr('data-unix-time')));
+                    if (self.time_ < unixTime) {
                         return false;
                     }
                     target = e;

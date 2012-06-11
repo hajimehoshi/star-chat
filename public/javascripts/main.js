@@ -269,7 +269,8 @@ $(function() {
                             var li = $('<li></li>').text(commonHead);
                             if (commonHead !== nick) {
                                 li.append($('<em></em>').text(nick[commonHead.length]));
-                                li.append(document.createTextNode(nick.substring(commonHead.length + 1)));
+                                var text = document.createTextNode(nick.substring(commonHead.length + 1));
+                                li.append($(text));
                             }
                             ul.append(li);
                         });
@@ -294,7 +295,7 @@ $(function() {
             $('#userNameCandidates').hide();
         });
         form.find('[type="submit"]').click(function () {
-            postMessage();
+            postMessage(false);
             return false;
         });
     })();
