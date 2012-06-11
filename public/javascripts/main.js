@@ -274,8 +274,9 @@ $(function() {
                             ul.append(li);
                         });
                         var pos = Measurement.caretPos(this);
-                        ul.css('left', pos.left);
-                        ul.css('top', pos.top - 30);
+                        var parent = $('#messages');
+                        ul.css('left', pos.left     - parent.offset().left);
+                        ul.css('top',  pos.top - 30 - parent.offset().top);
                         ul.show();
                     } else {
                         var val = $(this).val();
