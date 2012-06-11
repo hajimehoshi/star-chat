@@ -119,10 +119,13 @@ starChat.parseQuery = function (str) {
 };
 
 /**
- * @param {Date} date
+ * @param {Date|Number} date
  * @param {string=} type
  */
 starChat.toISO8601 = function (date, type) {
+    if ($.isNumeric(date)) {
+        date = new Date(date * 1000);
+    }
     if (type === void(0)) {
         type = 'datetime';
     }
@@ -152,6 +155,18 @@ starChat.toISO8601 = function (date, type) {
     } else if (type === 'hourMinute') {
         return fillZero(date.getHours()) + ':' +
             fillZero(date.getMinutes());
+    }
+};
+
+starChat.toUNIXTime = function (str) {
+    var match;
+    if (match = str.match(/^(\d{4})-(\d{2})-(\d{2})$/)) {
+        var year  = starChat.parseInt(match[1]);
+        var month = starChat.parseInt(match[2]);
+        var day   = starChat.parseInt(match[3]);
+        return Math.floor(new Date(year, month - 1, day).getTime() / 1000);
+    } else {
+        throw "Sorry, other formats are not implemented."
     }
 };
 

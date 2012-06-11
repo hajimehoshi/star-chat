@@ -135,6 +135,9 @@ h1 {
 .sidebar li {
     margin-bottom: 5px;
 }
+.sidebar ul ul {
+    margin: 5px 0 0 10px;
+}
 .sidebar a:visited {
     color: #000 !important;
 }
@@ -147,6 +150,7 @@ h1 {
     background-color: #fff;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 #messages h2 {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0.80, #889), color-stop(0.00, #556));
@@ -163,7 +167,12 @@ h1 {
     font-weight: bold;
     margin: 0;
     padding: 10px 20px;
+    position: relative;
     text-shadow: #556 0 -1px;
+}
+#messages h2 img.toolIcon {
+    position: absolute;
+    right: 20px;
 }
 #messages > section {
     margin: 0;
@@ -180,31 +189,37 @@ h1 {
     border-collapse: separate;
     border-spacing: 0 5px;
     margin-bottom: 10px;
+    margin-top: -5px; /* The first line is dummy, and it has 5-px border-spacing. */
     table-layout: fixed;
     width: 100%;
 }
 #messages > section td {
     vertical-align: top;
 }
-#messages > section td.createdAt {
+#messages > section tr.message td.createdAt {
     color: #999;
     font-size: 80%;
     padding-top: 4px;
     padding-right: 10px;
     width: 40px;
 }
-#messages > section td.userName {
+#messages > section tr.message td.userName {
     color: #338;
     padding-right: 10px;
     text-align: right;
     width: 120px;
     word-wrap: break-word;
 }
-#messages > section td.body {
+#messages > section tr.message td.body {
     word-wrap: break-word;
 }
-#messages > section td.body.notice {
+#messages > section tr.message td.body.notice {
     color: #888;
+}
+#messages > section tr.date td {
+    color: #ccc;
+    padding-top: 10px;
+    font-size: 250%;
 }
 #postMessageForm {
     margin: 0;
@@ -247,6 +262,64 @@ h1 {
 }
 #topic {
     margin: 0;
+}
+#timeline {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow:         0 0 8px #000;
+    -moz-box-shadow:    0 0 8px #000;
+    -webkit-box-shadow: 0 0 8px #000;
+    color: #000 !important;
+    display: none;
+    margin: 0;
+    max-height: 70%;
+    overflow-y: auto;
+    padding: 10px;
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    z-index: 2;
+}
+#timeline ul {
+    border-color: #999;
+    border-style: solid;
+    border-width: 0 0 0 4px;
+    margin: 0;
+    padding: 0;
+}
+#timeline span {
+    color: #999;
+    display: block;
+    font-weight: bold;
+    padding: 0 0 5px 0;
+}
+#timeline a {
+    color: #000 !important;
+    text-decoration: none;
+}
+#timeline ul ul {
+    border-color: #999;
+    border-style: solid;
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+}
+#timeline li {
+    border-color: #999;
+    border-style: solid;
+    border-width: 1px 0 0 0;
+    display: block;
+    margin: 0;
+    padding: 0 10px 0 10px;
+}
+#timeline li li {
+    border-color: #999;
+    border-style: none;
+    border-width: 0 0 0 0;
+    margin: 0;
+    padding: 0 0 5px 0;
+}
+#timeline li li:last-child {
+    margin-bottom: 5px;
 }
 
 .toolIcon {

@@ -46,6 +46,7 @@ $(function() {
                     data.forEach(function (message) {
                         view.addNewMessage(channel.name(), message, false);
                     });
+                    // TODO: call this only one time?
                     view.update();
                     $(window).trigger('hashchange');
                 });
@@ -297,6 +298,12 @@ $(function() {
         });
     })();
     (function () {
+        $('img[data-tool-id="toggleTimeline"]').click(function () {
+            $('#timeline').toggle();
+            return false;
+        });
+    })();
+    (function () {
         $('img[data-tool-id="editTopic"]').click(function () {
             var view = getView();
             view.isEdittingTopic(!view.isEdittingTopic());
@@ -324,21 +331,7 @@ $(function() {
         $('#channels menu img[data-tool-id="edit"]').click(function () {
             var view = getView();
             view.isEdittingChannels(!view.isEdittingChannels());
-            if (view.isEdittingChannels()) {
-                var session = view.session();
-                var channels = session.user().channels();
-                channels.forEach(function (channel) {
-                    channel.load(session, function (sessionId) {
-                        var view = getView();
-                        if (view.session().id() !== sessionId) {
-                            return;
-                        }
-                        view.update();
-                    });
-                });
-            } else {
-                view.update();
-            }
+            view.update();
             return false;
         });
         $('#editChannelsDialog img[data-tool-id="edit"]').click(function () {
@@ -533,6 +526,9 @@ $(function () {
                                         $('#messages > h2').outerHeight() -
                                         $('#messages > form').height());
         $('.sidebar').height($(window).height() - $('header').outerHeight());
+        var messages = $('#messages');
+        $('#timeline').css('top', (messages.offset().top + 50) + 'px').
+            css('right', (messages.offset().left + 20) + 'px');
     }
     var isRequestedRelayouting = false;
     $(window).resize(function () {

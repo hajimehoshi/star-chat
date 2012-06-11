@@ -15,23 +15,16 @@
                 return;
             }
             lastFragment = fragment;
+            $('#timeline').hide();
             view.channelName = '';
-            view.resetTimeSpan();
             if (fragment.match(/^channels\//)) {
                 var params = {};
                 var match;
                 if (match = fragment.match(/^channels\/([^\/\?]+)(\?(.*))?$/)) {
                     var channelName = decodeURIComponent(match[1]);
-                    var startTime   = null;
-                    var endTime     = null;
                     if (match[3]) {
                         params = starChat.parseQuery(match[3]);
                     }
-                } else if (match = fragment.match(/^channels\/([^\/\?]+)\/old_logs\/by_time_span\/(\d+),(\d+)$/)) {
-                    var channelName = decodeURIComponent(match[1]);
-                    var startTime   = starChat.parseInt(decodeURIComponent(match[2]));
-                    var endTime     = starChat.parseInt(decodeURIComponent(match[3]));
-                    view.setTimeSpan(startTime, endTime);
                 } else {
                     return;
                 }
@@ -44,21 +37,21 @@
                         return false;
                     }
                 });
-                if (isAlreadyJoined || view.isShowingOldLogs()) {
-                    view.channelName = channelName;
-                    if ($.isNumeric(startTime) && $.isNumeric(endTime)) {
-                        var url = '/channels/' + encodeURIComponent(channelName) +
-                            '/messages/by_time_span/' +
-                            encodeURIComponent(String(startTime)) + ',' + encodeURIComponent(String(endTime));
-                        starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
+                if (isAlreadyJoined) {
+                    var channel = starChat.Channel.find(channelName);
+                    if (!channel.firstMessage()) {
+                        channel.loadFirstMessage(session, function (sessionId) {
                             var view = getView();
                             if (view.session().id() !== sessionId) {
                                 return;
                             }
-                            view.setOldMessages(channelName, startTime, endTime, data);
+                            if (!channel.firstMessage()) {
+                                return;
+                            }
                             view.update();
                         });
                     }
+                    view.channelName = channelName;
                     view.update();
                     return;
                 }
@@ -87,6 +80,18 @@
                         }
                         view.update();
                     });
+                    if (!channel.firstMessage()) {
+                        channel.loadFirstMessage(session, function (sessionId) {
+                            var view = getView();
+                            if (view.session().id() !== sessionId) {
+                                return;
+                            }
+                            if (!channel.firstMessage()) {
+                                return;
+                            }
+                            view.update();
+                        });
+                    }
                 });
                 return false;
             }
