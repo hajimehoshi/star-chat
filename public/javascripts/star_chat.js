@@ -78,6 +78,16 @@ starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, op
 };
 
 starChat.getFragment = function () {
+    if ($.browser.mozilla) {
+        // Firefox doesn't distinguish '%3F' and '?' with location.hash.
+        // Instead, use location.href to retain these characters.
+        var match;
+        if (match = location.href.match(/#([^#]+)$/)) {
+            return match[1];
+        } else {
+            return '';
+        }
+    }
     var fragment = location.hash;
     if (fragment[0] === '#') {
         fragment = fragment.substring(1);
