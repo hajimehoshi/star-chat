@@ -179,7 +179,7 @@ starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
  */
 starChat.Channel.prototype.loadMessagesByTimeSpan = function (session, startTime, endTime, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_time_span/' +
-        encodeURIComponent(string(startTime)) + ',' + encodeURIComponent(string(endTime));
+        encodeURIComponent(String(startTime)) + ',' + encodeURIComponent(String(endTime));
     var self = this;
     starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
         var key = startTime + ',' + endTime;
