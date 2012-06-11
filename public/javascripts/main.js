@@ -338,7 +338,7 @@ $(function() {
         });
         $('#editChannelsDialog img[data-tool-id="edit"]').click(function () {
             var e = $(this);
-            var channelName = e.attr('data-channel-name');
+            var channelName = String(e.attr('data-channel-name'));
             var view = getView();
             view.isEdittingChannel(true);
             view.edittingChannelName(channelName);
@@ -470,7 +470,7 @@ $(function() {
             var view = getView();
             var channelName = view.edittingChannelName();
             var channel = starChat.Channel.find(channelName);
-            var privacy = $('#editChannelDialog [name="privacy"]:checked').val();
+            var privacy = String($('#editChannelDialog [name="privacy"]:checked').val());
             channel.privacy(privacy);
             channel.save(view.session(), function (sessionId) {
                 var view = getView();

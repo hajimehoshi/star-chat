@@ -16,5 +16,6 @@ java -jar compiler.jar \
     --js public/javascripts/star_chat/hashchange.js \
     --js public/javascripts/main.js \
     --jscomp_error checkTypes \
-    --compilation_level WHITESPACE_ONLY \
+    --compilation_level ADVANCED_OPTIMIZATIONS \
     --externs jquery-1.7.extern.js > /dev/null
+
