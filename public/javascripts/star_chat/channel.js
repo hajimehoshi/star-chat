@@ -78,10 +78,16 @@ starChat.Channel.prototype.privacy = function (privacy) {
     }
 };
 
+/**
+ * @return {Array.<starChat.User>}
+ */
 starChat.Channel.prototype.users = function () {
     return this.users_;
 };
 
+/**
+ * @param {string} name
+ */
 starChat.Channel.prototype.addUser = function (name) {
     var r = $.grep(this.users_, function (user) {
         return user.name() === name;
@@ -91,6 +97,9 @@ starChat.Channel.prototype.addUser = function (name) {
     }
 };
 
+/**
+ * @param {string} name
+ */
 starChat.Channel.prototype.removeUser = function (name) {
     var idx = -1;
     for (var i = 0; i < this.users_.length; i++) {
@@ -104,10 +113,17 @@ starChat.Channel.prototype.removeUser = function (name) {
     }
 };
 
+/**
+ * @return {Object.<string,*>}
+ */
 starChat.Channel.prototype.firstMessage = function () {
     return this.firstMessage_;
 };
 
+/**
+ * @param {number} startTime
+ * @param {number} endTime
+ */
 starChat.Channel.prototype.messagesByTimespan = function (startTime, endTime) {
     var key = startTime + ',' + endTime;
     if (key in this.messagesByTimeSpan_) {
@@ -154,10 +170,9 @@ starChat.Channel.prototype.loadUsers = function (session, callback) {
     });
 };
 
-// TODO: Array -> Array.<starChat.Message>
 /**
  * @param {!starChat.Session} session
- * @param {function(number, Array)=} callback
+ * @param {function(number, Array.<string,*>)=} callback
  */
 starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_index/0,1';
@@ -170,12 +185,11 @@ starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
     });
 };
 
-// TODO: Array -> Array.<starChat.Message>
 /**
  * @param {!starChat.Session} session
  * @param {number} startTime
  * @param {number} endTime
- * @param {function(number, Array)=} callback
+ * @param {function(number, Array.<string,*>)=} callback
  */
 starChat.Channel.prototype.loadMessagesByTimeSpan = function (session, startTime, endTime, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_time_span/' +
@@ -190,7 +204,6 @@ starChat.Channel.prototype.loadMessagesByTimeSpan = function (session, startTime
     });
 };
 
-// TODO: Is the callback type OK?
 /**
  * @param {!starChat.Session} session
  * @param {function(number, string)=} callback
