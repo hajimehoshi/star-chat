@@ -218,7 +218,10 @@ starChat.View = (function () {
         userNameTD.addClass('userName');
         messageTR.append(userNameTD);
 
-        var bodyTD = $('<td></td>').addClass('body').text(message.body);
+        /**
+         * @type {!jQuery}
+         */
+        var bodyTD = /** @type {!jQuery} */$('<td></td>').addClass('body').text(message.body);
         if (message.notice) {
             bodyTD.addClass('notice');
         }
@@ -486,7 +489,10 @@ starChat.View = (function () {
             var channel = starChat.Channel.find(self.channelName);
             var topic   = channel.topic();
             if (topic && topic.body) {
-                var topicE = $('#topic').text(topic.body);
+                /**
+                 * @type {!jQuery}
+                 */
+                var topicE = /** @type {!jQuery} */$('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
                 form.find('[name="body"]').val(topic.body);
@@ -758,7 +764,10 @@ starChat.View = (function () {
                     return false;
                 }
                 var body1 = e.find('.body').text();
-                var e = $('<div></div>').text(body);
+                /**
+                 * @type {!jQuery}
+                 */
+                var e = /** @type {!jQuery} */$('<div></div>').text(body);
                 starChat.replaceURLWithLinks(e);
                 starChat.replaceBreakLines(e);
                 var body2 = e.text();

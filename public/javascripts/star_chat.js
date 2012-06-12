@@ -11,6 +11,12 @@ starChat.parseInt = function (val) {
     return window.parseInt(val, 10);
 };
 
+/**
+ * @param {Array} a
+ * @param {Array} b
+ * @param {function(*,*):boolean} func
+ * @return {boolean}
+ */
 starChat.isSameArray = function (a, b, func) {
     if (!func) {
         func = function (x, y) {
@@ -35,7 +41,7 @@ starChat.isSameArray = function (a, b, func) {
  * @param {Object} data
  * @param {function(number,string,string,Object)=} callbackSuccess
  * @param {Object=} options
- * @return {jQuery.jqXHR}
+ * @return {!jQuery.jqXHR}
  */
 starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, options) {
     var sessionId = session.id();
@@ -74,9 +80,15 @@ starChat.ajaxRequest = function (session, url, method, data, callbackSuccess, op
     if (data) {
         args.data = data;
     }
+    /**
+     * @type {!jQuery.jqXHR}
+     */
     return $.ajax(args);
 };
 
+/**
+ * @return {string}
+ */
 starChat.getFragment = function () {
     if ($.browser.mozilla) {
         // Firefox mixes '%3F' and '?' in location.hash.
@@ -104,6 +116,10 @@ starChat.clearFragment = function () {
     history.replaceState($.now(), null, newURL);
 };
 
+/**
+ * @param {string} str
+ * @return {Object.<string,string>}
+ */
 starChat.parseQuery = function (str) {
     var i = str.indexOf('?');
     if (i !== -1) {
@@ -131,6 +147,7 @@ starChat.parseQuery = function (str) {
 /**
  * @param {Date|Number} date
  * @param {string=} type
+ * @return {string}
  */
 starChat.toISO8601 = function (date, type) {
     if ($.isNumeric(date)) {
@@ -168,6 +185,10 @@ starChat.toISO8601 = function (date, type) {
     }
 };
 
+/**
+ * @param {string} str
+ * @return {number}
+ */
 starChat.toUNIXTime = function (str) {
     var match;
     if (match = str.match(/^(\d{4})-(\d{2})-(\d{2})$/)) {
@@ -193,6 +214,11 @@ jQuery.fn.outerHTML = function(s) {
         : jQuery("<p>").append(this.eq(0).clone()).html();
 }
 
+/**
+ * @param {!jQuery} element
+ * @param {string} keyword
+ * @return {number}
+ */
 starChat.emphasizeKeyword = function (element, keyword) {
     if (!keyword) {
         return 0;
@@ -218,6 +244,10 @@ starChat.emphasizeKeyword = function (element, keyword) {
     return num;
 };
 
+/**
+ * @param {!jQuery} element
+ * @return {number}
+ */
 starChat.replaceBreakLines = function (element) {
     var num = 0;
     var html = '';
@@ -242,6 +272,10 @@ starChat.replaceBreakLines = function (element) {
     return num;
 };
 
+/**
+ * @param {!jQuery} element
+ * @return {number}
+ */
 starChat.replaceURLWithLinks = function (element) {
     var num = 0;
     var html = '';
@@ -263,6 +297,9 @@ starChat.replaceURLWithLinks = function (element) {
     return num;
 };
 
+/**
+ * @return {boolean}
+ */
 starChat.isFocused = (function () {
     var isFocused_ = true;
     $(window).focus(function () {
@@ -275,6 +312,11 @@ starChat.isFocused = (function () {
     };
 })();
 
+/**
+ * @param {string} str1
+ * @param {string} str2
+ * @return {string}
+ */
 starChat.getCommonHead = function (str1, str2) {
     var length = Math.min(str1.length, str2.length);
     var str = '';
