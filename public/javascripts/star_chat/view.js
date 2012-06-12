@@ -11,57 +11,59 @@ starChat.View = function (sessionClass) {
 
 /**
  * @private
+ * @return undefined
  */
-starChat.View.prototype.initialize = function (self) {
-    self.session_ = new self.sessionClass_();
+starChat.View.prototype.initialize = function () {
+    this.session_ = new this.sessionClass_();
 
     // TODO: Model に相当するクラスを作る?
     // TODO: いずれこれらの変数も private (_ 終わり) にする
-    self.channelName = '';
+    this.channelName = '';
 
-    self.lastChannelName_ = '';
-    self.newMessages_ = {};
-    self.pseudoMessages_ = {};
-    self.messageElements_ = {};
-    self.messageIdsAlreadyInSection_ = {};
-    self.messageScrollTops_ = {};
-    self.isScrolling_ = false;
-    self.dirtyFlags_ = {};
-    self.time_ = null;
-    self.isBlinkingTitle_ = false;
-    self.searchQuery_ = null;
-    self.searchResult_ = [];
-    self.isEdittingTopic_ = false;
-    self.errorMessages_ = {};
+    this.lastChannelName_ = '';
+    this.newMessages_ = {};
+    this.pseudoMessages_ = {};
+    this.messageElements_ = {};
+    this.messageIdsAlreadyInSection_ = {};
+    this.messageScrollTops_ = {};
+    this.isScrolling_ = false;
+    this.dirtyFlags_ = {};
+    this.time_ = null;
+    this.isBlinkingTitle_ = false;
+    this.searchQuery_ = null;
+    this.searchResult_ = [];
+    this.isEdittingTopic_ = false;
+    this.errorMessages_ = {};
 
     // Dialogs
-    self.isEdittingUser_ = false;
-    self.isEdittingChannels_ = false;
-    self.isEdittingChannel_ = false;
-    self.edittingChannelName_ = false;
-    self.isShowingInvitationURLDialog_ = false;
+    this.isEdittingUser_ = false;
+    this.isEdittingChannels_ = false;
+    this.isEdittingChannel_ = false;
+    this.edittingChannelName_ = false;
+    this.isShowingInvitationURLDialog_ = false;
 
-    self.title_ = 'StarChat (β)';
-    document.title = self.title_;
-    this.stopBlinkingTitle(self);
+    this.title_ = 'StarChat (β)';
+    document.title = this.title_;
+    this.stopBlinkingTitle();
 }
 
 /**
  * @private
+ * @return undefined
  */
-starChat.View.prototype.startBlinkingTitle = function (self) {
-    if (self.isBlinkingTitle_) {
+starChat.View.prototype.startBlinkingTitle = function () {
+    if (this.isBlinkingTitle_) {
         return;
     }
-    self.isBlinkingTitle_ = true;
+    this.isBlinkingTitle_ = true;
     var self = this;
     function loop (i) {
         if (!self.isBlinkingTitle_) {
-            self.stopBlinkingTitle(self);
+            self.stopBlinkingTitle();
             return;
         }
         if (starChat.isFocused()) {
-            self.stopBlinkingTitle(self);
+            self.stopBlinkingTitle();
             return;
         }
         document.title = {
@@ -77,10 +79,11 @@ starChat.View.prototype.startBlinkingTitle = function (self) {
 
 /**
  * @private
+ * @return undefined
  */
-starChat.View.prototype.stopBlinkingTitle = function (self) {
-    self.isBlinkingTitle_ = false;
-    document.title = self.title_;
+starChat.View.prototype.stopBlinkingTitle = function () {
+    this.isBlinkingTitle_ = false;
+    document.title = this.title_;
 }
 
 /**
@@ -328,7 +331,7 @@ starChat.View.prototype.updateViewMessages = function (self) {
         });
     });
     if (hitKeyword && !starChat.isFocused()) {
-        this.startBlinkingTitle(self);
+        this.startBlinkingTitle();
     }
     self.title_ = 'StarChat (β)';
     if (self.channelName) {
@@ -799,7 +802,7 @@ starChat.View.prototype.logIn = function (userName, password) {
 };
 starChat.View.prototype.logOut = function () {
     this.session_ = new this.sessionClass_();
-    initialize(this);
+    this.initialize();
 };
 starChat.View.prototype.session = function () {
     return this.session_;
