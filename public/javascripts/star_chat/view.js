@@ -108,6 +108,7 @@ starChat.View.prototype.updateViewChannels = (function () {
         if (this.channelName) {
             this.dirtyFlags_[this.channelName] = false;
         }
+        var self = this;
         (function () {
             var ul = $('#channelsList');
             ul.find('li').filter(function (i) {
@@ -135,13 +136,12 @@ starChat.View.prototype.updateViewChannels = (function () {
                 li.append(a);
                 ul.append(li);
             });
-            var self = this;
             ul.find('li').each(function () {
                 var e = $(this);
                 var channelName = e.attr('data-channel-name');
                 e.find('a').toggleClass('dirty', self.dirtyFlags_[channelName] === true);
             });
-            lastSessionId = this.session_.id();
+            lastSessionId = self.session_.id();
         })();
     }
 })();
@@ -281,6 +281,8 @@ starChat.View.prototype.messageToElement = function (message, keywords) {
 
 /**
  * @private
+ * @param {string} dateStr
+ * @return {jQuery}
  */
 starChat.View.prototype.dateToElement = function (dateStr) {
     var unixTime = starChat.toUNIXTime(dateStr);
@@ -294,12 +296,13 @@ starChat.View.prototype.dateToElement = function (dateStr) {
 
 /**
  * @private
+ * @return {undefined}
  */
-starChat.View.prototype.updateViewMessages = function (self) {
-    if (self.channelName) {
+starChat.View.prototype.updateViewMessages = function () {
+    if (this.channelName) {
         var h2 = $('#messages h2');
-        h2.find('span').text(self.channelName);
-        var channel = starChat.Channel.find(self.channelName);
+        h2.find('span').text(this.channelName);
+        var channel = starChat.Channel.find(this.channelName);
         if (channel.privacy() === 'private') {
             h2.find('img[alt="private"]').show();
         } else {
@@ -342,16 +345,16 @@ starChat.View.prototype.updateViewMessages = function (self) {
     if (hitKeyword && !starChat.isFocused()) {
         this.startBlinkingTitle();
     }
-    self.title_ = 'StarChat (β)';
-    if (self.channelName) {
-        self.title_ += ' - ' + self.channelName;
-        if (!self.isBlinkingTitle_) {
-            document.title = self.title_;
+    this.title_ = 'StarChat (β)';
+    if (this.channelName) {
+        this.title_ += ' - ' + this.channelName;
+        if (!this.isBlinkingTitle_) {
+            document.title = this.title_;
         }
     }
 
-    if (!self.channelName) {
-        self.lastChannelName_ = '';
+    if (!this.channelName) {
+        this.lastChannelName_ = '';
         return;
     }
 
@@ -373,12 +376,11 @@ starChat.View.prototype.updateViewMessages = function (self) {
         table.append(tr);
         section.append(table);
     }
-    if (self.channelName in self.newMessages_) {
+    if (this.channelName in this.newMessages_) {
         var lastUNIXTime = table.find('tr.message').
             not('[data-pseudo-message-id]').find('time').
             last().attr('data-unix-time');
-        var msgs = self.newMessages_[self.channelName];
-        var self = this;
+        var msgs = this.newMessages_[this.channelName];
         msgs.forEach(function (message) {
             if (message.id in self.messageIdsAlreadyInSection_) {
                 return;
@@ -405,24 +407,23 @@ starChat.View.prototype.updateViewMessages = function (self) {
             table.append(self.messageElements_[message.id]);
             lastUNIXTime = message.created_at;
         });
-        self.newMessages_[self.channelName] = [];
+        this.newMessages_[this.channelName] = [];
     }
-    if (self.channelName in self.pseudoMessages_) {
-        var messages = self.pseudoMessages_[self.channelName];
-        var self = this;
+    if (this.channelName in this.pseudoMessages_) {
+        var messages = this.pseudoMessages_[this.channelName];
         messages.forEach(function (message) {
             var e = self.messageToElement(message);
             e.attr('data-pseudo-message-id', message.pseudo_message_id)
             table.append(e);
         });
-        self.pseudoMessages_[self.channelName] = [];
+        this.pseudoMessages_[this.channelName] = [];
     }
 
     $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
 
-    if (!self.isScrolling_) {
-        self.isScrolling_ = true;
-        if (self.time_ && self.channelName) {
+    if (!this.isScrolling_) {
+        this.isScrolling_ = true;
+        if (this.time_ && this.channelName) {
             var target = null;
             section.find('[data-unix-time]').each(function () {
                 var e = $(this);
@@ -437,11 +438,11 @@ starChat.View.prototype.updateViewMessages = function (self) {
                 target = target.parent().parent(); // tr
             }
             if (target === null ||
-                (starChat.toISO8601(self.time_, 'date') !==
+                (starChat.toISO8601(this.time_, 'date') !==
                  starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
                 var scrollTop = 0;
-                var date = new Date(self.time_ * 1000);
-                var dateStr = starChat.toISO8601(self.time_, 'date');
+                var date = new Date(this.time_ * 1000);
+                var dateStr = starChat.toISO8601(this.time_, 'date');
                 var tr = this.dateToElement(dateStr);
                 var nextTR = section.find('table.messages tr.date').filter(function () {
                     var e = $(this);
@@ -469,7 +470,7 @@ starChat.View.prototype.updateViewMessages = function (self) {
                     self.isScrolling_ = false;
                 }
             });
-            self.time_ = null;
+            this.time_ = null;
         } else {
             // Manipurate the scrool top after elements are set completely.
             setTimeout(function () {
@@ -501,9 +502,10 @@ starChat.View.prototype.updateViewMessages = function (self) {
 
 /**
  * @private
+ * @return {undefined}
  */
-starChat.View.prototype.loadMessages = function (self) {
-    if (!self.channelName) {
+starChat.View.prototype.loadMessages = function () {
+    if (!this.channelName) {
         return;
     }
     var section = this.getSectionElement();
@@ -770,8 +772,8 @@ starChat.View.prototype.update = function () {
     }
     this.updateViewChannels();
     this.updateViewSearch();
-    this.updateViewMessages(this);
-    this.loadMessages(this);
+    this.updateViewMessages();
+    this.loadMessages();
     this.updateViewTopic(this);
     this.updateViewUsers(this);
     this.updateViewTimeline(this);
