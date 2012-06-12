@@ -7,6 +7,8 @@ starChat.PacketProcessor =  function () {
 };
 
 /**
+ * @param {Object} packet
+ *
  * @private
  */
 starChat.PacketProcessor.prototype.processPacketMessage = function (packet, view) {
@@ -17,6 +19,8 @@ starChat.PacketProcessor.prototype.processPacketMessage = function (packet, view
 }
 
 /**
+ * @param {Object} packet
+ *
  * @private
  */
 starChat.PacketProcessor.prototype.processPacketSubscribing = function (packet, view) {
@@ -26,6 +30,8 @@ starChat.PacketProcessor.prototype.processPacketSubscribing = function (packet, 
 }
 
 /**
+ * @param {Object} packet
+ *
  * @private
  */
 starChat.PacketProcessor.prototype.processPacketDeleteSubscribing = function (packet, view) {
@@ -35,6 +41,8 @@ starChat.PacketProcessor.prototype.processPacketDeleteSubscribing = function (pa
 }
 
 /**
+ * @param {Object} packet
+ *
  * @private
  */
 starChat.PacketProcessor.prototype.processPacketTopic = function (packet, view) {
@@ -46,6 +54,8 @@ starChat.PacketProcessor.prototype.processPacketTopic = function (packet, view) 
 }
 
 /**
+ * @param {Object} packet
+ *
  * @private
  */
 starChat.PacketProcessor.prototype.processPacketUser = function(packet, view) {
@@ -57,6 +67,8 @@ starChat.PacketProcessor.prototype.processPacketUser = function(packet, view) {
 }
 
 /**
+ * @param {Object} packet
+ *
  * @private
  */
 starChat.PacketProcessor.prototype.processPacketChannel = function (packet, view) {
@@ -66,7 +78,10 @@ starChat.PacketProcessor.prototype.processPacketChannel = function (packet, view
         channel.update(channelObj);
     }
 }
-
+/**
+ * @param {Object} packet
+ *
+ */
 starChat.PacketProcessor.prototype.process = function (packet, view) {
     if (packet.type === 'message') {
         this.processPacketMessage(packet, view);
