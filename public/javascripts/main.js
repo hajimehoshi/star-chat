@@ -354,7 +354,7 @@ $(function() {
         });
         $('#editChannelsDialog img[data-tool-id="delete"]').click(function () {
             var e = $(this);
-            var channelName = e.attr('data-channel-name');
+            var channelName = String(e.attr('data-channel-name'));
             var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
             if (!confirm(msg)) {
                 return false;
