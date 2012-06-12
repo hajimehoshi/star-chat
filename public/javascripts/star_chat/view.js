@@ -2,6 +2,7 @@
 
 /**
  * @constructor
+ * @param {function(new:starChat.Session,number=,string=,string=):undefined} sessionClass
  */
 starChat.View = function (sessionClass) {
     this.sessionClass_ = sessionClass;

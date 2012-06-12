@@ -2,17 +2,27 @@
 
 /**
  * @constructor
- * @param {number} id
- * @param {string} userName
- * @param {string} password
+ * @param {number=} id
+ * @param {string=} userName
+ * @param {string=} password
  */
 starChat.Session = function (id, userName, password) {
+    /**
+     * @type {number}
+     */
+    this.id_ = 0;
+    /**
+     * @type {starChat.User}
+     */
+    this.user_ = null;
+    /**
+     * @type {?string}
+     */
+    this.password_ = null;
     if (id !== void(0)) {
         this.id_ = id;
-    } else {
-        this.id_ = 0;
     }
-    if (this.id_) {
+    if (this.id_ && userName && password) {
         this.user_ = starChat.User.find(userName);
         this.password_ = password;
     }
@@ -26,7 +36,7 @@ starChat.Session.prototype.isLoggedIn = function () {
 };
 
 /**
- * @return {string}
+ * @return {?string}
  */
 starChat.Session.prototype.password = function () {
     return this.password_;
