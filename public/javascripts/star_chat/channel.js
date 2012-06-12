@@ -33,6 +33,7 @@ starChat.Channel.find = (function () {
 
 /**
  * @param {Object.<string,*>} obj
+ * @return {undefined}
  */
 starChat.Channel.prototype.update = function (obj) {
     if ('topic' in obj) {
@@ -87,6 +88,7 @@ starChat.Channel.prototype.users = function () {
 
 /**
  * @param {string} name
+ * @return {undefined}
  */
 starChat.Channel.prototype.addUser = function (name) {
     var r = $.grep(this.users_, function (user) {
@@ -99,6 +101,7 @@ starChat.Channel.prototype.addUser = function (name) {
 
 /**
  * @param {string} name
+ * @return {undefined}
  */
 starChat.Channel.prototype.removeUser = function (name) {
     var idx = -1;
@@ -123,6 +126,7 @@ starChat.Channel.prototype.firstMessage = function () {
 /**
  * @param {number} startTime
  * @param {number} endTime
+ * @return {Array.<Object>}
  */
 starChat.Channel.prototype.messagesByTimespan = function (startTime, endTime) {
     var key = startTime + ',' + endTime;
@@ -136,6 +140,7 @@ starChat.Channel.prototype.messagesByTimespan = function (startTime, endTime) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.Channel.prototype.load = function (session, callback) {
     var url = '/channels/' + encodeURIComponent(this.name());
@@ -154,6 +159,7 @@ starChat.Channel.prototype.load = function (session, callback) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.Channel.prototype.loadUsers = function (session, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/users';
@@ -173,6 +179,7 @@ starChat.Channel.prototype.loadUsers = function (session, callback) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number, Array.<string,*>)=} callback
+ * @return {undefined}
  */
 starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_index/0,1';
@@ -190,6 +197,7 @@ starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
  * @param {number} startTime
  * @param {number} endTime
  * @param {function(number, Array.<string,*>)=} callback
+ * @return {undefined}
  */
 starChat.Channel.prototype.loadMessagesByTimeSpan = function (session, startTime, endTime, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_time_span/' +
@@ -207,6 +215,7 @@ starChat.Channel.prototype.loadMessagesByTimeSpan = function (session, startTime
 /**
  * @param {!starChat.Session} session
  * @param {function(number, string)=} callback
+ * @return {undefined}
  */
 starChat.Channel.prototype.generateKey = function (session, callback) {
     var url = '/channels/' + encodeURIComponent(this.name()) + '/keys';
@@ -221,6 +230,7 @@ starChat.Channel.prototype.generateKey = function (session, callback) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.Channel.prototype.save = (function () {
     var lastTopicBody = null;

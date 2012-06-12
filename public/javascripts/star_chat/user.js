@@ -39,6 +39,7 @@ starChat.User.find = (function () {
 
 /**
  * @param {Object.<string,*>} obj
+ * @return {undefined}
  */
 starChat.User.prototype.update = function (obj) {
     if ('nick' in obj) {
@@ -78,6 +79,7 @@ starChat.User.prototype.channels = function () {
 
 /**
  * @param {string} name
+ * @return {undefined}
  */
 starChat.User.prototype.addChannel = function(name) {
     var r = $.grep(this.channels_, function (channel) {
@@ -90,6 +92,7 @@ starChat.User.prototype.addChannel = function(name) {
 
 /**
  * @param {string} name
+ * @return {undefined}
  */
 starChat.User.prototype.removeChannel = function(name) {
     var idx = -1;
@@ -106,6 +109,7 @@ starChat.User.prototype.removeChannel = function(name) {
 
 /**
  * @param {Array.<string>} keywords
+ * @return {starChat.User|Array.<string>}
  */
 starChat.User.prototype.keywords = function (keywords) {
     if (keywords !== void(0)) {
@@ -122,6 +126,7 @@ starChat.User.prototype.keywords = function (keywords) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.User.prototype.load = function (session, callback) {
     var url = '/users/' + encodeURIComponent(this.name_);
@@ -137,6 +142,7 @@ starChat.User.prototype.load = function (session, callback) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.User.prototype.loadChannels = function (session, callback) {
     var url = '/users/' + encodeURIComponent(this.name_) + '/channels';
@@ -156,6 +162,7 @@ starChat.User.prototype.loadChannels = function (session, callback) {
 /**
  * @param {!starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.User.prototype.save = function (session, callback) {
     var url = '/users/' + encodeURIComponent(this.name_);

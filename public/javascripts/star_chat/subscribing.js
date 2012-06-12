@@ -36,6 +36,7 @@ starChat.Subscribing.prototype.key = function (value) {
 /**
  * @param {starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.Subscribing.prototype.save = function (session, callback) {
     var url = '/subscribings?' +
@@ -60,6 +61,7 @@ starChat.Subscribing.prototype.save = function (session, callback) {
 /**
  * @param {starChat.Session} session
  * @param {function(number)=} callback
+ * @return {undefined}
  */
 starChat.Subscribing.prototype.destroy = function (session, callback) {
     var url = '/subscribings?' +

@@ -20,8 +20,9 @@ starChat.Stream = function (packetProcessor) {
 };
 
 /**
- * 
+ * @param {starChat.View} view
  * @param {number} startTime
+ * @return {undefined}
  */
 starChat.Stream.prototype.start = function (view, startTime) {
     if (this.ajax_) {
@@ -102,6 +103,7 @@ starChat.Stream.prototype.start = function (view, startTime) {
 };
 
 /**
+ * @return {undefined}
  */
 starChat.Stream.prototype.stop = function () {
     if (!this.ajax_) {

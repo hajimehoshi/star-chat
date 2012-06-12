@@ -6,12 +6,12 @@
  */
 starChat.View = function (sessionClass) {
     this.sessionClass_ = sessionClass;
-    this.initialize(this);
+    this.initialize();
 };
 
 /**
  * @private
- * @return undefined
+ * @return {undefined}
  */
 starChat.View.prototype.initialize = function () {
     this.session_ = new this.sessionClass_();
@@ -49,7 +49,7 @@ starChat.View.prototype.initialize = function () {
 
 /**
  * @private
- * @return undefined
+ * @return {undefined}
  */
 starChat.View.prototype.startBlinkingTitle = function () {
     if (this.isBlinkingTitle_) {
@@ -79,7 +79,7 @@ starChat.View.prototype.startBlinkingTitle = function () {
 
 /**
  * @private
- * @return undefined
+ * @return {undefined}
  */
 starChat.View.prototype.stopBlinkingTitle = function () {
     this.isBlinkingTitle_ = false;
@@ -771,7 +771,7 @@ starChat.View.prototype.update = function () {
         if (e.attr('src')) {
             return true;
         }
-        var iconName = e.attr('data-image-icon-name');
+        var iconName = String(e.attr('data-image-icon-name'));
         e.attr('src', starChat.Icons[iconName]);
     });
 
