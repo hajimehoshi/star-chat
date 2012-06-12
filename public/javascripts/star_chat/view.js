@@ -88,13 +88,14 @@ starChat.View.prototype.stopBlinkingTitle = function () {
 
 /**
  * @private
+ * @return {undefined}
  */
 starChat.View.prototype.updateViewChannels = (function () {
     var lastSessionId = 0;
-    return function (self) {
+    return function () {
         var channels = [];
-        if (self.session().isLoggedIn()) {
-            channels = self.session().user().channels().sort(function (a, b) {
+        if (this.session().isLoggedIn()) {
+            channels = this.session().user().channels().sort(function (a, b) {
                 if (a.name() > b.name()) {
                     return 1;
                 }
@@ -104,8 +105,8 @@ starChat.View.prototype.updateViewChannels = (function () {
                 return 0;
             });
         }
-        if (self.channelName) {
-            self.dirtyFlags_[self.channelName] = false;
+        if (this.channelName) {
+            this.dirtyFlags_[this.channelName] = false;
         }
         (function () {
             var ul = $('#channelsList');
@@ -134,23 +135,26 @@ starChat.View.prototype.updateViewChannels = (function () {
                 li.append(a);
                 ul.append(li);
             });
+            var self = this;
             ul.find('li').each(function () {
                 var e = $(this);
                 var channelName = e.attr('data-channel-name');
                 e.find('a').toggleClass('dirty', self.dirtyFlags_[channelName] === true);
             });
-            lastSessionId = self.session_.id();
+            lastSessionId = this.session_.id();
         })();
     }
 })();
 
 /**
  * @private
+ * @return {undefined}
  */
-starChat.View.prototype.updateViewSearch = function (self) {
+starChat.View.prototype.updateViewSearch = function () {
     var ul = $('#searchResultList');
     ul.empty();
-    self.searchResult_.forEach(function (result) {
+    var self = this;
+    this.searchResult_.forEach(function (result) {
         var message = result.message;
 
         var li = $('<li></li>');
@@ -189,11 +193,13 @@ starChat.View.prototype.updateViewSearch = function (self) {
 
 /**
  * @private
+ * @return {jQuery}
  */
-starChat.View.prototype.getSectionElement = function (self) {
-    if (!self.channelName) {
+starChat.View.prototype.getSectionElement = function () {
+    if (!this.channelName) {
         return $('#messages > section[data-channel-name=""]');
     }
+    var self = this;
     var sections = $('#messages > section').filter(function (i) {
         return $(this).attr('data-channel-name') === self.channelName;
     });
@@ -208,7 +214,7 @@ starChat.View.prototype.getSectionElement = function (self) {
         throw 'invalid sections';
     }
     var section = $('<section></section>');
-    var channelName = self.channelName;
+    var channelName = this.channelName;
     section.attr('data-channel-name', channelName);
     section.scroll(function () {
         if (self.channelName !== channelName) {
@@ -304,7 +310,10 @@ starChat.View.prototype.updateViewMessages = function (self) {
         h2.find('span').text("\u00a0");
         h2.find('img[alt="private"]').hide();
     }
-    var section = this.getSectionElement(self);
+    /**
+     * @type {jQuery}
+     */
+    var section = this.getSectionElement();
     $('#messages > section').each(function () {
         var e = $(this);
         if (e.get(0) === section.get(0)) {
@@ -447,10 +456,11 @@ starChat.View.prototype.updateViewMessages = function (self) {
                 tr.addClass('imcomplete'); // needs to load messages
                 target = tr;
             }
+            var scrollTop = 0;
             if (target !== null) {
-                var scrollTop = target.position().top + section.scrollTop() - 40;
+                scrollTop = target.position().top + section.scrollTop() - 40;
             } else {
-                var scrollTop = section.get(0).scrollHeight();
+                scrollTop = section.get(0).scrollHeight;
             }
             section.animate({scrollTop: scrollTop}, {
                 complete: function () {
@@ -496,7 +506,7 @@ starChat.View.prototype.loadMessages = function (self) {
     if (!self.channelName) {
         return;
     }
-    var section = this.getSectionElement(self);
+    var section = this.getSectionElement();
     var self = this;
     section.find('table.messages tr.date.imcomplete').each(function () {
         var e = $(this);
@@ -758,8 +768,8 @@ starChat.View.prototype.update = function () {
         $('#logOutLink').hide();
         $('#main').find('input, textarea').attr('disabled', 'disabled');
     }
-    this.updateViewChannels(this);
-    this.updateViewSearch(this);
+    this.updateViewChannels();
+    this.updateViewSearch();
     this.updateViewMessages(this);
     this.loadMessages(this);
     this.updateViewTopic(this);
