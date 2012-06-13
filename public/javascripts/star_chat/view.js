@@ -803,12 +803,13 @@ starChat.View.prototype.update = function () {
         if (!schema.match(/^https?$/)) {
             return true;
         }
-        match = href.match(/^([a-zA-Z1-9+.-]+):\/\/([^\/]+)\//);
-        // This may include a user and a pass, but they are ignored.
-        var login = match[2];
-        if (schema + ':' === location.protocol &&
-            login === location.host) {
-            return false;
+        if (match = href.match(/^([a-zA-Z1-9+.-]+):\/\/([^\/]+)\//)) {
+            // This may include a user and a pass, but they are ignored.
+            var login = match[2];
+            if (schema + ':' === location.protocol &&
+                login === location.host) {
+                return false;
+            }
         }
         return true;
     }).attr('target', '_blank').attr('rel', 'noreferrer');
