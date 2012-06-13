@@ -844,7 +844,7 @@ starChat.View.prototype.addNewMessage = function (channelName, message, setDirty
     if (message.user_name === this.session().user().name()) {
         var body = message.body;
         // Is it OK to use the global selection?
-        var id = $('[data-pseudo-message-id]').filter(function () {
+        var id = starChat.parseInt(String($('[data-pseudo-message-id]').filter(function () {
             var e = $(this);
             if (e.attr('data-removed') === 'true') {
                 return false;
@@ -858,22 +858,43 @@ starChat.View.prototype.addNewMessage = function (channelName, message, setDirty
             starChat.replaceBreakLines(e);
             var body2 = e.text();
             return body1 === body2;
-        }).first().attr('data-pseudo-message-id');
+        }).first().attr('data-pseudo-message-id')));
         this.removePseudoMessage(id);
     }
 };
+
+/**
+ * @param {Object} message
+ * @return {undefined}
+ */
 starChat.View.prototype.addPseudoMessage = function (message) {
     if (!(message.channel_name in this.pseudoMessages_)) {
         this.pseudoMessages_[message.channel_name] = [];
     }
     this.pseudoMessages_[message.channel_name].push(message);
 };
+
+/**
+ * @param {number} id
+ * @return {undefined}
+ */
 starChat.View.prototype.removePseudoMessage = function (id) {
-    $('[data-pseudo-message-id=' + starChat.parseInt(id) + ']').attr('data-removed', 'true');
+    $('[data-pseudo-message-id=' + id + ']').attr('data-removed', 'true');
 };
+
+/**
+ * @param {string} channelName
+ * @param {boolean} value
+ * @return {undefined}
+ */
 starChat.View.prototype.setDirtyFlag = function (channelName, value) {
     this.dirtyFlags_[channelName] = value;
 };
+
+/**
+ * @param {number} time
+ * @return {undefined}
+ */
 starChat.View.prototype.setTime = function (time) {
     this.time_ = time;
 };
@@ -942,16 +963,30 @@ starChat.View.prototype.isShowingInvitationURLDialog = function (value) {
         return this.isShowingInvitationURLDialog_;
     }
 };
+
+/**
+ * @return {undefined}
+ */
 starChat.View.prototype.closeDialogs = function () {
     this.isEdittingUser(false);
     this.isEdittingChannels(false);
     this.isEdittingChannel(false);
     this.isShowingInvitationURLDialog(false);
 };
+
+/**
+ * @param {string} query
+ * @param {Array.<Object>} result
+ * @return {undefined}
+ */
 starChat.View.prototype.setSearch = function (query, result) {
     this.searchQuery_  = query;
     this.searchResult_ = result;
 };
+
+/**
+ * @return {undefined}
+ */
 starChat.View.prototype.clearSearch = function () {
     this.searchQuery_  = null;
     this.searchResult_ = [];
