@@ -109,6 +109,11 @@ module StarChat
       end
     end
 
+    def message_id(idx)
+      redis_key = ['channels', name, 'messages']
+      RedisDB.exec(:lindex, redis_key, idx).to_i
+    end
+
     def message_count
       redis_key = ['channels', name, 'messages']
       RedisDB.exec(:llen, redis_key)

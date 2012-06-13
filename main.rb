@@ -163,8 +163,7 @@ get '/users/:user_name/stream', provides: :json do
       packets = current_user.channels.inject([]) do |msgs, channel|
         len = channel.message_count
         idx = StarChat::BinarySearch.search(params[:start_message_id].to_i, 0, len) do |i|
-          # Is it heavy?
-          channel.messages(i, 1)[0].id
+          channel.message_id(i)
         end
         msgs.concat(channel.messages(idx, len - idx).map do |msg|
                       {
