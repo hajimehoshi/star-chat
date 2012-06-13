@@ -21,10 +21,10 @@ starChat.Stream = function (packetProcessor) {
 
 /**
  * @param {starChat.View} view
- * @param {number} startTime
+ * @param {number=} startMessageId
  * @return {undefined}
  */
-starChat.Stream.prototype.start = function (view, startTime) {
+starChat.Stream.prototype.start = function (view, startMessageId) {
     if (this.ajax_) {
         console.error('An ajax object already exists!');
         return;
@@ -33,15 +33,15 @@ starChat.Stream.prototype.start = function (view, startTime) {
     var session = view.session();
     var streamReadIndex = 0;
     var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
-    if (startTime !== void(0)) {
-        url += '?start_time=' + encodeURIComponent(String(startTime));
+    if (startMessageId !== void(0) && 1 < startMessageId) {
+        url += '?start_message_id=' + encodeURIComponent(String(startMessageId));
     }
-    var restartStream = function (lastTime) {
+    var restartStream = function (lastMessageId) {
         self.stop();
         if (!view.session().isLoggedIn()) {
             return;
         }
-        self.start(view, lastTime);
+        self.start(view, lastMessageId + 1);
     };
     console.log('Connecting stream...');
     this.ajax_ = $.ajax({
@@ -56,7 +56,8 @@ starChat.Stream.prototype.start = function (view, startTime) {
         success: function (data, textStatus, jqXHR) {
             self.continuingErrorNum_ = 0;
             setTimeout(function () {
-                restartStream(starChat.parseInt($.now() / 1000) - 10);
+                var lastMessageId = self.packetProcessor_.lastMessageId();
+                restartStream(lastMessageId);
             }, 0);
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -69,7 +70,8 @@ starChat.Stream.prototype.start = function (view, startTime) {
                 return;
             }
             setTimeout(function () {
-                restartStream(starChat.parseInt($.now() / 1000) - 10);
+                var lastMessageId = self.packetProcessor_.lastMessageId();
+                restartStream(lastMessageId);
             }, 2000);
         },
         xhrFields: {

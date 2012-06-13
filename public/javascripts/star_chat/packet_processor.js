@@ -4,6 +4,10 @@
  * @constructor
  */
 starChat.PacketProcessor =  function () {
+    /**
+     * @type {number}
+     */
+    this.lastMessageId_ = 0;
 };
 
 /**
@@ -16,6 +20,9 @@ starChat.PacketProcessor.prototype.processPacketMessage = function (packet, view
     var message = packet.message;
     if (message && message.channel_name) {
         view.addNewMessage(message.channel_name, message, true);
+        if (this.lastMessageId_ < message.id) {
+            this.lastMessageId_ = message.id;
+        }
     }
 }
 
@@ -84,6 +91,7 @@ starChat.PacketProcessor.prototype.processPacketChannel = function (packet, view
         channel.update(channelObj);
     }
 }
+
 /**
  * @param {Object} packet
  * @param {starChat.View} view
@@ -104,4 +112,11 @@ starChat.PacketProcessor.prototype.process = function (packet, view) {
         console.error('Received an unknown packet:');
         console.error(packet);
     }
+};
+
+/**
+ * @return {number}
+ */
+starChat.PacketProcessor.prototype.lastMessageId = function () {
+    return this.lastMessageId_;
 };
