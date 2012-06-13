@@ -7,7 +7,7 @@
  */
 
 /**
- * @type {Object.<string,string>}
+ * @type {!Object.<string,string>}
  */
 starChat.Icons = (function () {
     var Icons = {

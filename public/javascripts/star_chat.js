@@ -145,7 +145,7 @@ starChat.parseQuery = function (str) {
 };
 
 /**
- * @param {Date|Number} date
+ * @param {!Date|number} date
  * @param {string=} type
  * @return {string}
  */

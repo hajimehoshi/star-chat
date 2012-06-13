@@ -12,8 +12,8 @@ starChat.PacketProcessor =  function () {
 
 /**
  * @private
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.processPacketMessage = function (packet, view) {
@@ -28,8 +28,8 @@ starChat.PacketProcessor.prototype.processPacketMessage = function (packet, view
 
 /**
  * @private
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.processPacketSubscribing = function (packet, view) {
@@ -40,8 +40,8 @@ starChat.PacketProcessor.prototype.processPacketSubscribing = function (packet, 
 
 /**
  * @private
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.processPacketDeleteSubscribing = function (packet, view) {
@@ -52,8 +52,8 @@ starChat.PacketProcessor.prototype.processPacketDeleteSubscribing = function (pa
 
 /**
  * @private
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.processPacketTopic = function (packet, view) {
@@ -66,8 +66,8 @@ starChat.PacketProcessor.prototype.processPacketTopic = function (packet, view) 
 
 /**
  * @private
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.processPacketUser = function(packet, view) {
@@ -80,8 +80,8 @@ starChat.PacketProcessor.prototype.processPacketUser = function(packet, view) {
 
 /**
  * @private
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.processPacketChannel = function (packet, view) {
@@ -93,8 +93,8 @@ starChat.PacketProcessor.prototype.processPacketChannel = function (packet, view
 }
 
 /**
- * @param {Object} packet
- * @param {starChat.View} view
+ * @param {!Object} packet
+ * @param {!starChat.View} view
  * @return {undefined}
  */
 starChat.PacketProcessor.prototype.process = function (packet, view) {
