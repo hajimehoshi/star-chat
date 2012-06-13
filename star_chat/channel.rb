@@ -109,9 +109,19 @@ module StarChat
       end
     end
 
-    def messages_by_time_span(start_time, end_time)
+    def message_id(idx)
       redis_key = ['channels', name, 'messages']
-      len = RedisDB.exec(:llen, redis_key)
+      RedisDB.exec(:lindex, redis_key, idx).to_i
+    end
+
+    def message_count
+      redis_key = ['channels', name, 'messages']
+      RedisDB.exec(:llen, redis_key)
+    end
+
+    def messages_by_time_span(start_time, end_time)
+      len = message_count
+      redis_key = ['channels', name, 'messages']
       idx1 = BinarySearch.search(start_time, 0, len) do |i|
         Message.find_by_list(redis_key, i, 1)[0].created_at
       end

@@ -159,11 +159,13 @@ get '/users/:user_name/stream', provides: :json do
   stream(:keep_open) do |out|
     subscribe = [@user.name, out]
     settings.streams << subscribe
-    if params[:start_time]
-      start_time = params[:start_time].to_i
-      end_time   = Time.now.to_i + 1
+    if params[:start_message_id]
       packets = current_user.channels.inject([]) do |msgs, channel|
-        msgs.concat(channel.messages_by_time_span(start_time, end_time).map do |msg|
+        len = channel.message_count
+        idx = StarChat::BinarySearch.search(params[:start_message_id].to_i, 0, len) do |i|
+          channel.message_id(i)
+        end
+        msgs.concat(channel.messages(idx, len - idx).map do |msg|
                       {
                         type: 'message',
                         message: msg,

@@ -269,7 +269,8 @@ $(function() {
                             var li = $('<li></li>').text(commonHead);
                             if (commonHead !== nick) {
                                 li.append($('<em></em>').text(nick[commonHead.length]));
-                                li.append(document.createTextNode(nick.substring(commonHead.length + 1)));
+                                var text = document.createTextNode(nick.substring(commonHead.length + 1));
+                                li.append($(text));
                             }
                             ul.append(li);
                         });
@@ -294,7 +295,7 @@ $(function() {
             $('#userNameCandidates').hide();
         });
         form.find('[type="submit"]').click(function () {
-            postMessage();
+            postMessage(false);
             return false;
         });
     })();
@@ -337,7 +338,7 @@ $(function() {
         });
         $('#editChannelsDialog img[data-tool-id="edit"]').click(function () {
             var e = $(this);
-            var channelName = e.attr('data-channel-name');
+            var channelName = String(e.attr('data-channel-name'));
             var view = getView();
             view.isEdittingChannel(true);
             view.edittingChannelName(channelName);
@@ -353,7 +354,7 @@ $(function() {
         });
         $('#editChannelsDialog img[data-tool-id="delete"]').click(function () {
             var e = $(this);
-            var channelName = e.attr('data-channel-name');
+            var channelName = String(e.attr('data-channel-name'));
             var msg = "Are you sure you want to delete subscribing '" + channelName + "'?"
             if (!confirm(msg)) {
                 return false;
@@ -469,7 +470,7 @@ $(function() {
             var view = getView();
             var channelName = view.edittingChannelName();
             var channel = starChat.Channel.find(channelName);
-            var privacy = $('#editChannelDialog [name="privacy"]:checked').val();
+            var privacy = String($('#editChannelDialog [name="privacy"]:checked').val());
             channel.privacy(privacy);
             channel.save(view.session(), function (sessionId) {
                 var view = getView();
