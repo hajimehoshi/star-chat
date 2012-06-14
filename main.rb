@@ -80,6 +80,16 @@ helpers do
 
 end
 
+configure do
+  EM::next_tick do
+    EM::add_periodic_timer(30) do
+      settings.streams.each do |user_name, connection|
+        connection << "\n"
+      end
+    end
+  end
+end
+
 get '/', provides: :html do
   erb(:index)
 end
