@@ -13,6 +13,10 @@ starChat.Channel = function (obj) {
     this.users_              = [];
     this.messagesByTimeSpan_ = {};
     this.firstMessage_       = null;
+    /**
+     * @type {number}
+     */
+    this.userNum_            = 0;
     this.update(obj);
 };
 
@@ -77,6 +81,9 @@ starChat.Channel.prototype.update = function (obj) {
     }
     if ('privacy' in obj) {
         this.privacy_ = obj.privacy;
+    }
+    if ('user_num' in obj) {
+        this.userNum_ = obj.user_num;
     }
 };
 
@@ -150,6 +157,13 @@ starChat.Channel.prototype.removeUser = function (name) {
     if (idx !== -1) {
         this.users_.splice(idx, 1);
     }
+};
+
+/**
+ * @return {number}
+ */
+starChat.Channel.prototype.userNum = function () {
+    return this.userNum_;
 };
 
 /**
