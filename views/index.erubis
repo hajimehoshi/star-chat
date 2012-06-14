@@ -64,7 +64,7 @@
       <div id="editUserDialog" class="dialog">
         <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
-          <h2>User</h2>
+          <h2>Account</h2>
           <table>
             <tr>
               <th>Name:</th>
@@ -84,7 +84,7 @@
       </div>
       <div id="editChannelsDialog" class="dialog">
         <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
-        <h2>Channels</h2>
+        <h2>The channels you are subscribing to</h2>
         <table>
           <tr class="cloneMe" data-channel-name="">
             <td class="channelName">...</td>

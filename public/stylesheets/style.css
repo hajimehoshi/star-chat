@@ -345,7 +345,7 @@ li .toolIcon {
 }
 .dialog h2 {
     font-size: 100%;
-    margin: 0;
+    margin: 0 20px 0 0;
 }
 .dialog table {
     border-collapse: separate;
