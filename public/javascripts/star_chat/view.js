@@ -808,37 +808,10 @@ starChat.View.prototype.updateViewDialogs = function () {
     if (this.isEdittingUser()) {
         $('#editUserDialog').show();
         dialogIsShown = true;
-    } else if (this.session_.isLoggedIn()) {
-        $('#editUserDialog [title="name"]').text(String(this.session().userName()));
-        var user = this.session().user();
-        var userNick = String(user.nick());
-        $('#editUserDialog [name="nick"]').val(userNick);
-        var val = user.keywords().join('\n');
-        $('#editUserDialog [name="keywords"]').val(val);
     }
     if (this.isEdittingChannels()) {
         $('#editChannelsDialog').show();
         dialogIsShown = true;
-    } else if (this.session_.isLoggedIn()) {
-        var channels = this.session().user().channels();
-        channels = channels.sort(function (a, b) {
-            if (a.name() > b.name()) {
-                return 1;
-            }
-            if (a.name() < b.name()) {
-                return -1;
-            }
-            return 0;
-        });
-        var table = $('#editChannelsDialog h2 ~ table');
-        var origTR = table.find('tr.cloneMe').hide();
-        table.find('tr.cloned').not(origTR).remove();
-        channels.forEach(function (channel) {
-            var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
-            tr.find('.channelName').text(channel.name());
-            tr.find('.toolIcon').attr('data-channel-name', channel.name());
-            table.append(tr);
-        });
     }
     if (this.isEdittingChannel()) {
         $('#editChannelDialog').show();
@@ -857,25 +830,6 @@ starChat.View.prototype.updateViewDialogs = function () {
     if (this.isShowingAllChannelsDialog()) {
         $('#allChannelsDialog').show();
         dialogIsShown = true;
-        var table = $('#allChannelsDialog h2 ~ table');
-        var origTR = table.find('tr.cloneMe').hide();
-        table.find('tr.cloned').remove();
-        starChat.Channel.all().sort(function (a, b) {
-            if (a.name() > b.name()) {
-                return 1;
-            }
-            if (a.name() < b.name()) {
-                return -1;
-            }
-            return 0;
-        }).forEach(function (channel) {
-            var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
-            var link = $('<a></a>').text(channel.name());
-            link.attr('href', '#channels/' + encodeURIComponent(channel.name()));
-            tr.find('.channelName').empty().append(link);
-            tr.find('.numOfPeople').text(channel.userNum());
-            table.append(tr);
-        });
     }
     if (this.isShowingInvitationURLDialog()) {
         $('#invitationURLDialog').show();
@@ -1059,6 +1013,14 @@ starChat.View.prototype.setTime = function (time) {
 starChat.View.prototype.isEdittingUser = function (value) {
     if (value !== void(0)) {
         this.isEdittingUser_ = value;
+        if (this.session().isLoggedIn() && value) {
+            $('#editUserDialog [title="name"]').text(String(this.session().userName()));
+            var user = this.session().user();
+            var userNick = String(user.nick());
+            $('#editUserDialog [name="nick"]').val(userNick);
+            var val = user.keywords().join('\n');
+            $('#editUserDialog [name="keywords"]').val(val);
+        }
         return this;
     } else {
         return this.isEdittingUser_;
@@ -1072,6 +1034,27 @@ starChat.View.prototype.isEdittingUser = function (value) {
 starChat.View.prototype.isEdittingChannels = function (value) {
     if (value !== void(0)) {
         this.isEdittingChannels_ = value;
+        if (this.session().isLoggedIn() && value) {
+            var channels = this.session().user().channels();
+            channels = channels.sort(function (a, b) {
+                if (a.name() > b.name()) {
+                    return 1;
+                }
+                if (a.name() < b.name()) {
+                    return -1;
+                }
+                return 0;
+            });
+            var table = $('#editChannelsDialog h2 ~ table');
+            var origTR = table.find('tr.cloneMe').hide();
+            table.find('tr.cloned').not(origTR).remove();
+            channels.forEach(function (channel) {
+                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
+                tr.find('.channelName').text(channel.name());
+                tr.find('.toolIcon').attr('data-channel-name', channel.name());
+                table.append(tr);
+            });
+        }
         return this;
     } else {
         return this.isEdittingChannels_;
@@ -1111,6 +1094,27 @@ starChat.View.prototype.edittingChannelName = function (value) {
 starChat.View.prototype.isShowingAllChannelsDialog = function (value) {
     if (value !== void(0)) {
         this.isShowingAllChannelsDialog_ = value;
+        if (this.session().isLoggedIn() && value) {
+            var table = $('#allChannelsDialog h2 ~ table');
+            var origTR = table.find('tr.cloneMe').hide();
+            table.find('tr.cloned').remove();
+            starChat.Channel.all().sort(function (a, b) {
+                if (a.name() > b.name()) {
+                    return 1;
+                }
+                if (a.name() < b.name()) {
+                    return -1;
+                }
+                return 0;
+            }).forEach(function (channel) {
+                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
+                var link = $('<a></a>').text(channel.name());
+                link.attr('href', '#channels/' + encodeURIComponent(channel.name()));
+                tr.find('.channelName').empty().append(link);
+                tr.find('.numOfPeople').text(channel.userNum());
+                table.append(tr);
+            });
+        }
         return this;
     } else {
         return this.isShowingAllChannelsDialog_;
