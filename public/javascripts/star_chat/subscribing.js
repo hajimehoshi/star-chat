@@ -54,7 +54,8 @@ starChat.Subscribing.prototype.save = function (session, callback) {
     var self = this;
     starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, url, method, data) {
         session.user().addChannel(self.channelName_);
-        starChat.Channel.find(self.channelName_).load(session);
+        var channel = starChat.Channel.find(self.channelName_);
+        channel.load(session);
         if (callback !== void(0)) {
             callback(sessionId);
         }

@@ -327,19 +327,6 @@ put '/subscribings', provides: :json do
     # TODO: Use User#subscribing?
     @channel.users.any?{|u| u.name == user.name}
   end
-  packets = @channel.messages(-100, 100).map do |message|
-    {
-      type: 'message',
-      message: message,
-    }.to_json
-  end.to_a
-  unless packets.empty?
-    packets_str = packets.join("\n")
-    settings.streams.each do |user_name, connection|
-      next if user_name != current_user.name
-      connection << packets_str << "\n"
-    end
-  end
   201
 end
 

@@ -195,6 +195,21 @@ starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
 
 /**
  * @param {!starChat.Session} session
+ * @param {function(number, !Array.<string,*>)=} callback
+ * @return {undefined}
+ */
+starChat.Channel.prototype.loadRecentMessages = function (session, callback) {
+    var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_index/-100,100';
+    var self = this;
+    starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
+        if (callback !== void(0)) {
+            callback(sessionId, data);
+        }
+    });
+};
+
+/**
+ * @param {!starChat.Session} session
  * @param {number} startTime
  * @param {number} endTime
  * @param {function(number, !Array.<string,*>)=} callback
