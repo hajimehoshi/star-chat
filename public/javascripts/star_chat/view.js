@@ -136,6 +136,12 @@ starChat.View.prototype.initialize = function () {
      * @private
      * @type {boolean}
      */
+    this.isShowingAllChannelsDialog_ = false;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isShowingInvitationURLDialog_ = false;
 
     /**
@@ -839,6 +845,7 @@ starChat.View.prototype.updateViewDialogs = function () {
         dialogIsShown = true;
         var channelName = String(this.edittingChannelName());
         var channel = starChat.Channel.find(channelName);
+        // TODO: fix it...
         if ($('#editChannelDialog [title="channelName"]').text() !== channel.name()) {
             $('#editChannelDialog [title="channelName"]').text(channel.name());
             $('#editChannelDialog [name="privacy"]').val(['public']);
@@ -848,6 +855,29 @@ starChat.View.prototype.updateViewDialogs = function () {
         }
     } else {
         $('#editChannelDialog').hide();
+    }
+    if (this.isShowingAllChannelsDialog()) {
+        $('#allChannelsDialog').show();
+        dialogIsShown = true;
+        var table = $('#allChannelsDialog h2 ~ table');
+        var origTR = table.find('tr.cloneMe').hide();
+        table.find('tr.cloned').remove();
+        starChat.Channel.all().sort(function (a, b) {
+            if (a.name() > b.name()) {
+                return 1;
+            }
+            if (a.name() < b.name()) {
+                return -1;
+            }
+            return 0;
+        }).forEach(function (channel) {
+            var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
+            tr.find('.channelName').text(channel.name());
+            tr.find('.numOfPeople').text(channel.users().length);
+            table.append(tr);
+        });
+    } else {
+        $('#allChannelsDialog').hide();
     }
     if (this.isShowingInvitationURLDialog()) {
         $('#invitationURLDialog').show();
@@ -1082,6 +1112,19 @@ starChat.View.prototype.edittingChannelName = function (value) {
  * @param {boolean=} value
  * @return {!starChat.View|boolean}
  */
+starChat.View.prototype.isShowingAllChannelsDialog = function (value) {
+    if (value !== void(0)) {
+        this.isShowingAllChannelsDialog_ = value;
+        return this;
+    } else {
+        return this.isShowingAllChannelsDialog_;
+    }
+};
+
+/**
+ * @param {boolean=} value
+ * @return {!starChat.View|boolean}
+ */
 starChat.View.prototype.isShowingInvitationURLDialog = function (value) {
     if (value !== void(0)) {
         this.isShowingInvitationURLDialog_ = value;
@@ -1098,6 +1141,7 @@ starChat.View.prototype.closeDialogs = function () {
     this.isEdittingUser(false);
     this.isEdittingChannels(false);
     this.isEdittingChannel(false);
+    this.isShowingAllChannelsDialog(false);
     this.isShowingInvitationURLDialog(false);
 };
 

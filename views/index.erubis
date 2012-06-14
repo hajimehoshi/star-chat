@@ -28,6 +28,7 @@
         <form id="addChannelForm">
           <p><input type="text" name="name" value="" /><input type="submit" value="Add" /></p>
         </form>
+        <p id="allChannelsLink"><a href="#">All...</a></p>
         <hr />
         <form id="searchForm">
           <p><input type="text" name="query" value="" /><input type="submit" value="Search" /></p>
@@ -65,7 +66,7 @@
         <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
           <h2>Account</h2>
-          <table>
+          <table class="form">
             <tr>
               <th>Name:</th>
               <td title="name"></td>
@@ -97,7 +98,7 @@
         <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
         <form>
           <h2>Channel</h2>
-          <table>
+          <table class="form">
             <tr>
               <th>Name:</th>
               <td title="channelName"></td>
@@ -114,6 +115,20 @@
           </table>
           <p class="buttons"><input type="submit" value="Update" /></p>
         </form>
+      </div>
+      <div id="allChannelsDialog" class="dialog">
+        <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>
+        <h2>Channels</h2>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Num of people</th>
+          </tr>
+          <tr class="cloneMe" data-channel-name="">
+            <td class="channelName">...</td>
+            <td class="numOfPeople number">0</td>
+          </tr>
+        </table>
       </div>
       <div id="invitationURLDialog" class="dialog">
         <p class="closeDialog"><img src="" alt="close" width="16" height="16" data-image-icon-name="blackDelete" data-tool-id="closeDialog" class="toolIcon" /></p>

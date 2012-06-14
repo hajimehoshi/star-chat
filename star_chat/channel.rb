@@ -25,6 +25,8 @@ module StarChat
     def self.all
       RedisDB.exec(:smembers, ['channels']).map do |name|
         Channel.find(name)
+      end.select do |channel|
+        channel
       end
     end
 

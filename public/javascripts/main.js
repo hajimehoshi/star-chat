@@ -405,6 +405,18 @@ $(function() {
             });
             return false;
         });
+        $('#allChannelsLink a').click(function () {
+            var view = getView();
+            starChat.Channel.loadAll(view.session(), function (sessionId, key) {
+                var view = getView();
+                if (view.session().id() !== sessionId) {
+                    return;
+                }
+                view.isShowingAllChannelsDialog(true);
+                view.update();
+            });
+            return false;
+        });
         $('#invitationLink a').click(function () {
             var view = getView();
             var channelName = view.channelName;
@@ -456,6 +468,12 @@ $(function() {
         $('#editChannelDialog [data-tool-id="closeDialog"]').click(function () {
             var view = getView();
             view.isEdittingChannel(false);
+            view.update();
+            return false;
+        });
+        $('#allChannelsDialog [data-tool-id="closeDialog"]').click(function () {
+            var view = getView();
+            view.isShowingAllChannelsDialog(false);
             view.update();
             return false;
         });

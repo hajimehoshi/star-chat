@@ -197,6 +197,13 @@ get '/users/:user_name/stream', provides: :json do
   end
 end
 
+get '/channels' do
+  protect!
+  StarChat::Channel.all.select do |channel|
+    channel.public?
+  end.to_json
+end
+
 before %r{^/channels/([^/]+)} do
   protect!
   channel_name = params[:captures][0]

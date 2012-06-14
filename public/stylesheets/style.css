@@ -352,10 +352,17 @@ li .toolIcon {
     border-spacing: 5px 5px;
     margin: 10px 0px;
 }
-.dialog th {
+.dialog table th {
+    font-weight: bold;
+    text-align: left;
+    vertical-align: top;
+}
+.dialog table.form th {
     font-weight: normal;
     text-align: right;
-    vertical-align: top;
+}
+.dialog table td.number {
+    text-align: right;
 }
 .dialog p.buttons {
     margin: 0;

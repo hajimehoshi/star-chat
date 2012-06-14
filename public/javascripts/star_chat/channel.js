@@ -17,6 +17,12 @@ starChat.Channel = function (obj) {
 };
 
 /**
+ * @private
+ * @type {!Array.<!starChat.Channel>}
+ */
+starChat.Channel.all_ = [];
+
+/**
  * @param {!string} name
  * @return {!starChat.Channel}
  */
@@ -31,6 +37,34 @@ starChat.Channel.find = (function () {
         });
     };
 })();
+
+/**
+ * @this {function(new:starChat.Channel,!Object.<string,*>):undefined}
+ * @param {!starChat.Session} session
+ * @param {function(number)=} callback
+ * @return {undefined}
+ */
+starChat.Channel.loadAll = function (session, callback) {
+    var url = '/channels';
+    var self = this;
+    starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
+        self.all_ = data.map(function (obj) {
+            var channel = starChat.Channel.find(obj.name);
+            channel.update(obj);
+            return channel;
+        });
+        if (callback !== void(0)) {
+            callback(sessionId);
+        }
+    });
+};
+
+/**
+ * @return {!Array.<!starChat.Channel>}
+ */
+starChat.Channel.all = function () {
+    return this.all_;
+};
 
 /**
  * @param {!Object.<string,*>} obj
