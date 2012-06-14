@@ -407,7 +407,7 @@ $(function() {
         });
         $('#allChannelsLink a').click(function () {
             var view = getView();
-            starChat.Channel.loadAll(view.session(), function (sessionId, key) {
+            starChat.Channel.loadAll(view.session(), function (sessionId) {
                 var view = getView();
                 if (view.session().id() !== sessionId) {
                     return;

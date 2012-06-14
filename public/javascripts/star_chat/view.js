@@ -809,7 +809,7 @@ starChat.View.prototype.updateViewDialogs = function () {
         $('#editUserDialog').show();
         dialogIsShown = true;
     } else if (this.session_.isLoggedIn()) {
-        $('#editUserDialog [title="name"]').text(this.session().userName());
+        $('#editUserDialog [title="name"]').text(String(this.session().userName()));
         var user = this.session().user();
         var userNick = String(user.nick());
         $('#editUserDialog [name="nick"]').val(userNick);
@@ -895,7 +895,7 @@ starChat.View.prototype.updateViewDialogs = function () {
 starChat.View.prototype.update = function () {
     if (this.session_.isLoggedIn()) {
         $('#logInForm').hide();
-        $('#logOutLink span').text(this.session_.userName());
+        $('#logOutLink span').text(String(this.session_.userName()));
         $('#logOutLink').show();
         $('#main').find('input, textarea').removeAttr('disabled');
         if (this.channelName) {

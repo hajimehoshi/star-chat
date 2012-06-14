@@ -35,7 +35,7 @@ starChat.Stream.prototype.start = function (view, startMessageId) {
     var self = this;
     var session = view.session();
     var streamReadIndex = 0;
-    var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
+    var url = '/users/' + encodeURIComponent(String(session.userName())) + '/stream';
     if (startMessageId !== void(0) && 1 < startMessageId) {
         url += '?start_message_id=' + encodeURIComponent(String(startMessageId));
     }

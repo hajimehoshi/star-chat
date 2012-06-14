@@ -60,6 +60,7 @@ starChat.Channel.loadAll = function (session, callback) {
 };
 
 /**
+ * @this {function(new:starChat.Channel,!Object.<string,*>):undefined}
  * @return {!Array.<!starChat.Channel>}
  */
 starChat.Channel.all = function () {
