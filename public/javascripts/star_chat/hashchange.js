@@ -98,7 +98,7 @@
                             return;
                         }
                         data.forEach(function (message) {
-                            view.addNewMessage(message);
+                            view.addNewMessage(channel.name(), message);
                         });
                         view.update();
                     });
