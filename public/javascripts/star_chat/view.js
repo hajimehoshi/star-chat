@@ -650,20 +650,20 @@ starChat.View.prototype.updateViewTopic = function () {
         } else {
             $('#topic').show();
             form.hide();
-        }
-        var channel = starChat.Channel.find(this.channelName);
-        var topic   = channel.topic();
-        if (topic && topic.body) {
-            /**
-             * @type {!jQuery}
-             */
-            var topicE = /** @type {!jQuery} */$('#topic').text(topic.body);
-            starChat.replaceURLWithLinks(topicE);
-            starChat.replaceBreakLines(topicE);
-            form.find('[name="body"]').val(topic.body);
-        } else {
-            $('#topic').text('(No Topic)');
-            form.find('[name="body"]').val('');
+            var channel = starChat.Channel.find(this.channelName);
+            var topic   = channel.topic();
+            if (topic && topic.body) {
+                /**
+                 * @type {!jQuery}
+                 */
+                var topicE = /** @type {!jQuery} */$('#topic').text(topic.body);
+                starChat.replaceURLWithLinks(topicE);
+                starChat.replaceBreakLines(topicE);
+                form.find('[name="body"]').val(topic.body);
+            } else {
+                $('#topic').text('(No Topic)');
+                form.find('[name="body"]').val('');
+            }
         }
     } else {
         $('#topic').hide();
