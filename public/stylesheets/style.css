@@ -341,7 +341,7 @@ li .toolIcon {
     overflow-y: auto;
     padding: 20px;
     position: absolute;
-    z-index: 2;
+    z-index: 12;
 }
 .dialog h2 {
     font-size: 100%;
@@ -383,7 +383,7 @@ li .toolIcon {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 1;
+    z-index: 11;
 }
 #editChannelsDialog td.channelName {
 }
