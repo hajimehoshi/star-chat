@@ -128,9 +128,9 @@ starChat.View.prototype.initialize = function () {
 
     /**
      * @private
-     * @type {boolean}
+     * @type {string}
      */
-    this.edittingChannelName_ = false;
+    this.edittingChannelName_ = '';
 
     /**
      * @private
@@ -1066,8 +1066,8 @@ starChat.View.prototype.isEdittingChannel = function (value) {
 };
 
 /**
- * @param {boolean=} value
- * @return {!starChat.View|boolean}
+ * @param {string=} value
+ * @return {!starChat.View|string}
  */
 starChat.View.prototype.edittingChannelName = function (value) {
     if (value !== void(0)) {
