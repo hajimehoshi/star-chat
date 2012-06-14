@@ -249,6 +249,11 @@ starChat.View.prototype.updateViewChannels = (function () {
             });
             lastSessionId = self.session_.id();
         })();
+        if (this.session().isLoggedIn()) {
+            $('#allChannelsLink').show();
+        } else {
+            $('#allChannelsLink').hide();
+        }
     }
 })();
 
