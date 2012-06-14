@@ -37,6 +37,7 @@ $(function() {
                     }
                     view.update();
                 });
+                // TODO: use starChat.Channel
                 var url = '/channels/' + encodeURIComponent(channel.name()) + '/messages/recent';
                 starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, uri, method, data) {
                     var view = getView();
@@ -140,7 +141,25 @@ $(function() {
                 }
                 form.find('[name="name"]').val('');
                 var channel = starChat.Channel.find(channelName);
-                // The first message will be loaded when location.hash is changed
+                channel.loadUsers(view.session(), function () {
+                    var view = getView();
+                    if (view.session().id() !== sessionId) {
+                        return;
+                    }
+                    view.update();
+                });
+                if (!channel.firstMessage()) {
+                    channel.loadFirstMessage(session, function (sessionId) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
+                        if (!channel.firstMessage()) {
+                            return;
+                        }
+                        view.update();
+                    });
+                }
                 channel.loadRecentMessages(session, function (sessionId, data) {
                     var view = getView();
                     if (view.session().id() !== sessionId) {
