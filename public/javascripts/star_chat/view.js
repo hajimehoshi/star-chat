@@ -870,7 +870,9 @@ starChat.View.prototype.updateViewDialogs = function () {
             return 0;
         }).forEach(function (channel) {
             var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
-            tr.find('.channelName').text(channel.name());
+            var link = $('<a></a>').text(channel.name());
+            link.attr('href', '#channels/' + encodeURIComponent(channel.name()));
+            tr.find('.channelName').empty().append(link);
             tr.find('.numOfPeople').text(channel.users().length);
             table.append(tr);
         });
