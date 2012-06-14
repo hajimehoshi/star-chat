@@ -337,6 +337,8 @@ li .toolIcon {
     -moz-box-shadow:    0 0 8px #000;
     -webkit-box-shadow: 0 0 8px #000;
     display: none;
+    max-height: 80%;
+    overflow-y: auto;
     padding: 20px;
     position: absolute;
     z-index: 2;
