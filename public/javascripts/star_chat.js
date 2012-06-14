@@ -114,6 +114,7 @@ starChat.clearFragment = function () {
         newURL = newURL.substring(0, i);
     }
     history.replaceState($.now(), null, newURL);
+    $(window).trigger('hashchange');
 };
 
 /**
@@ -145,7 +146,7 @@ starChat.parseQuery = function (str) {
 };
 
 /**
- * @param {Date|Number} date
+ * @param {!Date|number} date
  * @param {string=} type
  * @return {string}
  */

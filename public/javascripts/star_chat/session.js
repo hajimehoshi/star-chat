@@ -8,14 +8,17 @@
  */
 starChat.Session = function (id, userName, password) {
     /**
+     * @private
      * @type {number}
      */
     this.id_ = 0;
     /**
+     * @private
      * @type {starChat.User}
      */
     this.user_ = null;
     /**
+     * @private
      * @type {?string}
      */
     this.password_ = null;

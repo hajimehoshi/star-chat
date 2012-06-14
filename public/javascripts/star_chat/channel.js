@@ -2,7 +2,8 @@
 
 /**
  * @constructor
- * @param {Object.<string,*>} obj
+ * @private
+ * @param {!Object.<string,*>} obj
  */
 starChat.Channel = function (obj) {
     var name = obj.name;
@@ -17,7 +18,7 @@ starChat.Channel = function (obj) {
 
 /**
  * @param {!string} name
- * @return {starChat.Channel}
+ * @return {!starChat.Channel}
  */
 starChat.Channel.find = (function () {
     var cache = {};
@@ -32,7 +33,7 @@ starChat.Channel.find = (function () {
 })();
 
 /**
- * @param {Object.<string,*>} obj
+ * @param {!Object.<string,*>} obj
  * @return {undefined}
  */
 starChat.Channel.prototype.update = function (obj) {
@@ -52,8 +53,8 @@ starChat.Channel.prototype.name = function () {
 };
 
 /**
- * @param {Object.<string,*>=} topic
- * @return {starChat.Channel|Object.<string,*>}
+ * @param {!Object.<string,*>=} topic
+ * @return {!starChat.Channel|!Object.<string,*>}
  */
 starChat.Channel.prototype.topic = function (topic) {
     if (topic !== void(0)) {
@@ -66,7 +67,7 @@ starChat.Channel.prototype.topic = function (topic) {
 
 /**
  * @param {string=} privacy
- * @return {starChat.Channel|string}
+ * @return {!starChat.Channel|string}
  */
 starChat.Channel.prototype.privacy = function (privacy) {
     if (privacy !== void(0)) {
@@ -80,7 +81,7 @@ starChat.Channel.prototype.privacy = function (privacy) {
 };
 
 /**
- * @return {Array.<starChat.User>}
+ * @return {!Array.<!starChat.User>}
  */
 starChat.Channel.prototype.users = function () {
     return this.users_;
@@ -126,7 +127,7 @@ starChat.Channel.prototype.firstMessage = function () {
 /**
  * @param {number} startTime
  * @param {number} endTime
- * @return {Array.<Object>}
+ * @return {!Array.<!Object>}
  */
 starChat.Channel.prototype.messagesByTimespan = function (startTime, endTime) {
     var key = startTime + ',' + endTime;
@@ -178,7 +179,7 @@ starChat.Channel.prototype.loadUsers = function (session, callback) {
 
 /**
  * @param {!starChat.Session} session
- * @param {function(number, Array.<string,*>)=} callback
+ * @param {function(number, !Array.<string,*>)=} callback
  * @return {undefined}
  */
 starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
@@ -194,9 +195,24 @@ starChat.Channel.prototype.loadFirstMessage = function (session, callback) {
 
 /**
  * @param {!starChat.Session} session
+ * @param {function(number, !Array.<string,*>)=} callback
+ * @return {undefined}
+ */
+starChat.Channel.prototype.loadRecentMessages = function (session, callback) {
+    var url = '/channels/' + encodeURIComponent(this.name()) + '/messages/by_index/-100,100';
+    var self = this;
+    starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
+        if (callback !== void(0)) {
+            callback(sessionId, data);
+        }
+    });
+};
+
+/**
+ * @param {!starChat.Session} session
  * @param {number} startTime
  * @param {number} endTime
- * @param {function(number, Array.<string,*>)=} callback
+ * @param {function(number, !Array.<string,*>)=} callback
  * @return {undefined}
  */
 starChat.Channel.prototype.loadMessagesByTimeSpan = function (session, startTime, endTime, callback) {

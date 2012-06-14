@@ -14,34 +14,134 @@ starChat.View = function (sessionClass) {
  * @return {undefined}
  */
 starChat.View.prototype.initialize = function () {
-    this.session_ = new this.sessionClass_();
-
-    // TODO: Model に相当するクラスを作る?
-    // TODO: いずれこれらの変数も private (_ 終わり) にする
+    // TODO: When changing this variable private, the name should be 'channelName_' due to Closure Commpiler.
+    /**
+     * @private
+     * @type {string}
+     */
     this.channelName = '';
 
+    /**
+     * @private
+     * @type {!starChat.Session}
+     */
+    this.session_ = new this.sessionClass_();
+
+    /**
+     * @private
+     * @type {string}
+     */
     this.lastChannelName_ = '';
+
+    /**
+     * @private
+     * @type {!Object.<string,!Array.<!Object>>}
+     */
     this.newMessages_ = {};
+
+    /**
+     * @private
+     * @type {!Object.<string,!Array.<!Object>>}
+     */
     this.pseudoMessages_ = {};
+
+    /**
+     * @private
+     * @type {!Object.<number,!Element>}
+     */
     this.messageElements_ = {};
+
+    /**
+     * @private
+     * @type {!Object.<number,boolean>}
+     */
     this.messageIdsAlreadyInSection_ = {};
+
+    /**
+     * @private
+     * @type {!Object.<string,number>}
+     */
     this.messageScrollTops_ = {};
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isScrolling_ = false;
+
+    /**
+     * @private
+     * @type {!Object.<string,boolean>}
+     */
     this.dirtyFlags_ = {};
+
+    /**
+     * @private
+     * @type {?number}
+     */
     this.time_ = null;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isBlinkingTitle_ = false;
+
+    /**
+     * @private
+     * @type {?string}
+     */
     this.searchQuery_ = null;
+
+    /**
+     * @private
+     * @type {!Array.<!Object>}
+     */
     this.searchResult_ = [];
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isEdittingTopic_ = false;
+
     this.errorMessages_ = {};
 
     // Dialogs
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isEdittingUser_ = false;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isEdittingChannels_ = false;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isEdittingChannel_ = false;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.edittingChannelName_ = false;
+
+    /**
+     * @private
+     * @type {boolean}
+     */
     this.isShowingInvitationURLDialog_ = false;
 
+    /**
+     * @private
+     * @type {string}
+     */
     this.title_ = 'StarChat (β)';
     document.title = this.title_;
     this.stopBlinkingTitle();
@@ -193,7 +293,7 @@ starChat.View.prototype.updateViewSearch = function () {
 
 /**
  * @private
- * @return {jQuery}
+ * @return {!jQuery}
  */
 starChat.View.prototype.getSectionElement = function () {
     if (!this.channelName) {
@@ -228,8 +328,8 @@ starChat.View.prototype.getSectionElement = function () {
 
 /**
  * @private
- * @param {Object} message
- * @param {Array.<string>=} keywords
+ * @param {!Object} message
+ * @param {!Array.<string>=} keywords
  */
 starChat.View.prototype.messageToElement = function (message, keywords) {
     var messageTR = $('<tr></tr>').addClass('message');
@@ -282,7 +382,7 @@ starChat.View.prototype.messageToElement = function (message, keywords) {
 /**
  * @private
  * @param {string} dateStr
- * @return {jQuery}
+ * @return {!jQuery}
  */
 starChat.View.prototype.dateToElement = function (dateStr) {
     var unixTime = starChat.toUNIXTime(dateStr);
@@ -314,7 +414,7 @@ starChat.View.prototype.updateViewMessages = function () {
         h2.find('img[alt="private"]').hide();
     }
     /**
-     * @type {jQuery}
+     * @type {!jQuery}
      */
     var section = this.getSectionElement();
     $('#messages > section').each(function () {
@@ -703,7 +803,8 @@ starChat.View.prototype.updateViewDialogs = function () {
         $('#editUserDialog').show();
         $('#editUserDialog [title="name"]').text(this.session().userName());
         var user = this.session().user();
-        $('#editUserDialog [name="nick"]').val(user.nick());
+        var userNick = String(user.nick());
+        $('#editUserDialog [name="nick"]').val(userNick);
         var val = user.keywords().join('\n');
         $('#editUserDialog [name="keywords"]').val(val); // Move to the view?
         dialogIsShown = true;
@@ -816,17 +917,38 @@ starChat.View.prototype.update = function () {
 
     $(window).resize();
 };
+
+/**
+ * @param {string} userName
+ * @param {string} password
+ * @return {undefined}
+ */
 starChat.View.prototype.logIn = function (userName, password) {
     this.session_ = new this.sessionClass_($.now(), userName, password);
 };
+
+/**
+ * @return {undefined}
+ */
 starChat.View.prototype.logOut = function () {
     this.session_ = new this.sessionClass_();
     this.initialize();
 };
+
+/**
+ * @return {!starChat.Session}
+ */
 starChat.View.prototype.session = function () {
     return this.session_;
 };
+
 // TODO: Is channelName needed?
+/**
+ * @param {string} channelName
+ * @param {!Object} message
+ * @param {boolean=} setDirtyFlag
+ * @return {undefined}
+ */
 starChat.View.prototype.addNewMessage = function (channelName, message, setDirtyFlag) {
     if (!this.newMessages_[channelName]) {
         this.newMessages_[channelName] = [];
@@ -844,7 +966,7 @@ starChat.View.prototype.addNewMessage = function (channelName, message, setDirty
     if (message.user_name === this.session().user().name()) {
         var body = message.body;
         // Is it OK to use the global selection?
-        var id = $('[data-pseudo-message-id]').filter(function () {
+        var id = starChat.parseInt(String($('[data-pseudo-message-id]').filter(function () {
             var e = $(this);
             if (e.attr('data-removed') === 'true') {
                 return false;
@@ -858,29 +980,50 @@ starChat.View.prototype.addNewMessage = function (channelName, message, setDirty
             starChat.replaceBreakLines(e);
             var body2 = e.text();
             return body1 === body2;
-        }).first().attr('data-pseudo-message-id');
+        }).first().attr('data-pseudo-message-id')));
         this.removePseudoMessage(id);
     }
 };
+
+/**
+ * @param {!Object} message
+ * @return {undefined}
+ */
 starChat.View.prototype.addPseudoMessage = function (message) {
     if (!(message.channel_name in this.pseudoMessages_)) {
         this.pseudoMessages_[message.channel_name] = [];
     }
     this.pseudoMessages_[message.channel_name].push(message);
 };
+
+/**
+ * @param {number} id
+ * @return {undefined}
+ */
 starChat.View.prototype.removePseudoMessage = function (id) {
-    $('[data-pseudo-message-id=' + starChat.parseInt(id) + ']').attr('data-removed', 'true');
+    $('[data-pseudo-message-id=' + id + ']').attr('data-removed', 'true');
 };
+
+/**
+ * @param {string} channelName
+ * @param {boolean} value
+ * @return {undefined}
+ */
 starChat.View.prototype.setDirtyFlag = function (channelName, value) {
     this.dirtyFlags_[channelName] = value;
 };
+
+/**
+ * @param {number} time
+ * @return {undefined}
+ */
 starChat.View.prototype.setTime = function (time) {
     this.time_ = time;
 };
 
 /**
  * @param {boolean=} value
- * @return {starChat.View|boolean}
+ * @return {!starChat.View|boolean}
  */
 starChat.View.prototype.isEdittingUser = function (value) {
     if (value !== void(0)) {
@@ -893,7 +1036,7 @@ starChat.View.prototype.isEdittingUser = function (value) {
 
 /**
  * @param {boolean=} value
- * @return {starChat.View|boolean}
+ * @return {!starChat.View|boolean}
  */
 starChat.View.prototype.isEdittingChannels = function (value) {
     if (value !== void(0)) {
@@ -906,7 +1049,7 @@ starChat.View.prototype.isEdittingChannels = function (value) {
 
 /**
  * @param {boolean=} value
- * @return {starChat.View|boolean}
+ * @return {!starChat.View|boolean}
  */
 starChat.View.prototype.isEdittingChannel = function (value) {
     if (value !== void(0)) {
@@ -919,7 +1062,7 @@ starChat.View.prototype.isEdittingChannel = function (value) {
 
 /**
  * @param {boolean=} value
- * @return {starChat.View|boolean}
+ * @return {!starChat.View|boolean}
  */
 starChat.View.prototype.edittingChannelName = function (value) {
     if (value !== void(0)) {
@@ -932,7 +1075,7 @@ starChat.View.prototype.edittingChannelName = function (value) {
 
 /**
  * @param {boolean=} value
- * @return {starChat.View|boolean}
+ * @return {!starChat.View|boolean}
  */
 starChat.View.prototype.isShowingInvitationURLDialog = function (value) {
     if (value !== void(0)) {
@@ -942,24 +1085,38 @@ starChat.View.prototype.isShowingInvitationURLDialog = function (value) {
         return this.isShowingInvitationURLDialog_;
     }
 };
+
+/**
+ * @return {undefined}
+ */
 starChat.View.prototype.closeDialogs = function () {
     this.isEdittingUser(false);
     this.isEdittingChannels(false);
     this.isEdittingChannel(false);
     this.isShowingInvitationURLDialog(false);
 };
+
+/**
+ * @param {string} query
+ * @param {!Array.<!Object>} result
+ * @return {undefined}
+ */
 starChat.View.prototype.setSearch = function (query, result) {
     this.searchQuery_  = query;
     this.searchResult_ = result;
 };
+
+/**
+ * @return {undefined}
+ */
 starChat.View.prototype.clearSearch = function () {
     this.searchQuery_  = null;
     this.searchResult_ = [];
 };
 
 /**
- * @param {Object=} value
- * @return {starChat.View|Object}
+ * @param {boolean=} value
+ * @return {!starChat.View|boolean}
  */
 starChat.View.prototype.isEdittingTopic = function (value) {
     if (value !== void(0)) {
@@ -969,6 +1126,9 @@ starChat.View.prototype.isEdittingTopic = function (value) {
         return this.isEdittingTopic_;
     }
 };
+
+/**
+ */
 starChat.View.prototype.setErrorMesasge = function (x, message) {
     this.errorMessages_[x] = message;
 };

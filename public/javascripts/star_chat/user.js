@@ -6,26 +6,30 @@
  */
 starChat.User = function (name) {
     /**
+     * @private
      * @type {string}
      */
     this.name_ = name;
     /**
+     * @private
      * @type {string}
      */
     this.nick_ = name;
     /**
-     * @type {Array.<starChat.Channel>}
+     * @private
+     * @type {!Array.<!starChat.Channel>}
      */
     this.channels_ = [];
     /**
-     * @type {Array.<string>}
+     * @private
+     * @type {!Array.<string>}
      */
     this.keywords_ = [];
 };
 
 /**
  * @param {string} name
- * @return {starChat.User}
+ * @return {!starChat.User}
  */
 starChat.User.find = (function () {
     var cache = {};
@@ -38,7 +42,7 @@ starChat.User.find = (function () {
 })();
 
 /**
- * @param {Object.<string,*>} obj
+ * @param {!Object.<string,*>} obj
  * @return {undefined}
  */
 starChat.User.prototype.update = function (obj) {
@@ -59,7 +63,7 @@ starChat.User.prototype.name = function () {
 
 /**
  * @param {string=} value
- * @return {starChat.User|string}
+ * @return {!starChat.User|string}
  */
 starChat.User.prototype.nick = function (value) {
     if (value !== void(0)) {
@@ -71,7 +75,7 @@ starChat.User.prototype.nick = function (value) {
 };
 
 /**
- * @return {Array.<starChat.Channel>}
+ * @return {!Array.<!starChat.Channel>}
  */
 starChat.User.prototype.channels = function () {
     return this.channels_;
@@ -108,8 +112,8 @@ starChat.User.prototype.removeChannel = function(name) {
 };
 
 /**
- * @param {Array.<string>} keywords
- * @return {starChat.User|Array.<string>}
+ * @param {!Array.<string>=} keywords
+ * @return {!starChat.User|!Array.<string>}
  */
 starChat.User.prototype.keywords = function (keywords) {
     if (keywords !== void(0)) {

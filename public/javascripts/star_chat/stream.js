@@ -2,25 +2,28 @@
 
 /**
  * @constructor
- * @param {starChat.PacketProcessor} packetProcessor
+ * @param {!starChat.PacketProcessor} packetProcessor
  */
 starChat.Stream = function (packetProcessor) {
     /**
+     * @private
      * @type {starChat.PacketProcessor}
      */
     this.packetProcessor_ = packetProcessor;
     /**
+     * @private
      * @type {number}
      */
     this.continuingErrorNum_ = 0;
     /**
+     * @private
      * @type {jQuery.jqXHR}
      */
     this.ajax_ = null;
 };
 
 /**
- * @param {starChat.View} view
+ * @param {!starChat.View} view
  * @param {number=} startMessageId
  * @return {undefined}
  */

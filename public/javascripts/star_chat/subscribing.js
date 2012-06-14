@@ -7,14 +7,17 @@
  */
 starChat.Subscribing = function (channelName, userName) {
     /**
+     * @private
      * @type {string}
      */
     this.channelName_ = channelName;
     /**
+     * @private
      * @type {string}
      */
     this.userName_ = userName;
     /**
+     * @private
      * @type {?string}
      */
     this.key_ = null;
@@ -22,7 +25,7 @@ starChat.Subscribing = function (channelName, userName) {
 
 /**
  * @param {string=} value
- * @return {starChat.Subscribing|string}
+ * @return {!starChat.Subscribing|?string}
  */
 starChat.Subscribing.prototype.key = function (value) {
     if (value !== void(0)) {
@@ -34,7 +37,7 @@ starChat.Subscribing.prototype.key = function (value) {
 };
 
 /**
- * @param {starChat.Session} session
+ * @param {!starChat.Session} session
  * @param {function(number)=} callback
  * @return {undefined}
  */
@@ -51,7 +54,8 @@ starChat.Subscribing.prototype.save = function (session, callback) {
     var self = this;
     starChat.ajaxRequest(session, url, 'PUT', null, function (sessionId, url, method, data) {
         session.user().addChannel(self.channelName_);
-        starChat.Channel.find(self.channelName_).load(session);
+        var channel = starChat.Channel.find(self.channelName_);
+        channel.load(session);
         if (callback !== void(0)) {
             callback(sessionId);
         }
@@ -59,7 +63,7 @@ starChat.Subscribing.prototype.save = function (session, callback) {
 };
 
 /**
- * @param {starChat.Session} session
+ * @param {!starChat.Session} session
  * @param {function(number)=} callback
  * @return {undefined}
  */

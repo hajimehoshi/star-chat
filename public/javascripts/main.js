@@ -139,6 +139,18 @@ $(function() {
                     return;
                 }
                 form.find('[name="name"]').val('');
+                var channel = starChat.Channel.find(channelName);
+                // The first message will be loaded when location.hash is changed
+                channel.loadRecentMessages(session, function (sessionId, data) {
+                    var view = getView();
+                    if (view.session().id() !== sessionId) {
+                        return;
+                    }
+                    data.forEach(function (message) {
+                        view.addNewMessage(channelName, message);
+                    });
+                    view.update();
+                });
                 location.hash = 'channels/' + encodeURIComponent(channelName);
             });
             return false;

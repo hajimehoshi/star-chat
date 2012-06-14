@@ -92,6 +92,16 @@
                             view.update();
                         });
                     }
+                    channel.loadRecentMessages(session, function (sessionId, data) {
+                        var view = getView();
+                        if (view.session().id() !== sessionId) {
+                            return;
+                        }
+                        data.forEach(function (message) {
+                            view.addNewMessage(message);
+                        });
+                        view.update();
+                    });
                 });
                 return false;
             }
