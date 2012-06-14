@@ -53,9 +53,12 @@ starChat.Session.prototype.user = function () {
 }
 
 /**
- * @return {string}
+ * @return {?string}
  */
 starChat.Session.prototype.userName = function () {
+    if (!this.user_) {
+        return null;
+    }
     return this.user_.name();
 };
 
