@@ -114,6 +114,7 @@ starChat.clearFragment = function () {
         newURL = newURL.substring(0, i);
     }
     history.replaceState($.now(), null, newURL);
+    $(window).trigger('hashchange');
 };
 
 /**
