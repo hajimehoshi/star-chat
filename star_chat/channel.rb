@@ -25,6 +25,8 @@ module StarChat
     def self.all
       RedisDB.exec(:smembers, ['channels']).map do |name|
         Channel.find(name)
+      end.select do |channel|
+        channel
       end
     end
 
@@ -169,8 +171,9 @@ module StarChat
 
     def to_json(*args)
       hash = {
-        name:    name,
-        privacy: privacy,
+        name:     name,
+        privacy:  privacy,
+        user_num: RedisDB.exec(:scard, ['channels', name, 'users']),
       }
       if current_topic
         hash[:topic] = current_topic

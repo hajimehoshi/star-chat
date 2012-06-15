@@ -35,7 +35,7 @@ starChat.Stream.prototype.start = function (view, startMessageId) {
     var self = this;
     var session = view.session();
     var streamReadIndex = 0;
-    var url = '/users/' + encodeURIComponent(session.userName()) + '/stream';
+    var url = '/users/' + encodeURIComponent(String(session.userName())) + '/stream';
     if (startMessageId !== void(0) && 1 < startMessageId) {
         url += '?start_message_id=' + encodeURIComponent(String(startMessageId));
     }
@@ -79,12 +79,12 @@ starChat.Stream.prototype.start = function (view, startMessageId) {
         },
         xhrFields: {
             onprogress: function () {
-                console.log('Reading stream...');
                 self.continuingErrorNum_ = 0;
                 // TODO: Reconnecting if overflow
                 var xhr = this;
                 var text = xhr.responseText;
                 var subText = text.substring(streamReadIndex);
+                var processedPacketsNum = 0;
                 while (true) {
                     var tokenLength = subText.search("\n");
                     if (tokenLength === -1) {
@@ -93,6 +93,9 @@ starChat.Stream.prototype.start = function (view, startMessageId) {
                     streamReadIndex += tokenLength + 1;
                     var token = subText.substring(0, tokenLength);
                     subText = subText.substring(tokenLength + 1);
+                    if (token === '') {
+                        continue;
+                    }
                     try {
                         var packet = JSON.parse(token);
                     } catch (e) {
@@ -100,6 +103,10 @@ starChat.Stream.prototype.start = function (view, startMessageId) {
                         continue;
                     }
                     self.packetProcessor_.process(packet, view);
+                    processedPacketsNum++;
+                }
+                if (0 < processedPacketsNum) {
+                    console.log('Packets processed...');
                 }
                 view.update();
             }

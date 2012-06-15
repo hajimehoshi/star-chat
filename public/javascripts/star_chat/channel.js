@@ -13,8 +13,18 @@ starChat.Channel = function (obj) {
     this.users_              = [];
     this.messagesByTimeSpan_ = {};
     this.firstMessage_       = null;
+    /**
+     * @type {number}
+     */
+    this.userNum_            = 0;
     this.update(obj);
 };
+
+/**
+ * @private
+ * @type {!Array.<!starChat.Channel>}
+ */
+starChat.Channel.all_ = [];
 
 /**
  * @param {!string} name
@@ -33,6 +43,35 @@ starChat.Channel.find = (function () {
 })();
 
 /**
+ * @this {function(new:starChat.Channel,!Object.<string,*>):undefined}
+ * @param {!starChat.Session} session
+ * @param {function(number)=} callback
+ * @return {undefined}
+ */
+starChat.Channel.loadAll = function (session, callback) {
+    var url = '/channels';
+    var self = this;
+    starChat.ajaxRequest(session, url, 'GET', null, function (sessionId, url, method, data) {
+        self.all_ = data.map(function (obj) {
+            var channel = starChat.Channel.find(obj.name);
+            channel.update(obj);
+            return channel;
+        });
+        if (callback !== void(0)) {
+            callback(sessionId);
+        }
+    });
+};
+
+/**
+ * @this {function(new:starChat.Channel,!Object.<string,*>):undefined}
+ * @return {!Array.<!starChat.Channel>}
+ */
+starChat.Channel.all = function () {
+    return this.all_;
+};
+
+/**
  * @param {!Object.<string,*>} obj
  * @return {undefined}
  */
@@ -42,6 +81,9 @@ starChat.Channel.prototype.update = function (obj) {
     }
     if ('privacy' in obj) {
         this.privacy_ = obj.privacy;
+    }
+    if ('user_num' in obj) {
+        this.userNum_ = obj.user_num;
     }
 };
 
@@ -115,6 +157,13 @@ starChat.Channel.prototype.removeUser = function (name) {
     if (idx !== -1) {
         this.users_.splice(idx, 1);
     }
+};
+
+/**
+ * @return {number}
+ */
+starChat.Channel.prototype.userNum = function () {
+    return this.userNum_;
 };
 
 /**

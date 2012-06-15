@@ -80,6 +80,16 @@ helpers do
 
 end
 
+configure do
+  EM::next_tick do
+    EM::add_periodic_timer(30) do
+      settings.streams.each do |user_name, connection|
+        connection << "\n"
+      end
+    end
+  end
+end
+
 get '/', provides: :html do
   erb(:index)
 end
@@ -185,6 +195,13 @@ get '/users/:user_name/stream', provides: :json do
       settings.streams.delete(subscribe)
     end
   end
+end
+
+get '/channels' do
+  protect!
+  StarChat::Channel.all.select do |channel|
+    channel.public?
+  end.to_json
 end
 
 before %r{^/channels/([^/]+)} do

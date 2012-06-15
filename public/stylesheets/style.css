@@ -337,23 +337,32 @@ li .toolIcon {
     -moz-box-shadow:    0 0 8px #000;
     -webkit-box-shadow: 0 0 8px #000;
     display: none;
+    max-height: 80%;
+    overflow-y: auto;
     padding: 20px;
     position: absolute;
-    z-index: 2;
+    z-index: 12;
 }
 .dialog h2 {
     font-size: 100%;
-    margin: 0;
+    margin: 0 20px 0 0;
 }
 .dialog table {
     border-collapse: separate;
     border-spacing: 5px 5px;
     margin: 10px 0px;
 }
-.dialog th {
+.dialog table th {
+    font-weight: bold;
+    text-align: left;
+    vertical-align: top;
+}
+.dialog table.form th {
     font-weight: normal;
     text-align: right;
-    vertical-align: top;
+}
+.dialog table td.number {
+    text-align: right;
 }
 .dialog p.buttons {
     margin: 0;
@@ -374,7 +383,7 @@ li .toolIcon {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 1;
+    z-index: 11;
 }
 #editChannelsDialog td.channelName {
 }
