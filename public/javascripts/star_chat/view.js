@@ -788,7 +788,9 @@ starChat.View.prototype.updateViewTimeline = function () {
                  startTime <= (today.getTime() / 1000);
                  startTime += 60 * 60 * 24) {
                 var li2 = $('<li></li>');
-                text = starChat.toISO8601(new Date(startTime * 1000), 'date').substr(8, 2);
+                var date = new Date(startTime * 1000);
+                var day = (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])[date.getDay() % 7];
+                text = starChat.toISO8601(date, 'date').substr(8, 2) + ' (' + day + ')';
                 var a = $('<a></a>').text(text);
                 (function () {
                     var s = startTime;
