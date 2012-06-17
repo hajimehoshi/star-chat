@@ -222,7 +222,7 @@ starChat.View.prototype.isDirtyChannel = function (channelName) {
         return false;
     }
     var messageReadingState = session.messageReadingState();
-    return messageReadingState.getMaxMessageId(channelName) < lastMessageId;
+    return messageReadingState.getMessageId(channelName) < lastMessageId;
 };
 
 /**
@@ -247,7 +247,7 @@ starChat.View.prototype.updateViewChannels = (function () {
         if (this.channelName) {
             var lastMessageId = this.getLastMessageId(this.channelName);
             var messageReadingState = this.session().messageReadingState();
-            messageReadingState.setMaxMessageId(this.channelName, lastMessageId);
+            messageReadingState.setMessageId(this.channelName, lastMessageId);
         }
         var ul = $('#channelsList');
         ul.find('li').filter(function (i) {

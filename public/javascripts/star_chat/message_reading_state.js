@@ -11,32 +11,28 @@ starChat.MessageReadingState = function (userName) {
      */
     this.userName_ = userName;
 
-    if (!localStorage.locals) {
-        localStorage.locals = JSON.stringify({});
+    if (!localStorage.readMessageIds) {
+        localStorage.readMessageIds = JSON.stringify({});
     }
     
     try {
-        var locals = JSON.parse(localStorage.locals);
+        var readMessageIds = JSON.parse(localStorage.readMessageIds);
     } catch (e) {
-        var locals = {};
+        var readMessageIds = {};
     }
 
-    if (!(userName in locals)) {
-        locals[userName] = {};
+    if (!(userName in readMessageIds)) {
+        readMessageIds[userName] = {};
     }
-    if (!('maxMessageIds' in locals[userName])) {
-        locals[userName].maxMessageIds = {};
-    }
-    localStorage.locals = JSON.stringify(locals);
+    localStorage.readMessageIds = JSON.stringify(readMessageIds);
 };
 
 /**
  * @param {string} channelName
  * @return {number}
  */
-starChat.MessageReadingState.prototype.getMaxMessageId = function (channelName) {
-    var locals = JSON.parse(localStorage.locals);
-    var ids = locals[this.userName_].maxMessageIds;
+starChat.MessageReadingState.prototype.getMessageId = function (channelName) {
+    var ids = JSON.parse(localStorage.readMessageIds)[this.userName_];
     if (!(channelName in ids)) {
         ids[channelName] = 0;
     }
@@ -49,14 +45,14 @@ starChat.MessageReadingState.prototype.getMaxMessageId = function (channelName) 
  * @param {number} messageId
  * @return {undefined}
  */
-starChat.MessageReadingState.prototype.setMaxMessageId = function (channelName, messageId) {
-    var locals = JSON.parse(localStorage.locals);
-    var ids = locals[this.userName_].maxMessageIds;
-    var currentMessageId = this.getMaxMessageId(channelName);
+starChat.MessageReadingState.prototype.setMessageId = function (channelName, messageId) {
+    var obj = JSON.parse(localStorage.readMessageIds);
+    var ids = obj[this.userName_];
+    var currentMessageId = this.getMessageId(channelName);
     if (currentMessageId < messageId) {
         ids[channelName] = messageId;
     }
-    localStorage.locals = JSON.stringify(locals);
+    localStorage.readMessageIds = JSON.stringify(obj);
 };
 
 
