@@ -414,11 +414,7 @@ starChat.View.prototype.updateViewMessages = function () {
         var h2 = $('#messages h2');
         h2.find('span').text(this.channelName);
         var channel = starChat.Channel.find(this.channelName);
-        if (channel.privacy() === 'private') {
-            h2.find('img[alt="private"]').show();
-        } else {
-            h2.find('img[alt="private"]').hide();
-        }
+        h2.find('img[alt="private"]').toggle(channel.privacy() === 'private');
     } else {
         var h2 = $('#messages h2');
         h2.find('span').text("\u00a0");
@@ -428,14 +424,8 @@ starChat.View.prototype.updateViewMessages = function () {
      * @type {!jQuery}
      */
     var section = this.getSectionElement();
-    $('#messages > section').each(function () {
-        var e = $(this);
-        if (e.get(0) === section.get(0)) {
-            e.show();
-        } else {
-            e.hide();
-        }
-    });
+    section.show();
+    $('#messages > section').not(section).hide();
     var hitKeyword = false;
     var self = this;
     Object.keys(self.newMessages_).forEach(function (channel) {
