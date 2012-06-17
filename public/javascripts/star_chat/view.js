@@ -418,11 +418,12 @@ starChat.View.prototype.messageToElement = function (message, keywords) {
 
 /**
  * @private
- * @param {string} dateStr
+ * @param {number} unixTime
  * @return {!jQuery}
  */
-starChat.View.prototype.dateToElement = function (dateStr) {
-    var unixTime = starChat.toUNIXTime(dateStr);
+starChat.View.prototype.dateToElement = function (unixTime) {
+    var day = (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])[new Date(unixTime * 1000).getDay() % 7];
+    var dateStr = starChat.toISO8601(unixTime, 'date') + ' (' + day + ')';
     var tr = $('<tr></tr>').addClass('date');
     var td = $('<td></td>').attr('colspan', '3');
     var time = $('<time></time>').text(dateStr).attr('data-unix-time', unixTime);
@@ -524,7 +525,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 if (table.find('tr.date').filter(function () {
                     return Math.floor($(this).find('time').attr('data-unix-time')) === nextDateUNIXTime;
                 }).length === 0) {
-                    var tr = self.dateToElement(nextDateStr);
+                    var tr = self.dateToElement(nextDateUNIXTime);
                     // The first tr.date needs to load messages
                     if (table.find('tr.date').length === 0) {
                         tr.addClass('imcomplete');
@@ -569,9 +570,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 (starChat.toISO8601(this.time_, 'date') !==
                  starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
                 var scrollTop = 0;
-                var date = new Date(this.time_ * 1000);
-                var dateStr = starChat.toISO8601(this.time_, 'date');
-                var tr = this.dateToElement(dateStr);
+                var tr = this.dateToElement(this.time_);
                 var nextTR = section.find('table.messages tr.date').filter(function () {
                     var e = $(this);
                     var nextUNIXTime = e.find('time').attr('data-unix-time');
