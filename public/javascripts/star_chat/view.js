@@ -643,6 +643,7 @@ starChat.View.prototype.loadMessages = function () {
                     lastTR = messageTR;
                 }
             });
+            view.update();
         });
         e.removeClass('imcomplete');
     });
