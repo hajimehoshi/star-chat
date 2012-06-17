@@ -670,17 +670,17 @@ starChat.View.prototype.updateViewTopic = function () {
                 var topicE = /** @type {!jQuery} */$('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
-                form.find('[name="body"]').val(topic.body);
+                form.find('[name="topicBody"]').val(topic.body);
             } else {
                 $('#topic').text('(No Topic)');
-                form.find('[name="body"]').val('');
+                form.find('[name="topicBody"]').val('');
             }
         }
     } else {
         $('#topic').hide();
         form.hide();
         $('#topic').text('');
-        form.find('[name="body"]').val('');
+        form.find('[name="topicBody"]').val('');
     }
 }
 

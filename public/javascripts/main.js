@@ -535,7 +535,7 @@ $(function() {
     })();
     (function () {
         $('#updateTopicForm [type="submit"]').click(function () {
-            var topicBody = $('#updateTopicForm [name="body"]').val();
+            var topicBody = $('#updateTopicForm [name="topicBody"]').val();
             var view = getView();
             var channel = starChat.Channel.find(view.channelName);
             channel.topic({
