@@ -329,7 +329,7 @@ put '/subscribings', provides: :json do
     @channel = StarChat::Channel.new(@channel_name)
     @channel.save
   end
-  halt 409 if StarChat::Subscribing.exist?(@channel, current_user)
+  halt 200 if StarChat::Subscribing.exist?(@channel, current_user)
   if @channel.private?
     # TODO: Use one-time password
     channel_key = request.env['HTTP_X_STARCHAT_CHANNEL_KEY']
@@ -349,7 +349,7 @@ end
 
 delete '/subscribings', provides: :json do
   halt 400 unless @channel
-  halt 409 unless StarChat::Subscribing.exist?(@channel, current_user)
+  halt 200 unless StarChat::Subscribing.exist?(@channel, current_user)
   StarChat::Subscribing.destroy(@channel, current_user)
   broadcast(type: 'delete_subscribing',
             channel_name: @channel.name,
