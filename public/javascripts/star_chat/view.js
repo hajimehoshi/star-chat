@@ -71,12 +71,6 @@ starChat.View.prototype.initialize = function () {
 
     /**
      * @private
-     * @type {!Object.<string,boolean>}
-     */
-    this.dirtyFlags_ = {};
-
-    /**
-     * @private
      * @type {?number}
      */
     this.time_ = null;
@@ -190,7 +184,46 @@ starChat.View.prototype.startBlinkingTitle = function () {
 starChat.View.prototype.stopBlinkingTitle = function () {
     this.isBlinkingTitle_ = false;
     document.title = this.title_;
+};
+
+/**
+ * @private
+ * @param {string} channelName
+ * @return {number}
+ */
+starChat.View.prototype.getLastMessageId = function (channelName) {
+    if (channelName in this.newMessages_) {
+        var msgs = this.newMessages_[channelName];
+        if (0 < msgs.length) {
+            return msgs[msgs.length - 1].id;
+        }
+    }
+    var section = this.getSectionElement(channelName);
+    var lastTR = section.find('tr.message:last-child');
+    if (0 < lastTR.length) {
+        return starChat.parseInt(String(lastTR.attr('data-message-id')));
+    } else {
+        return 0;
+    }
 }
+
+/**
+ * @private
+ * @param {string} channelName
+ * @return {boolean}
+ */
+starChat.View.prototype.isDirtyChannel = function (channelName) {
+    var session = this.session();
+    if (!session || !session.isLoggedIn()) {
+        return false;
+    }
+    var lastMessageId = this.getLastMessageId(channelName);
+    if (!lastMessageId) {
+        return false;
+    }
+    var messageReadingState = session.messageReadingState();
+    return messageReadingState.getMessageId(channelName) < lastMessageId;
+};
 
 /**
  * @private
@@ -212,48 +245,45 @@ starChat.View.prototype.updateViewChannels = (function () {
             });
         }
         if (this.channelName) {
-            this.dirtyFlags_[this.channelName] = false;
+            var lastMessageId = this.getLastMessageId(this.channelName);
+            var messageReadingState = this.session().messageReadingState();
+            messageReadingState.setMessageId(this.channelName, lastMessageId);
         }
+        var ul = $('#channelsList');
+        ul.find('li').filter(function (i) {
+            var channelName = $(this).attr('data-channel-name');
+            return channels.every(function (channel) {
+                return channel.name() !== channelName;
+            });
+        }).remove();
+        var existChannelNames = $.map(ul.find('li'), function (e) {
+            return $(e).attr('data-channel-name');
+        });
+        var newChannels = channels.filter(function (channel) {
+            return existChannelNames.every(function (name) {
+                return name !== channel.name();
+            });
+        });
+        // TODO: sort
+        newChannels.forEach(function (channel) {
+            var a = $('<a></a>');
+            var name = channel.name();
+            var href = '#channels/' + encodeURIComponent(channel.name());
+            a.attr('href', href);
+            a.text(name);
+            var li = $('<li></li>').attr('data-channel-name', channel.name());
+            li.append(a);
+            ul.append(li);
+        });
+        var messageReadingState = this.session().messageReadingState();
         var self = this;
-        (function () {
-            var ul = $('#channelsList');
-            ul.find('li').filter(function (i) {
-                var channelName = $(this).attr('data-channel-name');
-                return channels.every(function (channel) {
-                    return channel.name() !== channelName;
-                });
-            }).remove();
-            var existChannelNames = $.map(ul.find('li'), function (e) {
-                return $(e).attr('data-channel-name');
-            });
-            var newChannels = channels.filter(function (channel) {
-                return existChannelNames.every(function (name) {
-                    return name !== channel.name();
-                });
-            });
-            // TODO: sort
-            newChannels.forEach(function (channel) {
-                var a = $('<a></a>');
-                var name = channel.name();
-                var href = '#channels/' + encodeURIComponent(channel.name());
-                a.attr('href', href);
-                a.text(name);
-                var li = $('<li></li>').attr('data-channel-name', channel.name());
-                li.append(a);
-                ul.append(li);
-            });
-            ul.find('li').each(function () {
-                var e = $(this);
-                var channelName = e.attr('data-channel-name');
-                e.find('a').toggleClass('dirty', self.dirtyFlags_[channelName] === true);
-            });
-            lastSessionId = self.session_.id();
-        })();
-        if (this.session().isLoggedIn()) {
-            $('#allChannelsLink').show();
-        } else {
-            $('#allChannelsLink').hide();
-        }
+        ul.find('li').each(function () {
+            var e = $(this);
+            var channelName = e.attr('data-channel-name');
+            e.find('a').toggleClass('dirty', self.isDirtyChannel(channelName));
+        });
+        lastSessionId = this.session_.id();
+        $('#allChannelsLink').css('display', this.session().isLoggedIn() ? 'inline' : 'none');
     }
 })();
 
@@ -304,28 +334,24 @@ starChat.View.prototype.updateViewSearch = function () {
 
 /**
  * @private
+ * @param {string} channelName
  * @return {!jQuery}
  */
-starChat.View.prototype.getSectionElement = function () {
-    if (!this.channelName) {
+starChat.View.prototype.getSectionElement = function (channelName) {
+    if (!channelName) {
         return $('#messages > section[data-channel-name=""]');
     }
-    var self = this;
     var sections = $('#messages > section').filter(function (i) {
-        return $(this).attr('data-channel-name') === self.channelName;
+        return $(this).attr('data-channel-name') === channelName;
     });
     if (sections.length === 1) {
-        var section = sections;
-        section.find('[name="year"]').val('');
-        section.find('[name="month"]').val('');
-        section.find('[name="day"]').val('');
-        return section;
+        return sections;
     }
     if (2 <= sections.length) {
         throw 'invalid sections';
     }
     var section = $('<section></section>');
-    var channelName = this.channelName;
+    var self = this;
     section.attr('data-channel-name', channelName);
     section.scroll(function () {
         if (self.channelName !== channelName) {
@@ -392,11 +418,12 @@ starChat.View.prototype.messageToElement = function (message, keywords) {
 
 /**
  * @private
- * @param {string} dateStr
+ * @param {number} unixTime
  * @return {!jQuery}
  */
-starChat.View.prototype.dateToElement = function (dateStr) {
-    var unixTime = starChat.toUNIXTime(dateStr);
+starChat.View.prototype.dateToElement = function (unixTime) {
+    var day = (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])[new Date(unixTime * 1000).getDay() % 7];
+    var dateStr = starChat.toISO8601(unixTime, 'date') + ' (' + day + ')';
     var tr = $('<tr></tr>').addClass('date');
     var td = $('<td></td>').attr('colspan', '3');
     var time = $('<time></time>').text(dateStr).attr('data-unix-time', unixTime);
@@ -414,28 +441,19 @@ starChat.View.prototype.updateViewMessages = function () {
         var h2 = $('#messages h2');
         h2.find('span').text(this.channelName);
         var channel = starChat.Channel.find(this.channelName);
-        if (channel.privacy() === 'private') {
-            h2.find('img[alt="private"]').show();
-        } else {
-            h2.find('img[alt="private"]').hide();
-        }
+        var img = h2.find('img[alt="private"]');
+        img.css('display', channel.privacy() === 'private' ? 'inline' : 'none');
     } else {
         var h2 = $('#messages h2');
         h2.find('span').text("\u00a0");
-        h2.find('img[alt="private"]').hide();
+        h2.find('img[alt="private"]').css('display', 'none');
     }
     /**
      * @type {!jQuery}
      */
-    var section = this.getSectionElement();
-    $('#messages > section').each(function () {
-        var e = $(this);
-        if (e.get(0) === section.get(0)) {
-            e.show();
-        } else {
-            e.hide();
-        }
-    });
+    var section = this.getSectionElement(this.channelName);
+    section.css('display', 'block');
+    $('#messages > section').not(section).css('display', 'none');
     var hitKeyword = false;
     var self = this;
     Object.keys(self.newMessages_).forEach(function (channel) {
@@ -507,7 +525,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 if (table.find('tr.date').filter(function () {
                     return Math.floor($(this).find('time').attr('data-unix-time')) === nextDateUNIXTime;
                 }).length === 0) {
-                    var tr = self.dateToElement(nextDateStr);
+                    var tr = self.dateToElement(nextDateUNIXTime);
                     // The first tr.date needs to load messages
                     if (table.find('tr.date').length === 0) {
                         tr.addClass('imcomplete');
@@ -552,9 +570,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 (starChat.toISO8601(this.time_, 'date') !==
                  starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
                 var scrollTop = 0;
-                var date = new Date(this.time_ * 1000);
-                var dateStr = starChat.toISO8601(this.time_, 'date');
-                var tr = this.dateToElement(dateStr);
+                var tr = this.dateToElement(this.time_);
                 var nextTR = section.find('table.messages tr.date').filter(function () {
                     var e = $(this);
                     var nextUNIXTime = e.find('time').attr('data-unix-time');
@@ -619,7 +635,7 @@ starChat.View.prototype.loadMessages = function () {
     if (!this.channelName) {
         return;
     }
-    var section = this.getSectionElement();
+    var section = this.getSectionElement(this.channelName);
     var self = this;
     section.find('table.messages tr.date.imcomplete').each(function () {
         var e = $(this);
@@ -643,6 +659,7 @@ starChat.View.prototype.loadMessages = function () {
                     lastTR = messageTR;
                 }
             });
+            view.update();
         });
         e.removeClass('imcomplete');
     });
@@ -656,11 +673,11 @@ starChat.View.prototype.updateViewTopic = function () {
     var form = $('#updateTopicForm');
     if (this.channelName) {
         if (this.isEdittingTopic()) {
-            $('#topic').hide();
-            form.show();
+            $('#topic').css('display', 'none');
+            form.css('display', 'block');
         } else {
-            $('#topic').show();
-            form.hide();
+            $('#topic').css('display', 'block');
+            form.css('display', 'none');
             var channel = starChat.Channel.find(this.channelName);
             var topic   = channel.topic();
             if (topic && topic.body) {
@@ -670,17 +687,17 @@ starChat.View.prototype.updateViewTopic = function () {
                 var topicE = /** @type {!jQuery} */$('#topic').text(topic.body);
                 starChat.replaceURLWithLinks(topicE);
                 starChat.replaceBreakLines(topicE);
-                form.find('[name="body"]').val(topic.body);
+                form.find('[name="topicBody"]').val(topic.body);
             } else {
                 $('#topic').text('(No Topic)');
-                form.find('[name="body"]').val('');
+                form.find('[name="topicBody"]').val('');
             }
         }
     } else {
-        $('#topic').hide();
-        form.hide();
+        $('#topic').css('display', 'none');
+        form.css('display', 'none');
         $('#topic').text('');
-        form.find('[name="body"]').val('');
+        form.find('[name="topicBody"]').val('');
     }
 }
 
@@ -707,13 +724,9 @@ starChat.View.prototype.updateViewUsers = function () {
             li.text(user.nick()).attr('title', user.name());
             ul.append(li);
         });
-        if (channel.privacy() === 'private') {
-            $('#invitationLink').show();
-        } else {
-            $('#invitationLink').hide();
-        }
+        $('#invitationLink').css('display', channel.privacy() === 'private' ? 'inline' : 'none');
     } else {
-        $('#invitationLink').hide();
+        $('#invitationLink').css('display', 'none');
     }
 }
 
@@ -775,7 +788,9 @@ starChat.View.prototype.updateViewTimeline = function () {
                  startTime <= (today.getTime() / 1000);
                  startTime += 60 * 60 * 24) {
                 var li2 = $('<li></li>');
-                text = starChat.toISO8601(new Date(startTime * 1000), 'date').substr(8, 2);
+                var date = new Date(startTime * 1000);
+                var day = (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])[date.getDay() % 7];
+                text = starChat.toISO8601(date, 'date').substr(8, 2) + ' (' + day + ')';
                 var a = $('<a></a>').text(text);
                 (function () {
                     var s = startTime;
@@ -808,18 +823,18 @@ starChat.View.prototype.updateViewTimeline = function () {
  * @return {undefined}
  */
 starChat.View.prototype.updateViewDialogs = function () {
-    $('.dialog').hide();
+    $('.dialog').css('display', 'none');
     var dialogIsShown = false;
     if (this.isEdittingUser()) {
-        $('#editUserDialog').show();
+        $('#editUserDialog').css('display', 'block');
         dialogIsShown = true;
     }
     if (this.isEdittingChannels()) {
-        $('#editChannelsDialog').show();
+        $('#editChannelsDialog').css('display', 'block');
         dialogIsShown = true;
     }
     if (this.isEdittingChannel()) {
-        $('#editChannelDialog').show();
+        $('#editChannelDialog').css('display', 'block');
         dialogIsShown = true;
         var channelName = String(this.edittingChannelName());
         var channel = starChat.Channel.find(channelName);
@@ -833,19 +848,14 @@ starChat.View.prototype.updateViewDialogs = function () {
         }
     }
     if (this.isShowingAllChannelsDialog()) {
-        $('#allChannelsDialog').show();
+        $('#allChannelsDialog').css('display', 'block');
         dialogIsShown = true;
     }
     if (this.isShowingInvitationURLDialog()) {
-        $('#invitationURLDialog').show();
+        $('#invitationURLDialog').css('display', 'block');
         dialogIsShown = true;
     }
-
-    if (dialogIsShown) {
-        $('#dialogBackground').show();
-    } else {
-        $('#dialogBackground').hide();
-    }
+    $('#dialogBackground').css('display', dialogIsShown ? 'block' : 'none');
 }
 
 /**
@@ -853,9 +863,9 @@ starChat.View.prototype.updateViewDialogs = function () {
  */
 starChat.View.prototype.update = function () {
     if (this.session_.isLoggedIn()) {
-        $('#logInForm').hide();
+        $('#logInForm').css('display', 'none');
         $('#logOutLink span').text(String(this.session_.userName()));
-        $('#logOutLink').show();
+        $('#logOutLink').css('display', 'inline');
         $('#main').find('input, textarea').removeAttr('disabled');
         if (this.channelName) {
             $('#postMessageForm, #updateTopicForm').find('input, textarea').removeAttr('disabled');
@@ -863,8 +873,8 @@ starChat.View.prototype.update = function () {
             $('#postMessageForm, #updateTopicForm').find('input, textarea').attr('disabled', 'disabled');
         }
     } else {
-        $('#logInForm').show();
-        $('#logOutLink').hide();
+        $('#logInForm').css('display', 'block');
+        $('#logOutLink').css('display', 'none');
         $('#main').find('input, textarea').attr('disabled', 'disabled');
     }
     this.updateViewChannels();
@@ -936,10 +946,9 @@ starChat.View.prototype.session = function () {
 /**
  * @param {string} channelName
  * @param {!Object} message
- * @param {boolean=} setDirtyFlag
  * @return {undefined}
  */
-starChat.View.prototype.addNewMessage = function (channelName, message, setDirtyFlag) {
+starChat.View.prototype.addNewMessage = function (channelName, message) {
     if (!this.newMessages_[channelName]) {
         this.newMessages_[channelName] = [];
     }
@@ -947,11 +956,6 @@ starChat.View.prototype.addNewMessage = function (channelName, message, setDirty
         return;
     }
     this.newMessages_[channelName].push(message);
-    if (setDirtyFlag &&
-        channelName !== this.channelName &&
-        message.user_name !== this.session().user().name()) {
-        this.setDirtyFlag(channelName, true);
-    }
     // TODO: Emphasize channel name?
     if (message.user_name === this.session().user().name()) {
         var body = message.body;
@@ -992,15 +996,6 @@ starChat.View.prototype.addPseudoMessage = function (message) {
  */
 starChat.View.prototype.removePseudoMessage = function (id) {
     $('[data-pseudo-message-id=' + id + ']').attr('data-removed', 'true');
-};
-
-/**
- * @param {string} channelName
- * @param {boolean} value
- * @return {undefined}
- */
-starChat.View.prototype.setDirtyFlag = function (channelName, value) {
-    this.dirtyFlags_[channelName] = value;
 };
 
 /**
@@ -1051,10 +1046,11 @@ starChat.View.prototype.isEdittingChannels = function (value) {
                 return 0;
             });
             var table = $('#editChannelsDialog h2 ~ table');
-            var origTR = table.find('tr.cloneMe').hide();
+            var origTR = table.find('tr.cloneMe').css('display', 'none');
             table.find('tr.cloned').not(origTR).remove();
             channels.forEach(function (channel) {
-                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
+                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned');
+                tr.css('display', 'table-row'); // show
                 tr.find('.channelName').text(channel.name());
                 tr.find('.toolIcon').attr('data-channel-name', channel.name());
                 table.append(tr);
@@ -1101,7 +1097,7 @@ starChat.View.prototype.isShowingAllChannelsDialog = function (value) {
         this.isShowingAllChannelsDialog_ = value;
         if (this.session().isLoggedIn() && value) {
             var table = $('#allChannelsDialog h2 ~ table');
-            var origTR = table.find('tr.cloneMe').hide();
+            var origTR = table.find('tr.cloneMe').css('display', 'none');
             table.find('tr.cloned').remove();
             starChat.Channel.all().sort(function (a, b) {
                 if (a.name() > b.name()) {
@@ -1112,7 +1108,8 @@ starChat.View.prototype.isShowingAllChannelsDialog = function (value) {
                 }
                 return 0;
             }).forEach(function (channel) {
-                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned').show();
+                var tr = origTR.clone(true).removeClass('cloneMe').addClass('cloned');
+                tr.css('display', 'table-row');
                 var link = $('<a></a>').text(channel.name());
                 link.attr('href', '#channels/' + encodeURIComponent(channel.name()));
                 tr.find('.channelName').empty().append(link);

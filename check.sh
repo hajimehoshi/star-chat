@@ -12,6 +12,7 @@ java -jar compiler.jar \
     --js public/javascripts/star_chat/user.js \
     --js public/javascripts/star_chat/channel.js \
     --js public/javascripts/star_chat/subscribing.js \
+    --js public/javascripts/star_chat/message_reading_state.js \
     --js public/javascripts/star_chat/view.js \
     --js public/javascripts/star_chat/hashchange.js \
     --js public/javascripts/main.js \

@@ -53,7 +53,7 @@
         <menu><img src="" alt="edit" width="16" height="16" data-image-icon-name="blackPencil" data-tool-id="editTopic" class="toolIcon" /></menu>
         <p id="topic"></p>
         <form action="." id="updateTopicForm" method="post">
-          <p><textarea name="body" rows="10"></textarea><input type="submit" name="send" value="Update" /></p>
+          <p><textarea name="topicBody" rows="10"></textarea><input type="submit" name="send" value="Update" /></p>
         </form>
         <h2>Users</h2>
         <ul id="users">
@@ -149,6 +149,7 @@
     <script src="/javascripts/star_chat/user.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/channel.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/subscribing.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/message_reading_state.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/view.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/hashchange.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/main.js?_=<%= launched_time %>"></script>
