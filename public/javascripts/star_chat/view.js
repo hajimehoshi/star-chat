@@ -29,12 +29,6 @@ starChat.View.prototype.initialize = function () {
 
     /**
      * @private
-     * @type {string}
-     */
-    this.lastChannelName_ = '';
-
-    /**
-     * @private
      * @type {!Object.<string,!Array.<!Object>>}
      */
     this.newMessages_ = {};
@@ -483,7 +477,6 @@ starChat.View.prototype.updateViewMessages = function () {
     }
 
     if (!this.channelName) {
-        this.lastChannelName_ = '';
         return;
     }
 
@@ -569,7 +562,6 @@ starChat.View.prototype.updateViewMessages = function () {
             if (target === null ||
                 (starChat.toISO8601(this.time_, 'date') !==
                  starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
-                var scrollTop = 0;
                 var tr = this.dateToElement(this.time_);
                 var nextTR = section.find('table.messages tr.date').filter(function () {
                     var e = $(this);
@@ -593,7 +585,6 @@ starChat.View.prototype.updateViewMessages = function () {
             section.animate({scrollTop: scrollTop}, {
                 complete: function () {
                     self.messageScrollTops_[self.channelName] = section.scrollTop();
-                    self.lastChannelName_ = self.channelName;
                     self.isScrolling_ = false;
                 }
             });
@@ -601,25 +592,21 @@ starChat.View.prototype.updateViewMessages = function () {
         } else {
             // Manipurate the scrool top after elements are set completely.
             setTimeout(function () {
-                if (self.lastChannelName_ === self.channelName &&
-                    isBottom) {
+                if (isBottom) {
                     section.animate({scrollTop: section.get(0).scrollHeight}, {
                         duration: 750,
                         complete: function () {
                             self.messageScrollTops_[self.channelName] = section.scrollTop();
-                            self.lastChannelName_ = self.channelName;
                             self.isScrolling_ = false;
                         }
                     });
                 } else {
-                    if (!self.lastChannelName_ ||
-                        !(self.channelName in self.messageScrollTops_)) {
+                    if (!(self.channelName in self.messageScrollTops_)) {
                         section.scrollTop(section.get(0).scrollHeight);
                     } else {
                         section.scrollTop(self.messageScrollTops_[self.channelName]);
                     }
                     self.messageScrollTops_[self.channelName] = section.scrollTop();
-                    self.lastChannelName_ = self.channelName;
                     self.isScrolling_ = false;
                 }
             }, 0);
