@@ -595,9 +595,8 @@ starChat.View.prototype.updateViewMessages = function () {
     } else {
         if (isBottom) {
             if (section.scrollTop() === 0) {
-                // section.get(0).scrollHeight may not be an exact value.
                 setTimeout(function () {
-                    section.scrollTop(99999);
+                    section.scrollTop(section.get(0).scrollHeight);
                     self.messageScrollTops_[self.channelName] = section.scrollTop();
                     self.isScrolling_ = false;
                 });
@@ -644,6 +643,7 @@ starChat.View.prototype.loadMessages = function () {
             }
             var table = section.find('table.messages');
             var lastTR = e;
+            var scrollHeightBeforeAppending = section.get(0).scrollHeight;
             data.forEach(function (message) {
                 var messageTR = self.messageToElement(message);
                 var tr = section.find('tr.message[data-message-id="' + message.id + '"]');
@@ -654,6 +654,11 @@ starChat.View.prototype.loadMessages = function () {
                     lastTR = messageTR;
                 }
             });
+            var scrollHeightAfterAppending = section.get(0).scrollHeight;
+            if (!section.is(':animated')) {
+                var diff = scrollHeightAfterAppending - scrollHeightBeforeAppending;
+                section.scrollTop(section.scrollTop() + diff);
+            }
             view.update();
         });
         e.removeClass('imcomplete');
