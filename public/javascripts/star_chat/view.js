@@ -543,73 +543,81 @@ starChat.View.prototype.updateViewMessages = function () {
 
     $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
 
-    if (!this.isScrolling_) {
-        this.isScrolling_ = true;
-        if (this.time_ && this.channelName) {
-            var target = null;
-            section.find('[data-unix-time]').each(function () {
+    if (this.isScrolling_) {
+        return;
+    }
+    this.isScrolling_ = true;
+
+    if (this.time_ && this.channelName) {
+        var target = null;
+        section.find('[data-unix-time]').each(function () {
+            var e = $(this);
+            var unixTime = starChat.parseInt(String(e.attr('data-unix-time')));
+            if (self.time_ < unixTime) {
+                return false;
+            }
+            target = e;
+            return true;
+        });
+        if (target !== null) {
+            target = target.parent().parent(); // tr
+        }
+        if (target === null ||
+            (starChat.toISO8601(this.time_, 'date') !==
+             starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
+            var tr = this.dateToElement(this.time_);
+            var nextTR = section.find('table.messages tr.date').filter(function () {
                 var e = $(this);
-                var unixTime = starChat.parseInt(String(e.attr('data-unix-time')));
-                if (self.time_ < unixTime) {
-                    return false;
-                }
-                target = e;
-                return true;
-            });
-            if (target !== null) {
-                target = target.parent().parent(); // tr
-            }
-            if (target === null ||
-                (starChat.toISO8601(this.time_, 'date') !==
-                 starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
-                var tr = this.dateToElement(this.time_);
-                var nextTR = section.find('table.messages tr.date').filter(function () {
-                    var e = $(this);
-                    var nextUNIXTime = e.find('time').attr('data-unix-time');
-                    return self.time_ < nextUNIXTime;
-                }).first();
-                if (nextTR.length === 1) {
-                    tr.insertBefore(nextTR);
-                } else {
-                    section.find('table.messages').append(tr);
-                }
-                tr.addClass('imcomplete'); // needs to load messages
-                target = tr;
-            }
-            var scrollTop = 0;
-            if (target !== null) {
-                scrollTop = target.position().top + section.scrollTop() - 40;
+                var nextUNIXTime = e.find('time').attr('data-unix-time');
+                return self.time_ < nextUNIXTime;
+            }).first();
+            if (nextTR.length === 1) {
+                tr.insertBefore(nextTR);
             } else {
-                scrollTop = section.get(0).scrollHeight;
+                section.find('table.messages').append(tr);
             }
-            section.animate({scrollTop: scrollTop}, {
-                complete: function () {
-                    self.messageScrollTops_[self.channelName] = section.scrollTop();
-                    self.isScrolling_ = false;
-                }
-            });
-            this.time_ = null;
+            tr.addClass('imcomplete'); // needs to load messages
+            target = tr;
+        }
+        var scrollTop = 0;
+        if (target !== null) {
+            scrollTop = target.position().top + section.scrollTop() - 40;
         } else {
-            // Manipurate the scrool top after elements are set completely.
-            setTimeout(function () {
-                if (isBottom) {
-                    section.animate({scrollTop: section.get(0).scrollHeight}, {
-                        duration: 750,
-                        complete: function () {
-                            self.messageScrollTops_[self.channelName] = section.scrollTop();
-                            self.isScrolling_ = false;
-                        }
-                    });
-                } else {
-                    if (!(self.channelName in self.messageScrollTops_)) {
-                        section.scrollTop(section.get(0).scrollHeight);
-                    } else {
-                        section.scrollTop(self.messageScrollTops_[self.channelName]);
-                    }
+            scrollTop = section.get(0).scrollHeight;
+        }
+        section.animate({scrollTop: scrollTop}, {
+            complete: function () {
+                self.messageScrollTops_[self.channelName] = section.scrollTop();
+                self.isScrolling_ = false;
+            }
+        });
+        this.time_ = null;
+    } else {
+        if (isBottom) {
+            if (section.scrollTop() === 0) {
+                // section.get(0).scrollHeight may not be an exact value.
+                setTimeout(function () {
+                    section.scrollTop(99999);
                     self.messageScrollTops_[self.channelName] = section.scrollTop();
                     self.isScrolling_ = false;
-                }
-            }, 0);
+                });
+            } else {
+                section.animate({scrollTop: section.get(0).scrollHeight}, {
+                    duration: 750,
+                    complete: function () {
+                        self.messageScrollTops_[self.channelName] = section.scrollTop();
+                        self.isScrolling_ = false;
+                    }
+                });
+            }
+        } else {
+            if (!(this.channelName in this.messageScrollTops_)) {
+                section.scrollTop(section.get(0).scrollHeight);
+            } else {
+                section.scrollTop(this.messageScrollTops_[this.channelName]);
+            }
+            this.messageScrollTops_[this.channelName] = section.scrollTop();
+            this.isScrolling_ = false;
         }
     }
 }
