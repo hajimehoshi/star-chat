@@ -591,7 +591,6 @@ starChat.View.prototype.updateViewMessages = function () {
         var channelName = self.channelName;
         section.animate({scrollTop: scrollTop}, {
             complete: function () {
-                self.messageScrollTops_[channelName] = section.scrollTop();
                 self.isScrolling_[channelName] = false;
             }
         });
@@ -603,14 +602,12 @@ starChat.View.prototype.updateViewMessages = function () {
             if (section.scrollTop() === 0) {
                 setTimeout(function () {
                     section.scrollTop(section.get(0).scrollHeight);
-                    self.messageScrollTops_[channelName] = section.scrollTop();
                     self.isScrolling_[channelName] = false;
                 });
             } else {
                 section.animate({scrollTop: section.get(0).scrollHeight}, {
                     duration: 750,
                     complete: function () {
-                        self.messageScrollTops_[channelName] = section.scrollTop();
                         self.isScrolling_[channelName] = false;
                     }
                 });
@@ -621,7 +618,6 @@ starChat.View.prototype.updateViewMessages = function () {
             } else {
                 section.scrollTop(this.messageScrollTops_[this.channelName]);
             }
-            this.messageScrollTops_[this.channelName] = section.scrollTop();
             this.isScrolling_[this.channelName] = false;
         }
     }
