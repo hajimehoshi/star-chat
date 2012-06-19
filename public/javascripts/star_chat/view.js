@@ -59,9 +59,9 @@ starChat.View.prototype.initialize = function () {
 
     /**
      * @private
-     * @type {boolean}
+     * @type {Object.<string,boolean>}
      */
-    this.isScrolling_ = false;
+    this.isScrolling_ = {};
 
     /**
      * @private
@@ -543,10 +543,13 @@ starChat.View.prototype.updateViewMessages = function () {
 
     $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
 
-    if (this.isScrolling_) {
+    if (!(this.channelName in this.isScrolling_)) {
+        this.isScrolling_[this.channelName] = false;
+    }
+    if (this.isScrolling_[this.channelName]) {
         return;
     }
-    this.isScrolling_ = true;
+    this.isScrolling_[this.channelName] = true;
 
     if (this.time_ && this.channelName) {
         var target = null;
@@ -589,7 +592,7 @@ starChat.View.prototype.updateViewMessages = function () {
         section.animate({scrollTop: scrollTop}, {
             complete: function () {
                 self.messageScrollTops_[channelName] = section.scrollTop();
-                self.isScrolling_ = false;
+                self.isScrolling_[channelName] = false;
             }
         });
         this.time_ = null;
@@ -601,14 +604,14 @@ starChat.View.prototype.updateViewMessages = function () {
                 setTimeout(function () {
                     section.scrollTop(section.get(0).scrollHeight);
                     self.messageScrollTops_[channelName] = section.scrollTop();
-                    self.isScrolling_ = false;
+                    self.isScrolling_[channelName] = false;
                 });
             } else {
                 section.animate({scrollTop: section.get(0).scrollHeight}, {
                     duration: 750,
                     complete: function () {
                         self.messageScrollTops_[channelName] = section.scrollTop();
-                        self.isScrolling_ = false;
+                        self.isScrolling_[channelName] = false;
                     }
                 });
             }
@@ -619,7 +622,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 section.scrollTop(this.messageScrollTops_[this.channelName]);
             }
             this.messageScrollTops_[this.channelName] = section.scrollTop();
-            this.isScrolling_ = false;
+            this.isScrolling_[this.channelName] = false;
         }
     }
 }
