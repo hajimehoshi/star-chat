@@ -29,12 +29,6 @@ starChat.View.prototype.initialize = function () {
 
     /**
      * @private
-     * @type {string}
-     */
-    this.lastChannelName_ = '';
-
-    /**
-     * @private
      * @type {!Object.<string,!Array.<!Object>>}
      */
     this.newMessages_ = {};
@@ -65,9 +59,9 @@ starChat.View.prototype.initialize = function () {
 
     /**
      * @private
-     * @type {boolean}
+     * @type {Object.<string,boolean>}
      */
-    this.isScrolling_ = false;
+    this.isScrolling_ = {};
 
     /**
      * @private
@@ -483,7 +477,6 @@ starChat.View.prototype.updateViewMessages = function () {
     }
 
     if (!this.channelName) {
-        this.lastChannelName_ = '';
         return;
     }
 
@@ -550,79 +543,82 @@ starChat.View.prototype.updateViewMessages = function () {
 
     $('[data-pseudo-message-id]').filter('[data-removed="true"]').remove();
 
-    if (!this.isScrolling_) {
-        this.isScrolling_ = true;
-        if (this.time_ && this.channelName) {
-            var target = null;
-            section.find('[data-unix-time]').each(function () {
+    if (!(this.channelName in this.isScrolling_)) {
+        this.isScrolling_[this.channelName] = false;
+    }
+    if (this.isScrolling_[this.channelName]) {
+        return;
+    }
+    this.isScrolling_[this.channelName] = true;
+
+    if (this.time_ && this.channelName) {
+        var target = null;
+        section.find('[data-unix-time]').each(function () {
+            var e = $(this);
+            var unixTime = starChat.parseInt(String(e.attr('data-unix-time')));
+            if (self.time_ < unixTime) {
+                return false;
+            }
+            target = e;
+            return true;
+        });
+        if (target !== null) {
+            target = target.parent().parent(); // tr
+        }
+        if (target === null ||
+            (starChat.toISO8601(this.time_, 'date') !==
+             starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
+            var tr = this.dateToElement(this.time_);
+            var nextTR = section.find('table.messages tr.date').filter(function () {
                 var e = $(this);
-                var unixTime = starChat.parseInt(String(e.attr('data-unix-time')));
-                if (self.time_ < unixTime) {
-                    return false;
-                }
-                target = e;
-                return true;
-            });
-            if (target !== null) {
-                target = target.parent().parent(); // tr
-            }
-            if (target === null ||
-                (starChat.toISO8601(this.time_, 'date') !==
-                 starChat.toISO8601(target.find('time').attr('data-unix-time'), 'date'))) {
-                var scrollTop = 0;
-                var tr = this.dateToElement(this.time_);
-                var nextTR = section.find('table.messages tr.date').filter(function () {
-                    var e = $(this);
-                    var nextUNIXTime = e.find('time').attr('data-unix-time');
-                    return self.time_ < nextUNIXTime;
-                }).first();
-                if (nextTR.length === 1) {
-                    tr.insertBefore(nextTR);
-                } else {
-                    section.find('table.messages').append(tr);
-                }
-                tr.addClass('imcomplete'); // needs to load messages
-                target = tr;
-            }
-            var scrollTop = 0;
-            if (target !== null) {
-                scrollTop = target.position().top + section.scrollTop() - 40;
+                var nextUNIXTime = e.find('time').attr('data-unix-time');
+                return self.time_ < nextUNIXTime;
+            }).first();
+            if (nextTR.length === 1) {
+                tr.insertBefore(nextTR);
             } else {
-                scrollTop = section.get(0).scrollHeight;
+                section.find('table.messages').append(tr);
             }
-            section.animate({scrollTop: scrollTop}, {
-                complete: function () {
-                    self.messageScrollTops_[self.channelName] = section.scrollTop();
-                    self.lastChannelName_ = self.channelName;
-                    self.isScrolling_ = false;
-                }
-            });
-            this.time_ = null;
+            tr.addClass('imcomplete'); // needs to load messages
+            target = tr;
+        }
+        var scrollTop = 0;
+        if (target !== null) {
+            scrollTop = target.position().top + section.scrollTop() - 40;
         } else {
-            // Manipurate the scrool top after elements are set completely.
-            setTimeout(function () {
-                if (self.lastChannelName_ === self.channelName &&
-                    isBottom) {
-                    section.animate({scrollTop: section.get(0).scrollHeight}, {
-                        duration: 750,
-                        complete: function () {
-                            self.messageScrollTops_[self.channelName] = section.scrollTop();
-                            self.lastChannelName_ = self.channelName;
-                            self.isScrolling_ = false;
-                        }
-                    });
-                } else {
-                    if (!self.lastChannelName_ ||
-                        !(self.channelName in self.messageScrollTops_)) {
-                        section.scrollTop(section.get(0).scrollHeight);
-                    } else {
-                        section.scrollTop(self.messageScrollTops_[self.channelName]);
+            scrollTop = section.get(0).scrollHeight;
+        }
+        var channelName = self.channelName;
+        section.animate({scrollTop: scrollTop}, {
+            complete: function () {
+                self.isScrolling_[channelName] = false;
+            }
+        });
+        this.time_ = null;
+    } else {
+        if (isBottom ||
+            !(this.channelName in this.messageScrollTops_)) {
+            var channelName = self.channelName;
+            if (section.scrollTop() === 0) {
+                setTimeout(function () {
+                    section.scrollTop(section.get(0).scrollHeight);
+                    self.isScrolling_[channelName] = false;
+                });
+            } else {
+                section.animate({scrollTop: section.get(0).scrollHeight}, {
+                    duration: 750,
+                    complete: function () {
+                        self.isScrolling_[channelName] = false;
                     }
-                    self.messageScrollTops_[self.channelName] = section.scrollTop();
-                    self.lastChannelName_ = self.channelName;
-                    self.isScrolling_ = false;
-                }
-            }, 0);
+                });
+            }
+        } else {
+            if (!(this.channelName in this.messageScrollTops_)) {
+                section.scrollTop(section.get(0).scrollHeight);
+            } else {
+                section.scrollTop(this.messageScrollTops_[this.channelName]);
+            }
+            this.isScrolling_[this.channelName] = false;
         }
     }
 }
@@ -649,6 +645,7 @@ starChat.View.prototype.loadMessages = function () {
             }
             var table = section.find('table.messages');
             var lastTR = e;
+            var scrollHeightBeforeAppending = section.get(0).scrollHeight;
             data.forEach(function (message) {
                 var messageTR = self.messageToElement(message);
                 var tr = section.find('tr.message[data-message-id="' + message.id + '"]');
@@ -659,6 +656,11 @@ starChat.View.prototype.loadMessages = function () {
                     lastTR = messageTR;
                 }
             });
+            var scrollHeightAfterAppending = section.get(0).scrollHeight;
+            if (!section.is(':animated')) {
+                var diff = scrollHeightAfterAppending - scrollHeightBeforeAppending;
+                section.scrollTop(section.scrollTop() + diff);
+            }
             view.update();
         });
         e.removeClass('imcomplete');
