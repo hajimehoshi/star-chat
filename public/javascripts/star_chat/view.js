@@ -238,9 +238,9 @@ starChat.View.prototype.updateViewChannels = (function () {
                 return 0;
             });
         }
+        var messageReadingState = this.session().messageReadingState();
         if (this.channelName) {
             var lastMessageId = this.getLastMessageId(this.channelName);
-            var messageReadingState = this.session().messageReadingState();
             messageReadingState.setMessageId(this.channelName, lastMessageId);
         }
         var ul = $('#channelsList');
@@ -978,6 +978,7 @@ starChat.View.prototype.addNewMessage = function (channelName, message) {
             return body1 === body2;
         }).first().attr('data-pseudo-message-id')));
         this.removePseudoMessage(id);
+        this.session().messageReadingState().setMessageId(channelName, message.id);
     }
 };
 
