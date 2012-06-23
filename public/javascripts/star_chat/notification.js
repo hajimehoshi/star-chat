@@ -20,16 +20,17 @@ starChat.Notification.requestPermission = function () {
 };
 
 /**
- * @param {string} str
+ * @param {string} title
+ * @param {string} body
  * @return {undefined}
  */
-starChat.Notification.notify = function (str) {
+starChat.Notification.notify = function (title, body) {
     if (!window.webkitNotifications) {
         return;
     }
     if (window.webkitNotifications.checkPermission() !== 0) {
         return;
     }
-    var n = window.webkitNotifications.createNotification('', 'StarChat', str);
+    var n = window.webkitNotifications.createNotification('', title, body);
     n.show();
 };

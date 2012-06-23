@@ -19,7 +19,7 @@ starChat.PacketProcessor =  function () {
 starChat.PacketProcessor.prototype.processPacketMessage = function (packet, view) {
     var message = packet.message;
     if (message && message.channel_name) {
-        view.addNewMessage(message.channel_name, message);
+        view.addNewMessage(message.channel_name, message, true);
         if (this.lastMessageId_ < message.id) {
             this.lastMessageId_ = message.id;
         }
