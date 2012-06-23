@@ -603,7 +603,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 setTimeout(function () {
                     section.scrollTop(section.get(0).scrollHeight);
                     self.isScrolling_[channelName] = false;
-                });
+                }, 0);
             } else {
                 section.animate({scrollTop: section.get(0).scrollHeight}, {
                     duration: 750,
