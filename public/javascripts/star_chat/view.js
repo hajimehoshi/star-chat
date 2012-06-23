@@ -462,7 +462,9 @@ starChat.View.prototype.updateViewMessages = function () {
             }
             var e = self.messageToElement(message, keywords);
             self.messageElements_[message.id] = e;
-            hitKeyword |= (0 < e.data('emphasizedNum'));
+            if (0 < e.data('emphasizedNum')) {
+                hitKeyword = true;
+            }
         });
     });
     if (hitKeyword && !starChat.isFocused()) {
