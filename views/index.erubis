@@ -152,6 +152,7 @@
     <script src="/javascripts/star_chat/message_reading_state.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/view.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/star_chat/hashchange.js?_=<%= launched_time %>"></script>
+    <script src="/javascripts/star_chat/notification.js?_=<%= launched_time %>"></script>
     <script src="/javascripts/main.js?_=<%= launched_time %>"></script>
   </body>
 </html>
