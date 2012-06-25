@@ -1,5 +1,9 @@
 'use strict';
 
+$(window).click(function () {
+    starChat.Notification.requestPermission();
+});
+
 var getView = (function () {
     var view = null;
     return function () {

@@ -462,7 +462,9 @@ starChat.View.prototype.updateViewMessages = function () {
             }
             var e = self.messageToElement(message, keywords);
             self.messageElements_[message.id] = e;
-            hitKeyword |= (0 < e.data('emphasizedNum'));
+            if (0 < e.data('emphasizedNum')) {
+                hitKeyword = true;
+            }
         });
     });
     if (hitKeyword && !starChat.isFocused()) {
@@ -603,7 +605,7 @@ starChat.View.prototype.updateViewMessages = function () {
                 setTimeout(function () {
                     section.scrollTop(section.get(0).scrollHeight);
                     self.isScrolling_[channelName] = false;
-                });
+                }, 0);
             } else {
                 section.animate({scrollTop: section.get(0).scrollHeight}, {
                     duration: 750,
@@ -948,9 +950,16 @@ starChat.View.prototype.session = function () {
 /**
  * @param {string} channelName
  * @param {!Object} message
+ * @param {boolean=} notify
  * @return {undefined}
  */
-starChat.View.prototype.addNewMessage = function (channelName, message) {
+starChat.View.prototype.addNewMessage = function (channelName, message, notify) {
+    if (notify === void(0)) {
+        notify = false;
+    }
+    if (!this.session().isLoggedIn()) {
+        return;
+    }
     if (!this.newMessages_[channelName]) {
         this.newMessages_[channelName] = [];
     }
@@ -958,6 +967,19 @@ starChat.View.prototype.addNewMessage = function (channelName, message) {
         return;
     }
     this.newMessages_[channelName].push(message);
+    if (notify) {
+        var user = this.session().user();
+        var keywords = user.keywords();
+        var hit = keywords.some(function (keyword) {
+            return 0 <= message.body.indexOf(keyword);
+        });
+        if (hit) {
+            var title = 'StarChat: ' + message.channel_name;
+            var user  = starChat.User.find(message.user_name);
+            var body  = user.nick() + ': ' + message.body;
+            starChat.Notification.notify(title, body);
+        }
+    }
     // TODO: Emphasize channel name?
     if (message.user_name === this.session().user().name()) {
         var body = message.body;

@@ -15,6 +15,7 @@ java -jar compiler.jar \
     --js public/javascripts/star_chat/message_reading_state.js \
     --js public/javascripts/star_chat/view.js \
     --js public/javascripts/star_chat/hashchange.js \
+    --js public/javascripts/star_chat/notification.js \
     --js public/javascripts/main.js \
     --jscomp_error checkTypes \
     --jscomp_error accessControls \
