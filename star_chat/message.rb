@@ -128,13 +128,15 @@ module StarChat
     def save
       raise 'The body should not be empty' if body.empty?
       @id = Message.generate_id unless @id
-      RedisDB.exec(:hmset,
-                   ['messages', id],
-                   'created_at',   created_at,
-                   'user_name',    user_name,
-                   'body',         body,
-                   'channel_name', channel_name,
-                   'notice',       notice? ? 'true' : 'false')
+      args = ['created_at',     created_at,
+              'user_name',      user_name,
+              'body',           body,
+              'channel_name',   channel_name,
+              'notice',         notice? ? 'true' : 'false']
+      if !temporary_nick.empty?
+        args << 'temporary_nick' << temporary_nick
+      end
+      RedisDB.exec(:hmset, ['messages', id], *args)
       self
     end
 
