@@ -133,7 +133,11 @@ module StarChat
       Message.find_by_list(redis_key, idx1, idx2 - idx1)
     end
 
-    def post_message(user, body, notice, created_at = Time.now.to_i)
+    def post_message(user, body, notice, options = {})
+      options = {
+        created_at: Time.now.to_i,
+      }.merge(options)
+      created_at = options[:created_at]
       # TODO: Check subscribing?
       # TODO: lock?
       message = Message.new(user.name,

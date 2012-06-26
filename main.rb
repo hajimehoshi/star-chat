@@ -80,7 +80,7 @@ helpers do
 
 end
 
-configure do
+configure :production, :development do
   EM::next_tick do
     EM::add_periodic_timer(30) do
       settings.streams.each do |user_name, connection|
@@ -291,7 +291,7 @@ end
 
 post '/channels/:channel_name/messages', provides: :json do
   sleep(1) if development?
-  body = params[:body].to_s
+  body   = params[:body].to_s
   notice = params[:notice] == 'true'
   message = @channel.post_message(current_user, body, notice)
   # TODO: In fact, the real-time search is not needed.

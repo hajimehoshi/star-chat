@@ -109,15 +109,18 @@ module StarChat
     end
 
     def to_json(*args)
-      {
+      obj = {
         id:             id,
         user_name:      user_name,
         body:           body,
         created_at:     created_at,
         channel_name:   channel_name,
         notice:         notice?,
-        temporary_nick: temporary_nick,
-      }.to_json(*args)
+      }
+      if !temporary_nick.empty?
+        obj[:temporary_nick] = temporary_nick
+      end
+      obj.to_json(*args)
     end
 
     def save
