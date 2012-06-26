@@ -382,8 +382,17 @@ starChat.View.prototype.messageToElement = function (message, keywords) {
     messageTR.append(createdAtTD);
 
     var user = starChat.User.find(message.user_name);
-    var nick = String(user.nick());
+    if ('temporary_nick' in message) {
+        var nick = message.temporary_nick;
+        var isTemporaryNick = true;
+    } else {
+        var nick = String(user.nick());
+        var isTemporaryNick = false;
+    }
     var userNameTD = $('<td></td>').text(nick).attr('title', user.name());
+    if (isTemporaryNick) {
+        userNameTD.addClass('temporaryNick');
+    }
     userNameTD.addClass('userName');
     messageTR.append(userNameTD);
 

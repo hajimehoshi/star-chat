@@ -210,6 +210,9 @@ h1 {
     width: 120px;
     word-wrap: break-word;
 }
+#messages > section tr.message td.userName.temporaryNick {
+    color: #836;
+}
 #messages > section tr.message td.body {
     word-wrap: break-word;
 }

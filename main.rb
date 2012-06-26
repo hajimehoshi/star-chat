@@ -80,7 +80,7 @@ helpers do
 
 end
 
-configure do
+configure :production, :development do
   EM::next_tick do
     EM::add_periodic_timer(30) do
       settings.streams.each do |user_name, connection|
@@ -291,9 +291,11 @@ end
 
 post '/channels/:channel_name/messages', provides: :json do
   sleep(1) if development?
-  body = params[:body].to_s
-  notice = params[:notice] == 'true'
-  message = @channel.post_message(current_user, body, notice)
+  body           = params[:body].to_s
+  notice         = params[:notice] == 'true'
+  temporary_nick = params[:temporary_nick].to_s
+  message = @channel.post_message(current_user, body, notice,
+                                  temporary_nick: temporary_nick)
   # TODO: In fact, the real-time search is not needed.
   StarChat::GroongaDB.add_message(message)
   broadcast(type: 'message',

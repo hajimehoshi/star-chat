@@ -5,7 +5,7 @@ set :environment, :test
 
 require './main.rb'
 require 'test/unit'
-require 'rack/test'
+#require 'rack/test'
 
 class BinarySearchTest < Test::Unit::TestCase
 
@@ -53,17 +53,17 @@ class ChannelTest < Test::Unit::TestCase
     user1 = User.new('user1').save
     user2 = User.new('user2').save
     channel1 = Channel.new('channel1').save
-    channel1.post_message(user1, 'body1', false, 1000)
-    channel1.post_message(user2, 'body2', false, 1010)
-    channel1.post_message(user1, 'body3', false, 1011)
-    channel1.post_message(user2, 'body4', false, 1012)
-    channel1.post_message(user1, 'body5', false, 1020)
-    channel1.post_message(user2, 'body6', false, 1021)
-    channel1.post_message(user1, 'body7', false, 1022)
-    channel1.post_message(user2, 'body8', false, 1100)
-    channel1.post_message(user1, 'body9', false, 1101)
+    channel1.post_message(user1, 'body1', false, created_at: 000)
+    channel1.post_message(user2, 'body2', false, created_at: 010)
+    channel1.post_message(user1, 'body3', false, created_at: 011)
+    channel1.post_message(user2, 'body4', false, created_at: 012)
+    channel1.post_message(user1, 'body5', false, created_at: 020)
+    channel1.post_message(user2, 'body6', false, created_at: 021)
+    channel1.post_message(user1, 'body7', false, created_at: 022)
+    channel1.post_message(user2, 'body8', false, created_at: 100)
+    channel1.post_message(user1, 'body9', false, created_at: 101)
     channel2 = Channel.new('channel2').save
-    channel2.post_message(user1, 'body1', false, 1000)
+    channel2.post_message(user1, 'body1', false, created_at: 1000)
   end
 
   def teardown
