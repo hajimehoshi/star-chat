@@ -135,16 +135,19 @@ module StarChat
 
     def post_message(user, body, notice, options = {})
       options = {
-        created_at: Time.now.to_i,
+        created_at:     Time.now.to_i,
+        temporary_nick: '',
       }.merge(options)
-      created_at = options[:created_at]
+      created_at     = options[:created_at]
+      temporary_nick = options[:temporary_nick]
       # TODO: Check subscribing?
       # TODO: lock?
       message = Message.new(user.name,
                             body,
-                            created_at:   created_at,
-                            channel_name: name,
-                            notice:       notice).save
+                            created_at:     created_at,
+                            channel_name:   name,
+                            notice:         notice,
+                            temporary_nick: temporary_nick).save
       RedisDB.exec(:rpush,
                    ['channels', name, 'messages'],
                    message.id)

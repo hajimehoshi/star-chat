@@ -21,9 +21,9 @@ module StarChat
       Message.new(values[0], values[1],
                   id:             id.to_i,
                   created_at:     values[2].to_i,
-                  channel_name:   values[3],
+                  channel_name:   values[3].to_s,
                   notice:         values[4] == 'true',
-                  temporary_nick: values[5])
+                  temporary_nick: values[5].to_s)
     end
 
     def self.find_by_list(redis_key, idx, len)
@@ -49,9 +49,9 @@ module StarChat
                     values[idx+2],
                     id:             values[idx].to_i,
                     created_at:     values[idx+3].to_i,
-                    channel_name:   values[idx+4],
+                    channel_name:   values[idx+4].to_s,
                     notice:         values[idx+5] == 'true',
-                    temporary_nick: values[idx+6])
+                    temporary_nick: values[idx+6].to_s)
       end
     end
 
@@ -95,17 +95,19 @@ module StarChat
 
     def initialize(user_name, body, options = {})
       options = {
-        created_at:   Time.now.to_i,
-        id:           nil,
-        channel_name: '',
-        notice:       false,
+        created_at:     Time.now.to_i,
+        id:             nil,
+        channel_name:   '',
+        notice:         false,
+        temporary_nick: '',
       }.merge(options)
-      @user_name    = user_name
-      self.body     = body
-      @created_at   = options[:created_at].to_i
-      @id           = (options[:id] ? options[:id].to_i : nil)
-      @channel_name = options[:channel_name].to_s
-      self.notice   = options[:notice]
+      @user_name          = user_name
+      self.body           = body
+      @created_at         = options[:created_at].to_i
+      @id                 = (options[:id] ? options[:id].to_i : nil)
+      @channel_name       = options[:channel_name].to_s
+      self.notice         = options[:notice]
+      self.temporary_nick = options[:temporary_nick]
     end
 
     def to_json(*args)
