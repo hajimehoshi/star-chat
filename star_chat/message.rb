@@ -11,12 +11,19 @@ module StarChat
       key = ['messages', id]
       # TODO: lock?
       nil unless RedisDB.exec(:exists, key)
-      values = RedisDB.exec(:hmget, key, 'user_name', 'body', 'created_at', 'channel_name', 'notice')
+      values = RedisDB.exec(:hmget, key,
+                            'user_name',
+                            'body',
+                            'created_at',
+                            'channel_name',
+                            'notice',
+                            'temporary_nick')
       Message.new(values[0], values[1],
-                  id:           id.to_i,
-                  created_at:   values[2].to_i,
-                  channel_name: values[3],
-                  notice:       values[4] == 'true')
+                  id:             id.to_i,
+                  created_at:     values[2].to_i,
+                  channel_name:   values[3],
+                  notice:         values[4] == 'true',
+                  temporary_nick: values[5])
     end
 
     def self.find_by_list(redis_key, idx, len)
@@ -33,16 +40,18 @@ module StarChat
                                   'messages:*->body',
                                   'messages:*->created_at',
                                   'messages:*->channel_name',
-                                  'messages:*->notice'],
+                                  'messages:*->notice',
+                                  'messages:*->temporary_nick'],
                             limit: limit)
-      (values.size / 6).times.map do |i|
-        idx = i * 6
+      (values.size / 7).times.map do |i|
+        idx = i * 7
         Message.new(values[idx+1],
                     values[idx+2],
-                    id:           values[idx].to_i,
-                    created_at:   values[idx+3].to_i,
-                    channel_name: values[idx+4],
-                    notice:       values[idx+5] == 'true')
+                    id:             values[idx].to_i,
+                    created_at:     values[idx+3].to_i,
+                    channel_name:   values[idx+4],
+                    notice:         values[idx+5] == 'true',
+                    temporary_nick: values[idx+6])
       end
     end
 
@@ -76,6 +85,14 @@ module StarChat
       @notice = !!notice
     end
 
+    def temporary_nick
+      @temporary_nick ||= ''
+    end
+
+    def temporary_nick=(temporary_nick)
+      @temporary_nick = temporary_nick.strip.gsub(/(?![\n\r\t])[\x00-\x1f\x7f]/, '')[0, 32]
+    end
+
     def initialize(user_name, body, options = {})
       options = {
         created_at:   Time.now.to_i,
@@ -93,12 +110,13 @@ module StarChat
 
     def to_json(*args)
       {
-        id:           id,
-        user_name:    user_name,
-        body:         body,
-        created_at:   created_at,
-        channel_name: channel_name,
-        notice:       notice?,
+        id:             id,
+        user_name:      user_name,
+        body:           body,
+        created_at:     created_at,
+        channel_name:   channel_name,
+        notice:         notice?,
+        temporary_nick: temporary_nick,
       }.to_json(*args)
     end
 
