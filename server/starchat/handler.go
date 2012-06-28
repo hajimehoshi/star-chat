@@ -1,11 +1,13 @@
 package starchat
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 const (
@@ -70,17 +72,31 @@ func authorizedUser(r *http.Request) *User {
 	if len(matches) != 2 {
 		return nil
 	}
+	userAndPass, err := base64.StdEncoding.DecodeString(matches[1])
+	if err != nil {
+		return nil
+	}
+	arr := strings.SplitN(string(userAndPass), ":", 2)
+	if len(arr) != 2 {
+		return nil
+	}
+	userName := arr[0]
+	pass     := arr[1]
 	// TODO: Implement
-	return nil
+	if pass != "pass" {
+		return nil
+	}
+	// TODO: find
+	return &User{Name: userName}
 }
 
 func (self *Handler) serveItems(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	user := authorizedUser(r)
 	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	value := map[string]string {
 		"result": "pong",
 	}
@@ -92,11 +108,11 @@ func (self *Handler) serveItems(w http.ResponseWriter, r *http.Request) {
 }
 
 func (self *Handler) serveStream(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	user := authorizedUser(r)
 	if user == nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Connection", "close")
 }

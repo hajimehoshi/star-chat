@@ -2,6 +2,7 @@ package starchat_test
 
 import (
 	"."
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,10 +13,15 @@ import (
 type testCase struct {
 	RequestMethod       string
 	RequestPath         string
+	RequestHeader       map[string]string
 	RequestBody         []byte // []string?
 	ResponseStatusCode  int
 	ResponseContentType string
 	ResponseJSONBody    map[string]string // ?
+}
+
+func encodeBase64(str string) string {
+	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
 var testCases = []testCase{
@@ -28,9 +34,16 @@ var testCases = []testCase{
 	{
 		RequestMethod:      "GET",
 		RequestPath:        "/users/foo/ping",
+		RequestHeader:      map[string]string{"Authorization": "Basic " + encodeBase64("foo:pass")},
 		ResponseStatusCode: http.StatusOK,
 		ResponseJSONBody:   map[string]string{"result": "pong",
 		},
+	},
+	{
+		RequestMethod:      "GET",
+		RequestPath:        "/users/foo/ping",
+		RequestHeader:      map[string]string{"Authorization": "Basic " + encodeBase64("foo:invalid_pass")},
+		ResponseStatusCode: http.StatusUnauthorized,
 	},
 }
 
@@ -56,6 +69,11 @@ func checkTestCase(t *testing.T, rootURL string, tc *testCase) {
 	req, err := http.NewRequest(tc.RequestMethod, url, nil)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if tc.RequestHeader != nil {
+		for name, value := range tc.RequestHeader {
+			req.Header.Add(name, value);
+		}
 	}
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -99,9 +117,9 @@ func checkTestCase(t *testing.T, rootURL string, tc *testCase) {
 }
 
 func TestHandler(t *testing.T) {
-	db := &dummyDB{}
+	db      := &dummyDB{}
 	handler := starchat.NewHandler(db)
-	server := httptest.NewServer(handler)
+	server  := httptest.NewServer(handler)
 	defer server.Close()
 
 	for _, testCase := range testCases {
