@@ -9,9 +9,8 @@ module StarChat
 
     def load_or_create(path)
       if File.exist?(path)
-        raise 'Sorry, resuming is not implemented!'
-        # Groonga::Database.create(path: path)
-        # return
+        # Sorry, resuming is not implemented!
+        File.delete(*Dir["#{path}*"])
       end
       # TODO: 毎度作り直すのは明らかに重いと考えられるので、なんとかする。
       # 検索を別サーバー建てにするのを視野に入れる。
