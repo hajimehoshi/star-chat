@@ -1,19 +1,14 @@
-def update
-  system('git pull')
-end
-
 def start(config_file)
-  system("thin -C #{config_file} start")
+  system('thin', '-C', config_file, 'start')
 end
 
 def stop(config_file)
-  system("thin -C #{config_file} stop")
+  system('thin', '-C', config_file, '--force', 'stop')
 end
 
 def show_usage
   STDERR.puts('Usage:')
   STDERR.puts("  ruby #{$0} {start|stop|restart} CONFIG_FILE")
-  STDERR.puts("  ruby #{$0} update")
 end
 
 def main(argv)
@@ -42,8 +37,6 @@ def main(argv)
     end
     stop(config_file)
     start(config_file)
-  when 'update'
-    update
   end
 end
 
