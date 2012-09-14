@@ -981,7 +981,7 @@ starChat.View.prototype.addNewMessage = function (channelName, message, notify) 
         var keywords = user.keywords();
         var hit = keywords.some(function (keyword) {
             return 0 <= message.body.indexOf(keyword);
-        });
+        }) && (user.name() !== message.user_name);
         if (hit) {
             var title = 'StarChat: ' + message.channel_name;
             var user  = starChat.User.find(message.user_name);
