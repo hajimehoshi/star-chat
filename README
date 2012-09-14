@@ -1,6 +1,10 @@
-* How to run
+* How to use
 
-$ thin -C (MODE).yml start
+# Start
+ruby star_chat.rb start development.yml
+
+# Stop
+ruby star_chat.rb stop development.yml
 
 
 * Dependencies
