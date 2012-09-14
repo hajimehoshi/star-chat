@@ -12,8 +12,6 @@ module StarChat
         # Sorry, resuming is not implemented!
         File.delete(*Dir["#{path}*"])
       end
-      # TODO: 毎度作り直すのは明らかに重いと考えられるので、なんとかする。
-      # 検索を別サーバー建てにするのを視野に入れる。
       Groonga::Database.create(path: path)
       Groonga::Schema.define do |schema|
         schema.create_table('ChannelNames',
@@ -36,6 +34,7 @@ module StarChat
           table.index('Messages.channel_name', with_position: true)
         end
       end
+      # TODO: EventMachine 使ってインデックス生成処理を分割する
       Channel.all.each do |channel|
         channel.messages.each do |message|
           add_message(message)

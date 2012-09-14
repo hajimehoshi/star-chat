@@ -81,8 +81,8 @@ helpers do
 end
 
 configure :production, :development do
-  EM::next_tick do
-    EM::add_periodic_timer(30) do
+  EM.next_tick do
+    EM.add_periodic_timer(30) do
       settings.streams.each do |user_name, connection|
         connection << "\n"
       end
@@ -188,6 +188,7 @@ get '/users/:user_name/stream', provides: :json do
         out << packet.to_json << "\n"
       end
     end
+    # TODO: 一定時間後に切断
     out.callback do
       settings.streams.delete(subscribe)
     end
